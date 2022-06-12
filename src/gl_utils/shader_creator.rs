@@ -2,6 +2,8 @@ extern crate gl;
 
 use std::{collections::HashMap, ffi::CString, fs};
 
+use super::gl_error_reader::{GlError, GlErrorResult};
+
 pub enum AttribDataType {
     Float,
     Int,
@@ -84,36 +86,19 @@ impl ShaderProgram {
 
         unsafe { gl::CompileShader(shader_id) }
 
-        self.get_shader_error(shader_id);
+        let error_result = super::gl_error_reader::get_error(GlError::ShaderError(shader_id), 512);
 
-        return shader_id;
-    }
-
-    fn get_shader_error(&self, shader_id: u32) {
-        let mut status = -10;
-        unsafe {
-            gl::GetShaderiv(shader_id, gl::COMPILE_STATUS, &mut status);
-
-            if (status as u8) != gl::TRUE {
-                let mut buffer: Vec<i8> = Vec::new();
-                let mut buffer_len = 0;
-                println!("Compilation for shader {} failed.", shader_id);
-                gl::GetShaderInfoLog(shader_id, 512, &mut buffer_len, &mut buffer[0]);
-
-                let log_string = String::from_utf8(
-                    buffer
-                        .iter()
-                        .map(|s| s.to_owned() as u8)
-                        .collect::<Vec<u8>>(),
-                )
-                .expect("Could not transform buffer to string");
-
+        match error_result {
+            GlErrorResult::Error(error) => {
                 println!(
                     "Shader with id {} could not compile because:\n {}",
-                    shader_id, log_string
+                    shader_id, error
                 );
             }
+            _ => {}
         }
+
+        return shader_id;
     }
 
     pub fn use_program(&self) {
