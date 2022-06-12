@@ -11,12 +11,7 @@ use std::{mem::size_of_val, os::raw::c_void, ptr};
 
 use glfw::Context;
 
-fn main() {
-    let mut glfw = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
-
-    let (mut window, events) = glfw
-        .create_window(300, 300, "hi twitter", glfw::WindowMode::Windowed)
-        .expect("Failed to create glfw window");
+fn window_setup(glfw: &mut glfw::Glfw, window: &mut glfw::Window) {
 
     window.make_current();
 
@@ -32,12 +27,24 @@ fn main() {
     window.make_current();
     window.set_key_polling(true);
 
+}
+
+fn main() {
+    let mut glfw = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
+
+    let (mut window, events) = glfw
+        .create_window(300, 300, "hi twitter", glfw::WindowMode::Windowed)
+        .expect("Failed to create glfw window");
+
+    window_setup(&mut glfw, &mut window);
+
     let mut buf1: u32 = 0;
     let vertices: [f32; 6] = [0.0, 0.5, 0.5, -0.5, -0.5, -0.5];
 
-    // Initialize a vao
+    // Initialize a vao to handle gl data
     VertexArrayObject::new();
 
+    // Initialize a program and load a vertex and fragment shader
     let mut program = ShaderProgram::new();
     program.load_shaders(vec![
         Shader::VertexShader(
@@ -73,7 +80,6 @@ fn main() {
 
 
     program.use_program();
-
 
     while !window.should_close() {
         window.swap_buffers();
