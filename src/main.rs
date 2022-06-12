@@ -5,14 +5,13 @@ mod gl_utils;
 
 use gl_utils::shader_creator::{AttribDataType, Shader, ShaderProgram, VertexShaderAttribute};
 
-use gl_utils::vertex_array_object_handler::{VertexArrayObject};
+use gl_utils::vertex_array_object_handler::VertexArrayObject;
 
 use std::{mem::size_of_val, os::raw::c_void, ptr};
 
 use glfw::Context;
 
 fn window_setup(glfw: &mut glfw::Glfw, window: &mut glfw::Window) {
-
     window.make_current();
 
     gl::load_with(|s| glfw.get_proc_address_raw(s));
@@ -26,7 +25,6 @@ fn window_setup(glfw: &mut glfw::Glfw, window: &mut glfw::Window) {
 
     window.make_current();
     window.set_key_polling(true);
-
 }
 
 fn main() {
@@ -61,9 +59,7 @@ fn main() {
         Shader::FragmentShader(String::from("main")),
     ]);
 
-
     unsafe {
-
         // Buffer data
         gl::GenBuffers(1, &mut buf1);
         gl::BindBuffer(gl::ARRAY_BUFFER, buf1);
@@ -77,7 +73,6 @@ fn main() {
         let err = gl::GetError();
         println!("{}", err);
     }
-
 
     program.use_program();
 
