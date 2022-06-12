@@ -91,7 +91,7 @@ impl ShaderProgram {
         match error_result {
             GlErrorResult::Error(error) => {
                 println!(
-                    "Shader with id {} could not compile because:\n {}",
+                    "Shader with id {} could not compile because: {}",
                     shader_id, error
                 );
             }

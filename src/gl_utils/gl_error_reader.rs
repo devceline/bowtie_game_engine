@@ -21,7 +21,12 @@ fn buffer_to_string(buffer: &Vec<i8>) -> String {
 
 pub fn get_error(error: GlError, max_length: i32) -> GlErrorResult {
     let mut buffer: Vec<i8> = Vec::new();
+    buffer.reserve(max_length as usize);
     let mut buffer_len = 0;
+    for _ in 0..max_length {
+      buffer.push(2);
+    }
+
     match error {
         GlError::ShaderError(shader_id) => unsafe {
             let mut status = -1;
