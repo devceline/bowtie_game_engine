@@ -88,16 +88,15 @@ impl ShaderProgram {
     fn get_shader_location(&self, shader: &Shader) -> String {
         let mut base_url = String::from("./shaders/");
         match shader {
-            Shader::VertexShader(name, _attributes) => {
+            Shader::VertexShader(_name, _attributes) => {
                 base_url.push_str("vertex/");
-                base_url.push_str(&name);
             }
-            Shader::FragmentShader(name) => {
+            Shader::FragmentShader(_) => {
                 base_url.push_str("fragment/");
-                base_url.push_str(&name);
             }
         }
 
+        base_url.push_str(&shader.get_name());
         base_url.push_str(".glsl");
 
         return base_url;
