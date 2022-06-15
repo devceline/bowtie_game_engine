@@ -39,8 +39,7 @@ fn main() {
   window_setup(&mut glfw, &mut window);
   gl_error_reader::init_debug_callback();
 
-  let mut buf1: u32 = 0;
-
+  let elements: [i32; 3] = [0, 1, 2];
   let vertices: [f32; 15] = [
     0.0, 0.5, 1.0, 0.8, 0.3, 0.5, -0.5, 0.5, 0.2, 1.0, -0.5, -0.5, 0.0, 1.0, 0.8,
   ];
@@ -70,12 +69,24 @@ fn main() {
 
   unsafe {
     // Buffer data
-    gl::GenBuffers(1, &mut buf1);
-    gl::BindBuffer(gl::ARRAY_BUFFER, buf1);
+    let mut vba: u32 = 0;
+    let mut ebo: u32 = 0;
+
+    gl::GenBuffers(1, &mut vba);
+    gl::BindBuffer(gl::ARRAY_BUFFER, vba);
     gl::BufferData(
       gl::ARRAY_BUFFER,
       size_of_val(&vertices) as isize,
       vertices.as_ptr() as *const c_void,
+      gl::STATIC_DRAW,
+    );
+
+    gl::GenBuffers(1, &mut ebo);
+    gl::BindBuffer(gl::ELEMENT_ARRAY_BUFFER, ebo);
+    gl::BufferData(
+      gl::ELEMENT_ARRAY_BUFFER,
+      size_of_val(&elements) as isize,
+      elements.as_ptr() as *const c_void,
       gl::STATIC_DRAW,
     );
   }
@@ -94,7 +105,12 @@ fn main() {
     glfw.poll_events();
 
     unsafe {
-      gl::DrawArrays(gl::TRIANGLES, 0, 3);
+      gl::DrawElements(
+        gl::TRIANGLES,
+        3,
+        gl::UNSIGNED_INT,
+        0 as *const gl::types::GLvoid,
+      );
     }
 
     for (_, event) in glfw::flush_messages(&events) {
