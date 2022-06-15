@@ -1,25 +1,65 @@
 extern crate gl;
 
-use std::{collections::HashMap, ffi::CString, fs};
+use std::{collections::HashMap, ffi::CString, fs, mem::size_of};
 
 use super::gl_error_reader::{GlError, GlErrorResult};
 
-pub enum GlDataType {
-    Float,
-    Int,
+pub enum DataType {
+    Float32,
 }
+
+impl Clone for DataType {
+    fn clone(&self) -> Self {
+        match self {
+            DataType::Float32 => DataType::Float32,
+        }
+    }
+}
+
+impl Copy for DataType {}
+
+impl DataType {
+    pub fn get_size(&self) -> i32 {
+        match self {
+            DataType::Float32 => size_of::<f32>() as i32,
+        }
+    }
+}
+
 pub struct VertexShaderAttribute {
     pub name: String,
-    pub data_type: GlDataType,
+    pub data_type: DataType,
     pub size: i32,
     pub stride: i32,
     pub normalized: bool,
-    pub pointer: *const std::os::raw::c_void,
+    pub offset: i32,
+}
+
+impl VertexShaderAttribute {
+    pub fn new(
+        name: String,
+        data_type: DataType,
+        size: i32,
+        stride: i32,
+        normalized: bool,
+        offset: i32,
+    ) -> VertexShaderAttribute {
+        let attrib = VertexShaderAttribute {
+            name,
+            data_type,
+            size,
+            stride: ((data_type.get_size()) * stride),
+            normalized,
+            offset: ((data_type.get_size()) * offset) ,
+        };
+
+        return attrib;
+    }
 }
 
 pub struct Uniform<T> {
     pub name: String,
-    pub data_type: GlDataType,
+    pub data_type: DataType,
     pub count: i8,
     pub values: Vec<T>,
 }
@@ -67,7 +107,7 @@ impl ShaderProgram {
             unsafe { gl::GetUniformLocation(self.program_id, uniform_name.as_ptr()) };
 
         match (uniform.count, uniform.data_type) {
-            (3, GlDataType::Float) => {
+            (3, DataType::Float32) => {
                 unsafe {
                     gl::Uniform3f(
                         uniform_location,
@@ -151,8 +191,7 @@ impl ShaderProgram {
                         };
 
                         let gl_data_type = match attribute.data_type {
-                            GlDataType::Float => gl::FLOAT,
-                            GlDataType::Int => gl::UNSIGNED_INT,
+                            DataType::Float32 => gl::FLOAT,
                         };
 
                         let gl_normalized = if attribute.normalized {
@@ -168,8 +207,17 @@ impl ShaderProgram {
                                 gl_data_type,
                                 gl_normalized,
                                 attribute.stride,
-                                attribute.pointer,
+                                attribute.offset as *const gl::types::GLvoid
                             );
+
+                            loop {
+                                let err = gl::GetError();
+                                if err != gl::NO_ERROR {
+                                    println!("{}", err);
+                                } else {
+                                    break;
+                                }
+                            }
 
                             gl::EnableVertexAttribArray(attrib_location);
                         }

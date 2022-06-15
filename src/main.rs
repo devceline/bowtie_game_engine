@@ -3,12 +3,13 @@ extern crate glfw;
 
 mod gl_utils;
 
-use gl_utils::shader_creator::{GlDataType, Shader, ShaderProgram, Uniform, VertexShaderAttribute};
+use gl_utils::shader_creator::{DataType, Shader, ShaderProgram, Uniform, VertexShaderAttribute};
 
 use gl_utils::vertex_array_object_handler::VertexArrayObject;
 
-use std::mem::size_of;
-use std::{mem::size_of_val, os::raw::c_void, ptr};
+use gl_utils::gl_error_reader;
+
+use std::{mem::size_of_val, os::raw::c_void};
 
 use glfw::Context;
 
@@ -31,18 +32,18 @@ fn window_setup(glfw: &mut glfw::Glfw, window: &mut glfw::Window) {
 fn main() {
     let mut glfw = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
 
+
     let (mut window, events) = glfw
         .create_window(300, 300, "rust game engine", glfw::WindowMode::Windowed)
         .expect("Failed to create glfw window");
 
     window_setup(&mut glfw, &mut window);
+    gl_error_reader::init_debug_callback();
 
     let mut buf1: u32 = 0;
 
     let vertices: [f32; 15] = [
-      0.0, 0.5, 1.0, 0.8, 0.3,
-      0.5, -0.5, 0.5, 0.2, 1.0,
-      -0.5, -0.5, 0.0, 1.0, 0.8
+        0.0, 0.5, 1.0, 0.8, 0.3, 0.5, -0.5, 0.5, 0.2, 1.0, -0.5, -0.5, 0.0, 1.0, 0.8,
     ];
 
     // Initialize a vao to handle gl data
@@ -50,25 +51,20 @@ fn main() {
 
     // Initialize a program and load a vertex and fragment shader
     let mut program = ShaderProgram::new();
-    let mut tmp = 2*size_of::<f32>();
     program.load_shaders(vec![
         Shader::VertexShader(
             String::from("main"),
-            vec![VertexShaderAttribute {
-                name: String::from("position"),
-                data_type: GlDataType::Float,
-                size: 2,
-                normalized: true,
-                stride: 5*size_of::<f32>() as i32,
-                pointer: ptr::null(),
-            }, VertexShaderAttribute {
-              name: String::from("color"),
-              size:3,
-              data_type: GlDataType::Float,
-              stride: 5*size_of::<f32>() as i32,
-              normalized: true,
-              pointer: (&mut tmp) as *mut _ as *mut c_void
-            }],
+            vec![
+                VertexShaderAttribute::new(
+                    String::from("position"),
+                    DataType::Float32,
+                    2,
+                    5,
+                    true,
+                    0,
+                ),
+                VertexShaderAttribute::new(String::from("color"), DataType::Float32, 3, 5, true, 2),
+            ],
         ),
         Shader::FragmentShader(String::from("main")),
     ]);
@@ -83,15 +79,13 @@ fn main() {
             vertices.as_ptr() as *const c_void,
             gl::STATIC_DRAW,
         );
-
-        let err = gl::GetError();
-        println!("{}", err);
     }
 
     program.use_program();
+
     program.set_uniform(Uniform {
         name: String::from("triangleColor"),
-        data_type: GlDataType::Float,
+        data_type: DataType::Float32,
         count: 3,
         values: vec![0.8, 0.2, 0.5],
     });
@@ -105,7 +99,6 @@ fn main() {
         }
 
         for (_, event) in glfw::flush_messages(&events) {
-            println!("{:?}", event);
             match event {
                 glfw::WindowEvent::Key(glfw::Key::Escape, _, glfw::Action::Press, _) => {
                     window.set_should_close(true)
