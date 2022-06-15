@@ -3,7 +3,7 @@ extern crate glfw;
 
 mod gl_utils;
 
-use gl_utils::shader_creator::{AttribDataType, Shader, ShaderProgram, VertexShaderAttribute};
+use gl_utils::shader_creator::{GlDataType, Shader, ShaderProgram, VertexShaderAttribute};
 
 use gl_utils::vertex_array_object_handler::VertexArrayObject;
 
@@ -31,7 +31,7 @@ fn main() {
     let mut glfw = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
 
     let (mut window, events) = glfw
-        .create_window(300, 300, "hi twitter", glfw::WindowMode::Windowed)
+        .create_window(300, 300, "rust game engine", glfw::WindowMode::Windowed)
         .expect("Failed to create glfw window");
 
     window_setup(&mut glfw, &mut window);
@@ -52,7 +52,7 @@ fn main() {
                 normalized: true,
                 stride: 0,
                 size: 2,
-                attrib_data_type: AttribDataType::Float,
+                data_type: GlDataType::Float,
                 pointer: ptr::null(),
             }],
         ),

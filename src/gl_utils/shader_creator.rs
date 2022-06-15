@@ -4,23 +4,43 @@ use std::{collections::HashMap, ffi::CString, fs};
 
 use super::gl_error_reader::{GlError, GlErrorResult};
 
-pub enum AttribDataType {
+pub enum GlDataType {
     Float,
     Int,
 }
-
 pub struct VertexShaderAttribute {
     pub name: String,
-    pub attrib_data_type: AttribDataType,
+    pub data_type: GlDataType,
     pub size: i32,
     pub stride: i32,
     pub normalized: bool,
     pub pointer: *const std::os::raw::c_void,
 }
 
+pub struct Uniform<T> {
+    pub name: String,
+    pub data_type: GlDataType,
+    pub count: i8,
+    pub values: Vec<T>,
+}
+
+trait TmpTest {
+    fn get_name(&self) -> String;
+}
+
 pub enum Shader {
     VertexShader(String, Vec<VertexShaderAttribute>),
     FragmentShader(String),
+}
+
+impl Shader {
+    fn get_name(&self) -> String {
+        let thing = 122.0f32 as i32;
+        return match self {
+            Shader::VertexShader(name, _attributes) => name.to_owned(),
+            Shader::FragmentShader(name) => name.to_owned(),
+        };
+    }
 }
 
 fn get_c_string(original_string: String) -> CString {
@@ -39,6 +59,29 @@ impl ShaderProgram {
                 program_id: gl::CreateProgram(),
                 shader_map: HashMap::new(),
             };
+        }
+    }
+
+    fn set_uniform<T>(&self, uniform: Uniform<T>)
+    where
+        T: Into<f32> + Copy,
+    {
+        let uniform_name = get_c_string(uniform.name);
+
+        let uniform_location =
+            unsafe { gl::GetAttribLocation(self.program_id, uniform_name.as_ptr()) };
+        match (uniform.count, uniform.data_type) {
+            (3, GlDataType::Float) => {
+                unsafe {
+                    gl::Uniform3f(
+                        uniform_location,
+                        uniform.values[0].into(),
+                        uniform.values[1].into(),
+                        uniform.values[2].into(),
+                    );
+                };
+            }
+            _ => {}
         }
     }
 
@@ -112,9 +155,9 @@ impl ShaderProgram {
                             gl::GetAttribLocation(self.program_id, attrib_name.as_ptr()) as u32
                         };
 
-                        let gl_data_type = match attribute.attrib_data_type {
-                            AttribDataType::Float => gl::FLOAT,
-                            AttribDataType::Int => gl::UNSIGNED_INT,
+                        let gl_data_type = match attribute.data_type {
+                            GlDataType::Float => gl::FLOAT,
+                            GlDataType::Int => gl::UNSIGNED_INT,
                         };
 
                         let gl_normalized = if attribute.normalized {

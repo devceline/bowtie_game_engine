@@ -24,7 +24,7 @@ pub fn get_error(error: GlError, max_length: i32) -> GlErrorResult {
     buffer.reserve(max_length as usize);
     let mut buffer_len = 0;
     for _ in 0..max_length {
-      buffer.push(2);
+        buffer.push(0);
     }
 
     match error {
