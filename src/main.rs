@@ -63,7 +63,6 @@ fn main() {
     Shader::FragmentShader(String::from("main")),
   ]);
 
-
   VertexArrayBuffer::<f32>::new(
     vec![
       // X   Y    R    G    B

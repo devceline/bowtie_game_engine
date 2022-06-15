@@ -13,7 +13,7 @@ impl Clone for DataType {
   fn clone(&self) -> Self {
     match self {
       DataType::Float32 => DataType::Float32,
-      DataType::UnsignedInt => DataType::UnsignedInt
+      DataType::UnsignedInt => DataType::UnsignedInt,
     }
   }
 }
@@ -51,13 +51,13 @@ impl ToGl for DrawingMode {
 }
 
 pub enum UsageMode {
-  StaticDraw
+  StaticDraw,
 }
 
 impl ToGl for UsageMode {
   fn to_gl(&self) -> u32 {
     match self {
-      UsageMode::StaticDraw => gl::STATIC_DRAW
+      UsageMode::StaticDraw => gl::STATIC_DRAW,
     }
   }
 }

@@ -1,11 +1,11 @@
-use std::mem::{size_of_val, size_of};
+use std::mem::{size_of, size_of_val};
 
-use super::gl_translation::{DataType, UsageMode, ToGl};
+use super::gl_translation::{DataType, ToGl, UsageMode};
 
 pub struct VertexArrayBuffer<T> {
   id: u32,
   data_type: DataType,
-  vertices: Vec<T>
+  vertices: Vec<T>,
 }
 
 impl<T> VertexArrayBuffer<T> {
@@ -18,14 +18,14 @@ impl<T> VertexArrayBuffer<T> {
         gl::ARRAY_BUFFER,
         (size_of::<T>() * vertices.len()) as isize,
         vertices.as_ptr() as *const gl::types::GLvoid,
-        usage_mode.to_gl()
+        usage_mode.to_gl(),
       );
     }
 
     return VertexArrayBuffer {
       id,
       vertices,
-      data_type
-    }
+      data_type,
+    };
   }
 }

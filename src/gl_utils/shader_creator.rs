@@ -1,11 +1,9 @@
 extern crate gl;
 
-use std::{collections::HashMap, ffi::CString, fs, };
+use std::{collections::HashMap, ffi::CString, fs};
 
 use super::gl_error_reader::{GlError, GlErrorResult};
 use super::gl_translation::{DataType, ToGl};
-
-
 
 pub struct VertexShaderAttribute {
   pub name: String,
