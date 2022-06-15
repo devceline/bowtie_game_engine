@@ -24,10 +24,6 @@ pub struct Uniform<T> {
     pub values: Vec<T>,
 }
 
-trait TmpTest {
-    fn get_name(&self) -> String;
-}
-
 pub enum Shader {
     VertexShader(String, Vec<VertexShaderAttribute>),
     FragmentShader(String),
@@ -35,7 +31,6 @@ pub enum Shader {
 
 impl Shader {
     fn get_name(&self) -> String {
-        let thing = 122.0f32 as i32;
         return match self {
             Shader::VertexShader(name, _attributes) => name.to_owned(),
             Shader::FragmentShader(name) => name.to_owned(),
@@ -62,14 +57,15 @@ impl ShaderProgram {
         }
     }
 
-    fn set_uniform<T>(&self, uniform: Uniform<T>)
+    pub fn set_uniform<T>(&self, uniform: Uniform<T>)
     where
         T: Into<f32> + Copy,
     {
         let uniform_name = get_c_string(uniform.name);
 
         let uniform_location =
-            unsafe { gl::GetAttribLocation(self.program_id, uniform_name.as_ptr()) };
+            unsafe { gl::GetUniformLocation(self.program_id, uniform_name.as_ptr()) };
+
         match (uniform.count, uniform.data_type) {
             (3, GlDataType::Float) => {
                 unsafe {

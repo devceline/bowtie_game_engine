@@ -3,7 +3,7 @@ extern crate glfw;
 
 mod gl_utils;
 
-use gl_utils::shader_creator::{GlDataType, Shader, ShaderProgram, VertexShaderAttribute};
+use gl_utils::shader_creator::{GlDataType, Shader, ShaderProgram, Uniform, VertexShaderAttribute};
 
 use gl_utils::vertex_array_object_handler::VertexArrayObject;
 
@@ -75,6 +75,12 @@ fn main() {
     }
 
     program.use_program();
+    program.set_uniform(Uniform {
+        name: String::from("triangleColor"),
+        data_type: GlDataType::Float,
+        count: 3,
+        values: vec![0.8, 0.2, 0.5],
+    });
 
     while !window.should_close() {
         window.swap_buffers();
