@@ -7,6 +7,7 @@ use gl_utils::shader_creator::{GlDataType, Shader, ShaderProgram, Uniform, Verte
 
 use gl_utils::vertex_array_object_handler::VertexArrayObject;
 
+use std::mem::size_of;
 use std::{mem::size_of_val, os::raw::c_void, ptr};
 
 use glfw::Context;
@@ -37,23 +38,36 @@ fn main() {
     window_setup(&mut glfw, &mut window);
 
     let mut buf1: u32 = 0;
-    let vertices: [f32; 6] = [0.0, 0.5, 0.5, -0.5, -0.5, -0.5];
+
+    let vertices: [f32; 15] = [
+      0.0, 0.5, 1.0, 0.8, 0.3,
+      0.5, -0.5, 0.5, 0.2, 1.0,
+      -0.5, -0.5, 0.0, 1.0, 0.8
+    ];
 
     // Initialize a vao to handle gl data
     VertexArrayObject::new();
 
     // Initialize a program and load a vertex and fragment shader
     let mut program = ShaderProgram::new();
+    let mut tmp = 2*size_of::<f32>();
     program.load_shaders(vec![
         Shader::VertexShader(
             String::from("main"),
             vec![VertexShaderAttribute {
                 name: String::from("position"),
-                normalized: true,
-                stride: 0,
-                size: 2,
                 data_type: GlDataType::Float,
+                size: 2,
+                normalized: true,
+                stride: 5*size_of::<f32>() as i32,
                 pointer: ptr::null(),
+            }, VertexShaderAttribute {
+              name: String::from("color"),
+              size:3,
+              data_type: GlDataType::Float,
+              stride: 5*size_of::<f32>() as i32,
+              normalized: true,
+              pointer: (&mut tmp) as *mut _ as *mut c_void
             }],
         ),
         Shader::FragmentShader(String::from("main")),
