@@ -32,13 +32,12 @@ fn window_setup(glfw: &mut glfw::Glfw, window: &mut glfw::Window) {
 fn main() {
     let mut glfw = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
 
-
     let (mut window, events) = glfw
         .create_window(300, 300, "rust game engine", glfw::WindowMode::Windowed)
         .expect("Failed to create glfw window");
 
     window_setup(&mut glfw, &mut window);
-    gl_error_reader::init_debug_callback();
+    // gl_error_reader::init_debug_callback();
 
     let mut buf1: u32 = 0;
 
@@ -63,7 +62,7 @@ fn main() {
                     true,
                     0,
                 ),
-                VertexShaderAttribute::new(String::from("color"), DataType::Float32, 3, 5, true, 2),
+                VertexShaderAttribute::new(String::from("targetColor"), DataType::Float32, 3, 5, true, 2),
             ],
         ),
         Shader::FragmentShader(String::from("main")),

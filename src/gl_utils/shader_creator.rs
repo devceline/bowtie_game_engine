@@ -50,7 +50,7 @@ impl VertexShaderAttribute {
             size,
             stride: ((data_type.get_size()) * stride),
             normalized,
-            offset: ((data_type.get_size()) * offset) ,
+            offset: ((data_type.get_size()) * offset),
         };
 
         return attrib;
@@ -190,6 +190,8 @@ impl ShaderProgram {
                             gl::GetAttribLocation(self.program_id, attrib_name.as_ptr()) as u32
                         };
 
+                        println!("Locating {:?} led to {}", attrib_name, attrib_location);
+
                         let gl_data_type = match attribute.data_type {
                             DataType::Float32 => gl::FLOAT,
                         };
@@ -207,7 +209,7 @@ impl ShaderProgram {
                                 gl_data_type,
                                 gl_normalized,
                                 attribute.stride,
-                                attribute.offset as *const gl::types::GLvoid
+                                attribute.offset as *const gl::types::GLvoid,
                             );
 
                             loop {
@@ -218,6 +220,7 @@ impl ShaderProgram {
                                     break;
                                 }
                             }
+
 
                             gl::EnableVertexAttribArray(attrib_location);
                         }

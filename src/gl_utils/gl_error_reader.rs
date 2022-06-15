@@ -45,30 +45,29 @@ pub fn get_error(error: GlError, max_length: i32) -> GlErrorResult {
 }
 
 extern "system" fn debug_message_callback(
-  source: u32, 
-  message_type: u32, 
-  id: u32, 
-  severity: u32, 
-  length: i32, 
-  message: *const gl::types::GLchar, 
-  user_param: *mut gl::types::GLvoid
+    source: u32,
+    message_type: u32,
+    _id: u32,
+    severity: u32,
+    length: i32,
+    message: *const gl::types::GLchar,
+    _user_param: *mut gl::types::GLvoid,
 ) {
-  unsafe {
-    let mut buffer: Vec<i8> = Vec::new();
-    buffer.reserve(length as usize);
+    unsafe {
+        let mut buffer: Vec<i8> = Vec::new();
+        buffer.reserve(length as usize);
 
-    for i in 0..length {
-      buffer.push(std::ptr::read_volatile(message.offset(i as isize)));
+        for i in 0..length {
+            buffer.push(std::ptr::read_volatile(message.offset(i as isize)));
+        }
+
+        println!("({}) ({}): ({}) {:?}", severity, message_type, source, buffer_to_string(&buffer));
     }
-
-    println!("{:?}", buffer_to_string(&buffer));
-  }
 }
 
 pub fn init_debug_callback() {
-  unsafe {
-    gl::Enable(gl::DEBUG_OUTPUT);
-    gl::DebugMessageCallback(Some(debug_message_callback), 0 as *const gl::types::GLvoid);
-  }
+    unsafe {
+        gl::Enable(gl::DEBUG_OUTPUT);
+        gl::DebugMessageCallback(Some(debug_message_callback), 0 as *const gl::types::GLvoid);
+    }
 }
-
