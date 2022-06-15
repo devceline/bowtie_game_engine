@@ -1,30 +1,11 @@
 extern crate gl;
 
-use std::{collections::HashMap, ffi::CString, fs, mem::size_of};
+use std::{collections::HashMap, ffi::CString, fs, };
 
 use super::gl_error_reader::{GlError, GlErrorResult};
+use super::gl_translation::{DataType, ToGl};
 
-pub enum DataType {
-  Float32,
-}
 
-impl Clone for DataType {
-  fn clone(&self) -> Self {
-    match self {
-      DataType::Float32 => DataType::Float32,
-    }
-  }
-}
-
-impl Copy for DataType {}
-
-impl DataType {
-  pub fn get_size(&self) -> i32 {
-    match self {
-      DataType::Float32 => size_of::<f32>() as i32,
-    }
-  }
-}
 
 pub struct VertexShaderAttribute {
   pub name: String,
@@ -190,10 +171,6 @@ impl ShaderProgram {
 
             println!("Locating {:?} led to {}", attrib_name, attrib_location);
 
-            let gl_data_type = match attribute.data_type {
-              DataType::Float32 => gl::FLOAT,
-            };
-
             let gl_normalized = if attribute.normalized {
               gl::TRUE
             } else {
@@ -204,7 +181,7 @@ impl ShaderProgram {
               gl::VertexAttribPointer(
                 attrib_location,
                 attribute.size,
-                gl_data_type,
+                attribute.data_type.to_gl(),
                 gl_normalized,
                 attribute.stride,
                 attribute.offset as *const gl::types::GLvoid,

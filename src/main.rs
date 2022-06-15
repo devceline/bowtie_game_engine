@@ -3,11 +3,12 @@ extern crate glfw;
 
 mod gl_utils;
 
-use gl_utils::shader_creator::{DataType, Shader, ShaderProgram, Uniform, VertexShaderAttribute};
-
-use gl_utils::vertex_array_object_handler::VertexArrayObject;
-
+use gl_utils::element_array_buffer::ElementArrayBuffer;
 use gl_utils::gl_error_reader;
+use gl_utils::gl_translation::{DataType, DrawingMode, UsageMode};
+use gl_utils::shader_creator::{Shader, ShaderProgram, Uniform, VertexShaderAttribute};
+use gl_utils::vertex_array_buffer::VertexArrayBuffer;
+use gl_utils::vertex_array_object_handler::VertexArrayObject;
 
 use std::{mem::size_of_val, os::raw::c_void};
 
@@ -39,11 +40,6 @@ fn main() {
   window_setup(&mut glfw, &mut window);
   gl_error_reader::init_debug_callback();
 
-  let elements: [i32; 3] = [0, 1, 2];
-  let vertices: [f32; 15] = [
-    0.0, 0.5, 1.0, 0.8, 0.3, 0.5, -0.5, 0.5, 0.2, 1.0, -0.5, -0.5, 0.0, 1.0, 0.8,
-  ];
-
   // Initialize a vao to handle gl data
   VertexArrayObject::new();
 
@@ -68,28 +64,44 @@ fn main() {
   ]);
 
   unsafe {
-    // Buffer data
-    let mut vba: u32 = 0;
-    let mut ebo: u32 = 0;
+  //   // Buffer data
+    // let mut vba: u32 = 0;
 
-    gl::GenBuffers(1, &mut vba);
-    gl::BindBuffer(gl::ARRAY_BUFFER, vba);
-    gl::BufferData(
-      gl::ARRAY_BUFFER,
-      size_of_val(&vertices) as isize,
-      vertices.as_ptr() as *const c_void,
-      gl::STATIC_DRAW,
-    );
+    // let vertices: [f32; 20] = [
+    //  // X   Y    R    G    B
+    //   -0.5, 0.5, 1.0, 0.8, 0.3, // vertex 1
+    //   0.5, 0.5, 0.8, 0.2, 0.0, // vertex 2
+    //   0.5, -0.5, 0.8, 1.0, 0.0, // vertex 3
+    //   -0.5, -0.5, 0.7, 1.0, 0.0, // vertex 3
+    // ];
 
-    gl::GenBuffers(1, &mut ebo);
-    gl::BindBuffer(gl::ELEMENT_ARRAY_BUFFER, ebo);
-    gl::BufferData(
-      gl::ELEMENT_ARRAY_BUFFER,
-      size_of_val(&elements) as isize,
-      elements.as_ptr() as *const c_void,
-      gl::STATIC_DRAW,
-    );
+    // gl::GenBuffers(1, &mut vba);
+    // gl::BindBuffer(gl::ARRAY_BUFFER, vba);
+    // gl::BufferData(
+    //   gl::ARRAY_BUFFER,
+    //   size_of_val(&vertices) as isize,
+    //   vertices.as_ptr() as *const c_void,
+    //   gl::STATIC_DRAW,
+    // );
   }
+
+  let vertex_array_buffer: VertexArrayBuffer<f32> = VertexArrayBuffer::new(
+    vec![
+      // X   Y    R    G    B
+      -0.5, 0.5, 1.0, 0.8, 0.3, // vertex 1
+      0.5, 0.5, 0.5, 0.2, 1.0, // vertex 2
+      0.5, -0.5, 0.0, 1.0, 0.8, // vertex 3
+      -0.5, -0.5, 0.0, 1.0, 0.8, // vertex 3
+    ],
+    DataType::Float32,
+    UsageMode::StaticDraw,
+  );
+
+  let element_buffer = ElementArrayBuffer::new(
+    vec![0, 1, 2, 2, 3, 0],
+    DataType::UnsignedInt,
+    UsageMode::StaticDraw,
+  );
 
   program.use_program();
 
@@ -104,14 +116,7 @@ fn main() {
     window.swap_buffers();
     glfw.poll_events();
 
-    unsafe {
-      gl::DrawElements(
-        gl::TRIANGLES,
-        3,
-        gl::UNSIGNED_INT,
-        0 as *const gl::types::GLvoid,
-      );
-    }
+    element_buffer.draw(DrawingMode::Triangles);
 
     for (_, event) in glfw::flush_messages(&events) {
       match event {
