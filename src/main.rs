@@ -63,29 +63,8 @@ fn main() {
     Shader::FragmentShader(String::from("main")),
   ]);
 
-  unsafe {
-  //   // Buffer data
-    // let mut vba: u32 = 0;
 
-    // let vertices: [f32; 20] = [
-    //  // X   Y    R    G    B
-    //   -0.5, 0.5, 1.0, 0.8, 0.3, // vertex 1
-    //   0.5, 0.5, 0.8, 0.2, 0.0, // vertex 2
-    //   0.5, -0.5, 0.8, 1.0, 0.0, // vertex 3
-    //   -0.5, -0.5, 0.7, 1.0, 0.0, // vertex 3
-    // ];
-
-    // gl::GenBuffers(1, &mut vba);
-    // gl::BindBuffer(gl::ARRAY_BUFFER, vba);
-    // gl::BufferData(
-    //   gl::ARRAY_BUFFER,
-    //   size_of_val(&vertices) as isize,
-    //   vertices.as_ptr() as *const c_void,
-    //   gl::STATIC_DRAW,
-    // );
-  }
-
-  let vertex_array_buffer: VertexArrayBuffer<f32> = VertexArrayBuffer::new(
+  VertexArrayBuffer::<f32>::new(
     vec![
       // X   Y    R    G    B
       -0.5, 0.5, 1.0, 0.8, 0.3, // vertex 1
