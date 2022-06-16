@@ -185,15 +185,6 @@ impl ShaderProgram {
                 attribute.offset as *const gl::types::GLvoid,
               );
 
-              loop {
-                let err = gl::GetError();
-                if err != gl::NO_ERROR {
-                  println!("{}", err);
-                } else {
-                  break;
-                }
-              }
-
               gl::EnableVertexAttribArray(attrib_location);
             }
           }
@@ -227,7 +218,6 @@ impl ShaderProgram {
 
 impl Drop for ShaderProgram {
   fn drop(&mut self) {
-    println!("Dropping shader program {}", self.program_id);
     unsafe {
       gl::DeleteProgram(self.program_id);
 

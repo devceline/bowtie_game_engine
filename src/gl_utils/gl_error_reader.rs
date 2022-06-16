@@ -1,5 +1,3 @@
-use std::ffi::c_void;
-
 extern crate gl;
 
 pub enum GlErrorResult {
@@ -9,6 +7,17 @@ pub enum GlErrorResult {
 
 pub enum GlError {
   ShaderError(u32),
+}
+
+pub fn pull_errors() {
+  loop {
+    let err = unsafe { gl::GetError() };
+    if err != gl::NO_ERROR {
+      println!("{}", err);
+    } else {
+      break;
+    }
+  }
 }
 
 fn buffer_to_string(buffer: &Vec<i8>) -> String {

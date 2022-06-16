@@ -63,7 +63,8 @@ fn main() {
     Shader::FragmentShader(String::from("main")),
   ]);
 
-  VertexArrayBuffer::<f32>::new(
+  // Keeping a variable regardless of use to prevent drop() being called.
+  let _vertex_array_buffer= VertexArrayBuffer::<f32>::new(
     vec![
       // X   Y    R    G    B
       -0.5, 0.5, 1.0, 0.8, 0.3, // vertex 1
@@ -90,6 +91,7 @@ fn main() {
     values: vec![0.8, 0.2, 0.5],
   });
 
+
   while !window.should_close() {
     window.swap_buffers();
     glfw.poll_events();
@@ -105,4 +107,6 @@ fn main() {
       }
     }
   }
+
+  window.close();
 }

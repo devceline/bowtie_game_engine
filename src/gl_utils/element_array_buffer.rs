@@ -9,6 +9,10 @@ pub struct ElementArrayBuffer<T> {
 }
 
 impl<T> ElementArrayBuffer<T> {
+  /**
+   * Generates a gl element buffer, binds and loads data from elements. 
+   * Then, an ElementArrayBuffer with the buffer id is returned.
+   */
   pub fn new(
     elements: Vec<T>,
     data_type: DataType,
@@ -44,5 +48,11 @@ impl<T> ElementArrayBuffer<T> {
         0 as *const gl::types::GLvoid,
       );
     }
+  }
+}
+
+impl<T> Drop for ElementArrayBuffer<T> {
+  fn drop(&mut self) {
+    unsafe { gl::DeleteBuffers(1, &self.id) };
   }
 }

@@ -1,6 +1,6 @@
-use std::mem::{size_of, size_of_val};
+use std::mem::{size_of };
 
-use super::gl_translation::{DataType, ToGl, UsageMode};
+use super::gl_translation::{DataType, ToGl, UsageMode, DrawingMode};
 
 pub struct VertexArrayBuffer<T> {
   id: u32,
@@ -9,6 +9,10 @@ pub struct VertexArrayBuffer<T> {
 }
 
 impl<T> VertexArrayBuffer<T> {
+  /**
+   * Generates a gl vertex array buffer, binds and loads data from elements. 
+   * Then, a VertexArrayBuffer with the buffer id is returned.
+   */
   pub fn new(vertices: Vec<T>, data_type: DataType, usage_mode: UsageMode) -> VertexArrayBuffer<T> {
     let mut id: u32 = 0;
     unsafe {
@@ -27,5 +31,17 @@ impl<T> VertexArrayBuffer<T> {
       vertices,
       data_type,
     };
+  }
+
+  pub fn draw(&self, drawing_mode: DrawingMode) {
+    unsafe {
+      gl::DrawArrays(drawing_mode.to_gl(), 0, self.vertices.len() as i32);
+    }
+  }
+}
+
+impl<T> Drop for VertexArrayBuffer<T> {
+  fn drop(&mut self) {
+    unsafe { gl::DeleteBuffers(1, &self.id) };
   }
 }
