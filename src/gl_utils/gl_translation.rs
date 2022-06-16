@@ -1,4 +1,4 @@
-use std::mem;
+use std::{mem, fmt::Display};
 
 pub trait ToGl {
   fn to_gl(&self) -> u32;
@@ -27,6 +27,13 @@ impl DataType {
       DataType::UnsignedInt => mem::size_of::<u32>() as i32,
     }
   }
+
+  pub fn get_data_type_string(&self) -> &str {
+    match self {
+      DataType::Float32 => "Float32",
+      DataType::UnsignedInt => "UnsignedInt",
+    }
+  }
 }
 
 impl ToGl for DataType {
@@ -35,6 +42,12 @@ impl ToGl for DataType {
       DataType::Float32 => gl::FLOAT,
       DataType::UnsignedInt => gl::UNSIGNED_INT,
     }
+  }
+}
+
+impl Display for DataType {
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    write!(f, "{}", self.get_data_type_string())
   }
 }
 

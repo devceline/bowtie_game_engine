@@ -80,7 +80,7 @@ impl ShaderProgram {
   where
     T: Into<f32> + Copy,
   {
-    let uniform_name = get_c_string(uniform.name);
+    let uniform_name = get_c_string(uniform.name.to_owned());
 
     let uniform_location =
       unsafe { gl::GetUniformLocation(self.program_id, uniform_name.as_ptr()) };
@@ -96,7 +96,9 @@ impl ShaderProgram {
           );
         };
       }
-      _ => {}
+      _ => {
+        panic!("Uniform {} for data type {} with {} values not implemented", uniform.name, uniform.data_type, uniform.count);
+      }
     }
   }
 
@@ -166,8 +168,6 @@ impl ShaderProgram {
             let attrib_name = get_c_string(attribute.name.to_owned());
             let attrib_location =
               unsafe { gl::GetAttribLocation(self.program_id, attrib_name.as_ptr()) as u32 };
-
-            println!("Locating {:?} led to {}", attrib_name, attrib_location);
 
             let gl_normalized = if attribute.normalized {
               gl::TRUE

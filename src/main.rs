@@ -1,6 +1,8 @@
 extern crate gl;
 extern crate glfw;
 
+use glfw::Context;
+
 mod gl_utils;
 
 use gl_utils::element_array_buffer::ElementArrayBuffer;
@@ -10,9 +12,6 @@ use gl_utils::shader_creator::{Shader, ShaderProgram, Uniform, VertexShaderAttri
 use gl_utils::vertex_array_buffer::VertexArrayBuffer;
 use gl_utils::vertex_array_object_handler::VertexArrayObject;
 
-use std::{mem::size_of_val, os::raw::c_void};
-
-use glfw::Context;
 
 fn window_setup(glfw: &mut glfw::Glfw, window: &mut glfw::Window) {
   window.make_current();
@@ -67,10 +66,10 @@ fn main() {
   let _vertex_array_buffer = VertexArrayBuffer::<f32>::new(
     vec![
       // X   Y    R    G    B
-      -0.5, 0.5, 1.0, 0.8, 0.3, // vertex 1
-      0.5, 0.5, 0.5, 0.2, 1.0, // vertex 2
-      0.5, -0.5, 0.0, 1.0, 0.8, // vertex 3
-      -0.5, -0.5, 0.0, 1.0, 0.8, // vertex 3
+      -1.0, 0.5, 0.0, 0.0, 0.0, // vertex 1
+      1.0, 0.5, 1.0, 1.0, 1.0, // vertex 2
+      1.0, -0.5, 0.0, 0.0, 0.0, // vertex 3
+      -1.0, -0.5, 1.0, 1.0, 1.0, // vertex 3
     ],
     DataType::Float32,
     UsageMode::StaticDraw,
