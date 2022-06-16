@@ -10,7 +10,7 @@ pub struct ElementArrayBuffer<T> {
 
 impl<T> ElementArrayBuffer<T> {
   /**
-   * Generates a gl element buffer, binds and loads data from elements. 
+   * Generates a gl element buffer, binds and loads data from elements.
    * Then, an ElementArrayBuffer with the buffer id is returned.
    */
   pub fn new(
