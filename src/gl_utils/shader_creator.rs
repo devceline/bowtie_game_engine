@@ -78,21 +78,30 @@ impl ShaderProgram {
 
   pub fn set_uniform<T>(&self, uniform: Uniform<T>)
   where
-    T: Into<f32> + Copy,
+    T: Into<f64> + Copy,
   {
     let uniform_name = get_c_string(uniform.name.to_owned());
 
     let uniform_location =
       unsafe { gl::GetUniformLocation(self.program_id, uniform_name.as_ptr()) };
 
+    if uniform_location < 0 {
+      panic!("Uniform {:?} was not found", uniform_name);
+    }
+
     match (uniform.count, uniform.data_type) {
+      (1, DataType::Int) => {
+        unsafe {
+          gl::Uniform1i(uniform_location, uniform.values[0].into() as i32);
+        }
+      }
       (3, DataType::Float32) => {
         unsafe {
           gl::Uniform3f(
             uniform_location,
-            uniform.values[0].into(),
-            uniform.values[1].into(),
-            uniform.values[2].into(),
+            uniform.values[0].into() as f32,
+            uniform.values[1].into() as f32,
+            uniform.values[2].into() as f32,
           );
         };
       }
