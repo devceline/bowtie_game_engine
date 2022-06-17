@@ -1,4 +1,6 @@
+extern crate png;
 use std::{mem, fmt::Display};
+
 
 pub trait ToGl {
   fn to_gl(&self) -> u32;
@@ -7,6 +9,7 @@ pub trait ToGl {
 pub enum DataType {
   Float32,
   UnsignedInt,
+  Int,
 }
 
 impl Clone for DataType {
@@ -14,6 +17,7 @@ impl Clone for DataType {
     match self {
       DataType::Float32 => DataType::Float32,
       DataType::UnsignedInt => DataType::UnsignedInt,
+      DataType::Int => DataType::Int,
     }
   }
 }
@@ -25,6 +29,7 @@ impl DataType {
     match self {
       DataType::Float32 => mem::size_of::<f32>() as i32,
       DataType::UnsignedInt => mem::size_of::<u32>() as i32,
+      DataType::Int => mem::size_of::<i32>() as i32,
     }
   }
 
@@ -32,6 +37,7 @@ impl DataType {
     match self {
       DataType::Float32 => "Float32",
       DataType::UnsignedInt => "UnsignedInt",
+      DataType::Int => "Int",
     }
   }
 }
@@ -41,6 +47,7 @@ impl ToGl for DataType {
     match self {
       DataType::Float32 => gl::FLOAT,
       DataType::UnsignedInt => gl::UNSIGNED_INT,
+      DataType::Int => gl::INT,
     }
   }
 }
@@ -71,6 +78,16 @@ impl ToGl for UsageMode {
   fn to_gl(&self) -> u32 {
     match self {
       UsageMode::StaticDraw => gl::STATIC_DRAW,
+    }
+  }
+}
+
+impl ToGl for png::ColorType {
+  fn to_gl(&self) -> u32 {
+    match self {
+      png::ColorType::RGBA => gl::RGBA,
+      png::ColorType::RGB => gl::RGB,
+      _ => panic!("PNG Color format {:?} not supported", self)
     }
   }
 }
