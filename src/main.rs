@@ -12,6 +12,7 @@ use gl_utils::gl_translation::{DataType, DrawingMode, UsageMode};
 use gl_utils::shader_creator::{Shader, ShaderProgram, Uniform, VertexShaderAttribute};
 use gl_utils::vertex_array_buffer::VertexArrayBuffer;
 use gl_utils::vertex_array_object_handler::VertexArrayObject;
+use gl_utils::gl_texture::{Texture, TextureOptions};
 
 fn window_setup(glfw: &mut glfw::Glfw, window: &mut glfw::Window) {
   window.make_current();
@@ -77,45 +78,9 @@ fn main() {
 
   program.use_program();
 
-  unsafe {
-    let mut tex = 0;
+  let texture1 = Texture::new();
+  texture1.load_texture("pride_flag", TextureOptions::defaults(), &program);
 
-    let decoder = png::Decoder::new(std::fs::File::open("images/pride_flag.png").unwrap());
-    let (info, mut reader) = decoder.read_info().unwrap();
-    let mut buf = vec![0; info.buffer_size()];
-    let (color, _) = reader.output_color_type();
-    println!("Color: {:?}", color);
-    reader.next_frame(&mut buf).unwrap();
-
-    gl::GenTextures(1, &mut tex);
-    gl::ActiveTexture(gl::TEXTURE0);
-    gl::BindTexture(gl::TEXTURE_2D, tex);
-
-
-    gl::TexImage2D(
-      gl::TEXTURE_2D,
-      0, gl::RGBA as i32,
-      info.width as i32,
-      info.height as i32,
-      0, gl::RGBA,
-      gl::UNSIGNED_BYTE,
-      buf.as_ptr() as *const gl::types::GLvoid
-    );
-
-
-    program.set_uniform(Uniform {
-      name: String::from("tex"),
-      data_type: DataType::Int,
-      count: 1,
-      values: vec![0]
-    });
-
-    gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_S, gl::CLAMP_TO_EDGE as i32);
-    gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_T, gl::CLAMP_TO_EDGE as i32);
-    gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::LINEAR as i32);
-    gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::LINEAR as i32);
-
-  }
 
   while !window.should_close() {
     window.swap_buffers();

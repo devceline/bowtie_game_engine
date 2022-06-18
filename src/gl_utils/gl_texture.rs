@@ -9,11 +9,11 @@ use super::gl_translation::{ToGl, DataType, TextureWrap, TextureFilter };
 
 static mut TEXTURE_COUNT: u32 = 0;
 
-struct Texture {
+pub struct Texture {
   _id: u32
 }
 
-struct TextureOptions {
+pub struct TextureOptions {
   wrap: TextureWrap,
   filter: TextureFilter
 }
@@ -85,12 +85,12 @@ impl Texture {
       });
 
       // Wrap
-      gl::TextureParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_S, options.wrap.to_gl() as i32);
-      gl::TextureParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_T, options.wrap.to_gl() as i32);
+      gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_S, options.wrap.to_gl() as i32);
+      gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_T, options.wrap.to_gl() as i32);
 
       // Filter
-      gl::TextureParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, options.filter.to_gl() as i32);
-      gl::TextureParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, options.filter.to_gl() as i32);
+      gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, options.filter.to_gl() as i32);
+      gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, options.filter.to_gl() as i32);
     };
   }
 
