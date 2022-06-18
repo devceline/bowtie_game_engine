@@ -97,7 +97,8 @@ pub enum TextureWrap {
 }
 
 pub enum TextureFilter {
-  Linear
+  Linear,
+  LinearMipmap
 }
 
 impl ToGl for TextureWrap {
@@ -111,7 +112,8 @@ impl ToGl for TextureWrap {
 impl ToGl for TextureFilter {
   fn to_gl(&self) -> u32 {
       match self {
-        TextureFilter::Linear => gl::LINEAR
+        TextureFilter::Linear => gl::LINEAR,
+        TextureFilter::LinearMipmap => gl::LINEAR_MIPMAP_LINEAR
       }
   }
 }

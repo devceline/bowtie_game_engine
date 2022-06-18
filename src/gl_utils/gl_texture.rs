@@ -22,7 +22,7 @@ impl TextureOptions {
   pub fn defaults() -> TextureOptions {
     TextureOptions {
       wrap: TextureWrap::ClampToEdge,
-      filter: TextureFilter::Linear
+      filter: TextureFilter::LinearMipmap
     }
   }
 }
@@ -83,6 +83,8 @@ impl Texture {
         count: 1,
         values: vec![TEXTURE_COUNT]
       });
+
+      gl::GenerateMipmap(gl::TEXTURE_2D);
 
       // Wrap
       gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_S, options.wrap.to_gl() as i32);
