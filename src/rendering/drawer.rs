@@ -44,9 +44,12 @@ impl Drawer {
 
     self.vertex_array_buffer.update_data(&self.vertices);
     self.element_array_buffer.update_data(&self.elements);
+
+    self.elements_count = self.elements_count + TShape::get_corners();
   }
 
   pub fn draw(&self, mode: DrawingMode) {
+
     unsafe {
       gl::DrawElements(
         mode.to_gl(),

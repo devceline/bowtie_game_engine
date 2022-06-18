@@ -19,6 +19,10 @@ impl Shape for Rectangle {
     return vec![0, 1, 2, 2, 3, 0];
   }
 
+  fn get_corners() -> i32 {
+      return 4;
+  }
+
   fn get_vertices(&self) -> Vec<f32> {
     let mut vertices = Vec::<f32>::new();
 
