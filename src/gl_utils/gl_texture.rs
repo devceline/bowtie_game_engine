@@ -30,16 +30,23 @@ impl TextureOptions {
 }
 
 impl Texture {
-  pub fn new() -> Texture {
+
+  pub fn new(
+    image_name: &str,
+    options: TextureOptions,
+    program: &ShaderProgram) -> Texture {
+
+    let mut id: u32 = 0;
     unsafe {
       TEXTURE_COUNT = TEXTURE_COUNT + 1;
     }
 
-    let mut id: u32 = 0;
-
     unsafe { gl::GenTextures(1, &mut id) };
 
-    Texture { _id: id }
+    let tex = Texture { _id: id };
+    tex.load_texture(image_name, options, &program);
+
+    return tex;
   }
 
   fn get_image_location(location: &str) -> String {
