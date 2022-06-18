@@ -20,7 +20,7 @@ impl Shape for Rectangle {
   }
 
   fn get_corners() -> i32 {
-      return 4;
+    return 4;
   }
 
   fn get_vertices(&self) -> Vec<f32> {

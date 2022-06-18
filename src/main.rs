@@ -17,7 +17,7 @@ use gl_utils::gl_translation::{DataType, DrawingMode, UsageMode};
 use gl_utils::shader_creator::{Shader, ShaderProgram, VertexShaderAttribute};
 use gl_utils::vertex_array_object_handler::VertexArrayObject;
 use rendering::drawer::Drawer;
-use shapes::{rectangle::Rectangle, shape::Shape};
+use shapes::rectangle::Rectangle;
 
 fn window_setup(glfw: &mut glfw::Glfw, window: &mut glfw::Window) {
   window.make_current();

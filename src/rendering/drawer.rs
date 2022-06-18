@@ -49,7 +49,6 @@ impl Drawer {
   }
 
   pub fn draw(&self, mode: DrawingMode) {
-
     unsafe {
       gl::DrawElements(
         mode.to_gl(),
