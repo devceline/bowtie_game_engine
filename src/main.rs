@@ -2,21 +2,23 @@ extern crate gl;
 extern crate glfw;
 extern crate png;
 
-mod gl_utils;
-mod shapes;
 mod general;
+mod gl_utils;
 mod math;
 mod rendering;
+mod shapes;
 
 use glfw::Context;
 
+use general::color::COLORS;
 use gl_utils::element_array_buffer::ElementArrayBuffer;
-use gl_utils::gl_error_reader;
 use gl_utils::gl_texture::{Texture, TextureOptions};
 use gl_utils::gl_translation::{DataType, DrawingMode, UsageMode};
 use gl_utils::shader_creator::{Shader, ShaderProgram, VertexShaderAttribute};
 use gl_utils::vertex_array_buffer::VertexArrayBuffer;
 use gl_utils::vertex_array_object_handler::VertexArrayObject;
+use gl_utils::gl_error_reader;
+use shapes::{rectangle::Rectangle, shape::Shape};
 
 fn window_setup(glfw: &mut glfw::Glfw, window: &mut glfw::Window) {
   window.make_current();
@@ -35,13 +37,10 @@ fn window_setup(glfw: &mut glfw::Glfw, window: &mut glfw::Window) {
 }
 
 fn main() {
-  let mut glfw = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
-
-  let (mut window, events) = glfw
-    .create_window(400, 400, "rust game engine", glfw::WindowMode::Windowed)
-    .expect("Failed to create glfw window");
-
-  window_setup(&mut glfw, &mut window);
+  let mut glfw_instance = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
+  let (mut window, events) = glfw_instance
+      .create_window(300, 300, "Rust Game Engine", glfw::WindowMode::Windowed)
+      .expect("Failed to create window");
   gl_error_reader::init_debug_callback();
 
   // Initialize a vao to handle gl data
@@ -82,29 +81,23 @@ fn main() {
     Shader::FragmentShader(String::from("main")),
   ]);
 
+  let rect = Rectangle {
+    x: -0.4,
+    y: 0.2,
+    width: 1.1,
+    height: 0.4,
+    color: COLORS::Red.into(),
+  };
+
   // Keeping a variable regardless of use to prevent drop() being called.
   let _vertex_array_buffer = VertexArrayBuffer::<f32>::new(
-    vec![
-      // X   Y    R    G    B    A    T_X  T_Y
-      -0.4, 0.2, 1.0, 0.0, 1.0, 1.0, 0.0, 0.0, // vertex 1
-      0.7, 0.2, 1.0, 0.0, 1.0, 1.0, 1.0, 0.0, // vertex 2
-      0.7, -0.2, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, // vertex 3
-      -0.4, -0.2, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, // vertex 4
-                                           //
-      -0.9, 0.7, 1.0, 0.0, 1.0, 1.0, 0.0, 0.0, // vertex 1
-      -0.7, 0.7, 1.0, 0.0, 1.0, 1.0, 1.0, 0.0, // vertex 2
-      -0.7, -0.7, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, // vertex 3
-      -0.9, -0.7, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, // vertex 4
-    ],
+    rect.get_vertices(),
     DataType::Float32,
     UsageMode::StaticDraw,
   );
 
-  // Shape::Rectangle::new(-0.4, 0.2, 1.1, 0.4, COLORS::Red);
-
   let element_buffer = ElementArrayBuffer::new(
-    vec![0, 1, 2, 2, 3, 0, 
-         4, 5, 6, 6, 7, 4],
+    vec![0, 1, 2, 2, 3, 0, 4, 5, 6, 6, 7, 4],
     DataType::UnsignedInt,
     UsageMode::StaticDraw,
   );
@@ -118,19 +111,21 @@ fn main() {
 
   while !window.should_close() {
     window.swap_buffers();
-    glfw.poll_events();
+    glfw_instance.poll_events();
 
     element_buffer.draw(DrawingMode::Triangles);
 
     for (_, event) in glfw::flush_messages(&events) {
       match event {
         glfw::WindowEvent::Key(glfw::Key::Escape, _, glfw::Action::Press, _) => {
-          window.set_should_close(true)
+          window.set_should_close(true);
         }
         _ => {}
       }
     }
+
   }
 
   window.close();
+
 }
