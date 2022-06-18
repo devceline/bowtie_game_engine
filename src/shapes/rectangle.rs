@@ -6,12 +6,12 @@ use crate::{
 use super::shape::Shape;
 
 pub struct Rectangle {
-  width: f32,
-  height: f32,
-  x: f32,
-  y: f32,
-  texture: Texture,
-  color: Color,
+  pub width: f32,
+  pub height: f32,
+  pub x: f32,
+  pub y: f32,
+  // texture: Texture,
+  pub color: Color,
 }
 
 const TEX_CORDS_CORNERS: [[f32; 2]; 4] = [[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0]];
