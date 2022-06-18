@@ -18,6 +18,10 @@ const TEX_CORDS_CORNERS: [[f32; 2]; 4] = [[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0
       
 
 impl Shape for Rectangle {
+  fn get_elements(&self) -> Vec<i32> {
+    return vec![0,1,2,2,3,0];
+  }
+
   fn get_vertices(&self) -> Vec<f32> {
     let mut vertices = Vec::<f32>::new();
 

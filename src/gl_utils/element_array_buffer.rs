@@ -3,8 +3,9 @@ use std::mem::{size_of, size_of_val};
 use super::gl_translation::{DataType, DrawingMode, ToGl, UsageMode};
 
 pub struct ElementArrayBuffer<T> {
-  pub elements: Vec<T>,
   pub data_type: DataType,
+  elements: Vec<T>,
+  pub usage_mode: UsageMode,
   id: u32,
 }
 
@@ -14,7 +15,6 @@ impl<T> ElementArrayBuffer<T> {
    * Then, an ElementArrayBuffer with the buffer id is returned.
    */
   pub fn new(
-    elements: Vec<T>,
     data_type: DataType,
     usage_mode: UsageMode,
   ) -> ElementArrayBuffer<T> {
@@ -22,20 +22,26 @@ impl<T> ElementArrayBuffer<T> {
 
     unsafe {
       gl::GenBuffers(1, &mut id);
-      gl::BindBuffer(gl::ELEMENT_ARRAY_BUFFER, id);
+    }
+
+    return ElementArrayBuffer {
+      data_type,
+      elements: vec![],
+      usage_mode,
+      id,
+    };
+  }
+
+  pub fn update_data(&self, elements: &Vec<T>) {
+    unsafe {
+      gl::BindBuffer(gl::ELEMENT_ARRAY_BUFFER, self.id);
       gl::BufferData(
         gl::ELEMENT_ARRAY_BUFFER,
         (size_of::<T>() * elements.len()) as isize,
         elements.as_ptr() as *const gl::types::GLvoid,
-        usage_mode.to_gl(),
+        self.usage_mode.to_gl(),
       );
     }
-
-    return ElementArrayBuffer {
-      elements,
-      data_type,
-      id,
-    };
   }
 
   pub fn draw(&self, mode: DrawingMode) {

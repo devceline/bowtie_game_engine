@@ -15,32 +15,27 @@ impl<T> VertexArrayBuffer<T> {
    * Then, a VertexArrayBuffer with the buffer id is returned.
    */
   pub fn new(
-    vertices: Vec<T>,
     data_type: DataType,
     usage_mode: UsageMode,
   ) -> VertexArrayBuffer<T> {
     let mut id: u32 = 0;
     unsafe {
       gl::GenBuffers(1, &mut id);
-      gl::BindBuffer(gl::ARRAY_BUFFER, id);
-      gl::BufferData(
-        gl::ARRAY_BUFFER,
-        (size_of::<T>() * vertices.len()) as isize,
-        vertices.as_ptr() as *const gl::types::GLvoid,
-        usage_mode.to_gl(),
-      );
     }
 
     return VertexArrayBuffer {
       id,
-      vertices,
       data_type,
+      vertices: vec![],
       usage_mode
     };
   }
 
-  pub fn update_data(&mut self, vertices: Vec<T>) {
-      println!("Updating");
+  pub fn get_vertices_len(&self) -> usize {
+    self.vertices.len()
+  }
+
+  pub fn update_data(&mut self, vertices: &Vec<T>)  {
     unsafe { 
       gl::BindBuffer(gl::ARRAY_BUFFER, self.id);
       gl::BufferData(
@@ -50,8 +45,6 @@ impl<T> VertexArrayBuffer<T> {
         self.usage_mode.to_gl(),
       )
     }
-
-    self.vertices = vertices;
   }
 
   pub fn draw(&self, drawing_mode: DrawingMode) {
