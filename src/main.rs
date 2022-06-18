@@ -39,9 +39,12 @@ fn window_setup(glfw: &mut glfw::Glfw, window: &mut glfw::Window) {
 fn main() {
   let mut glfw_instance = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
   let (mut window, events) = glfw_instance
-      .create_window(300, 300, "Rust Game Engine", glfw::WindowMode::Windowed)
+      .create_window(300, 300, "rust game engine", glfw::WindowMode::Windowed)
       .expect("Failed to create window");
+  window_setup(&mut glfw_instance, &mut window);
+
   gl_error_reader::init_debug_callback();
+
 
   // Initialize a vao to handle gl data
   VertexArrayObject::new();
