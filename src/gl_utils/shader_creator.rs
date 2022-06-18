@@ -131,7 +131,8 @@ impl ShaderProgram {
 
   fn load_shader_src(&self, shader: &Shader, id: u32) {
     let location = self.get_shader_location(shader);
-    let source_code = fs::read_to_string(location).expect("Could not locate shader at location {}");
+    let source_code = fs::read_to_string(location)
+      .expect("Could not locate shader at location {}");
 
     let source_code_ptr: *const *const i8 = &(source_code.as_ptr() as *const i8);
 
@@ -147,14 +148,17 @@ impl ShaderProgram {
       Shader::VertexShader(ref _name, ref _attributes) => unsafe {
         gl::CreateShader(gl::VERTEX_SHADER)
       },
-      Shader::FragmentShader(ref _name) => unsafe { gl::CreateShader(gl::FRAGMENT_SHADER) },
+      Shader::FragmentShader(ref _name) => unsafe {
+        gl::CreateShader(gl::FRAGMENT_SHADER)
+      },
     };
 
     self.load_shader_src(shader, shader_id);
 
     unsafe { gl::CompileShader(shader_id) }
 
-    let error_result = super::gl_error_reader::get_error(GlError::ShaderError(shader_id), 512);
+    let error_result =
+      super::gl_error_reader::get_error(GlError::ShaderError(shader_id), 512);
 
     match error_result {
       GlErrorResult::Error(error) => {
@@ -176,8 +180,9 @@ impl ShaderProgram {
         Shader::VertexShader(_name, attributes) => {
           for attribute in attributes {
             let attrib_name = get_c_string(attribute.name.to_owned());
-            let attrib_location =
-              unsafe { gl::GetAttribLocation(self.program_id, attrib_name.as_ptr()) as u32 };
+            let attrib_location = unsafe {
+              gl::GetAttribLocation(self.program_id, attrib_name.as_ptr()) as u32
+            };
 
             let gl_normalized = if attribute.normalized {
               gl::TRUE

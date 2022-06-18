@@ -47,13 +47,20 @@ impl Texture {
     return base_url;
   }
 
-  pub fn load_texture(&self, image_name: &str, options: TextureOptions, program: &ShaderProgram) {
+  pub fn load_texture(
+    &self,
+    image_name: &str,
+    options: TextureOptions,
+    program: &ShaderProgram,
+  ) {
     unsafe {
       gl::ActiveTexture(gl::TEXTURE0 + TEXTURE_COUNT);
       gl::BindTexture(gl::TEXTURE_2D, self._id);
 
       // Loading file bytes
-      let decoder = png::Decoder::new(File::open(Texture::get_image_location(image_name)).unwrap());
+      let decoder = png::Decoder::new(
+        File::open(Texture::get_image_location(image_name)).unwrap(),
+      );
 
       let (info, mut reader) = decoder.read_info().unwrap();
       let mut buf = vec![0; info.buffer_size()];

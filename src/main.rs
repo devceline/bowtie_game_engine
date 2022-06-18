@@ -10,7 +10,9 @@ use gl_utils::element_array_buffer::ElementArrayBuffer;
 use gl_utils::gl_error_reader;
 use gl_utils::gl_texture::{Texture, TextureOptions};
 use gl_utils::gl_translation::{DataType, DrawingMode, UsageMode};
-use gl_utils::shader_creator::{Shader, ShaderProgram, Uniform, VertexShaderAttribute};
+use gl_utils::shader_creator::{
+  Shader, ShaderProgram, Uniform, VertexShaderAttribute,
+};
 use gl_utils::vertex_array_buffer::VertexArrayBuffer;
 use gl_utils::vertex_array_object_handler::VertexArrayObject;
 
@@ -34,7 +36,7 @@ fn main() {
   let mut glfw = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
 
   let (mut window, events) = glfw
-    .create_window(300, 300, "rust game engine", glfw::WindowMode::Windowed)
+    .create_window(400, 400, "rust game engine", glfw::WindowMode::Windowed)
     .expect("Failed to create glfw window");
 
   window_setup(&mut glfw, &mut window);
@@ -49,7 +51,14 @@ fn main() {
     Shader::VertexShader(
       String::from("main"),
       vec![
-        VertexShaderAttribute::new(String::from("position"), DataType::Float32, 2, 7, true, 0),
+        VertexShaderAttribute::new(
+          String::from("position"),
+          DataType::Float32,
+          2,
+          7,
+          true,
+          0,
+        ),
         VertexShaderAttribute::new(
           String::from("targetColor"),
           DataType::Float32,
@@ -94,6 +103,9 @@ fn main() {
 
   let texture1 = Texture::new();
   texture1.load_texture("pride_flag", TextureOptions::defaults(), &program);
+
+  let texture2 = Texture::new();
+  texture2.load_texture("patrick", TextureOptions::defaults(), &program);
 
   while !window.should_close() {
     window.swap_buffers();

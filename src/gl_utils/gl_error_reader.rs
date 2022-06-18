@@ -44,7 +44,12 @@ pub fn get_error(error: GlError, max_length: i32) -> GlErrorResult {
       gl::GetShaderiv(shader_id, gl::COMPILE_STATUS, &mut status);
 
       if (status as u8) != gl::TRUE {
-        gl::GetShaderInfoLog(shader_id, max_length, &mut buffer_len, &mut buffer[0]);
+        gl::GetShaderInfoLog(
+          shader_id,
+          max_length,
+          &mut buffer_len,
+          &mut buffer[0],
+        );
         return GlErrorResult::Error(buffer_to_string(&buffer));
       } else {
         return GlErrorResult::NoError;
@@ -83,6 +88,9 @@ extern "system" fn debug_message_callback(
 pub fn init_debug_callback() {
   unsafe {
     gl::Enable(gl::DEBUG_OUTPUT);
-    gl::DebugMessageCallback(Some(debug_message_callback), 0 as *const gl::types::GLvoid);
+    gl::DebugMessageCallback(
+      Some(debug_message_callback),
+      0 as *const gl::types::GLvoid,
+    );
   }
 }

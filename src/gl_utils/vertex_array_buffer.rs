@@ -13,7 +13,11 @@ impl<T> VertexArrayBuffer<T> {
    * Generates a gl vertex array buffer, binds and loads data from elements.
    * Then, a VertexArrayBuffer with the buffer id is returned.
    */
-  pub fn new(vertices: Vec<T>, data_type: DataType, usage_mode: UsageMode) -> VertexArrayBuffer<T> {
+  pub fn new(
+    vertices: Vec<T>,
+    data_type: DataType,
+    usage_mode: UsageMode,
+  ) -> VertexArrayBuffer<T> {
     let mut id: u32 = 0;
     unsafe {
       gl::GenBuffers(1, &mut id);
