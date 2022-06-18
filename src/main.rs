@@ -2,17 +2,19 @@ extern crate gl;
 extern crate glfw;
 extern crate png;
 
-use glfw::Context;
-
 mod gl_utils;
+mod shapes;
+mod general;
+mod math;
+mod rendering;
+
+use glfw::Context;
 
 use gl_utils::element_array_buffer::ElementArrayBuffer;
 use gl_utils::gl_error_reader;
 use gl_utils::gl_texture::{Texture, TextureOptions};
 use gl_utils::gl_translation::{DataType, DrawingMode, UsageMode};
-use gl_utils::shader_creator::{
-  Shader, ShaderProgram, Uniform, VertexShaderAttribute,
-};
+use gl_utils::shader_creator::{Shader, ShaderProgram, VertexShaderAttribute};
 use gl_utils::vertex_array_buffer::VertexArrayBuffer;
 use gl_utils::vertex_array_object_handler::VertexArrayObject;
 
@@ -84,28 +86,35 @@ fn main() {
   let _vertex_array_buffer = VertexArrayBuffer::<f32>::new(
     vec![
       // X   Y    R    G    B   T_X  T_Y
-      -1.0, 0.5, 1.0, 0.0, 1.0, 0.0, 0.0, // vertex 1
-      1.0, 0.5, 1.0, 0.0, 1.0, 1.0, 0.0, // vertex 2
-      1.0, -0.5, 1.0, 0.0, 1.0, 1.0, 1.0, // vertex 3
-      -1.0, -0.5, 1.0, 0.0, 0.0, 0.0, 1.0, // vertex 3
+      -0.4, 0.2, 1.0, 0.0, 1.0, 0.0, 0.0, // vertex 1
+      0.7, 0.2, 1.0, 0.0, 1.0, 1.0, 0.0, // vertex 2
+      0.7, -0.2, 1.0, 0.0, 1.0, 1.0, 1.0, // vertex 3
+      -0.4, -0.2, 1.0, 0.0, 0.0, 0.0, 1.0, // vertex 4
+                                           //
+      -0.9, 0.7, 1.0, 0.0, 1.0, 0.0, 0.0, // vertex 1
+      -0.7, 0.7, 1.0, 0.0, 1.0, 1.0, 0.0, // vertex 2
+      -0.7, -0.7, 1.0, 0.0, 1.0, 1.0, 1.0, // vertex 3
+      -0.9, -0.7, 1.0, 0.0, 0.0, 0.0, 1.0, // vertex 4
     ],
     DataType::Float32,
     UsageMode::StaticDraw,
   );
 
+  // Shape::Rectangle::new(-0.4, 0.2, 1.1, 0.4, COLORS::Red);
+
   let element_buffer = ElementArrayBuffer::new(
-    vec![0, 1, 2, 2, 3, 0],
+    vec![0, 1, 2, 2, 3, 0, 
+         4, 5, 6, 6, 7, 4],
     DataType::UnsignedInt,
     UsageMode::StaticDraw,
   );
 
   program.use_program();
 
-  let texture1 = Texture::new();
-  texture1.load_texture("pride_flag", TextureOptions::defaults(), &program);
+  let _texture1 =
+    Texture::new("pride_flag", TextureOptions::defaults(), &program);
 
-  let texture2 = Texture::new();
-  texture2.load_texture("patrick", TextureOptions::defaults(), &program);
+  let _texture2 = Texture::new("patrick", TextureOptions::defaults(), &program);
 
   while !window.should_close() {
     window.swap_buffers();
