@@ -1,7 +1,4 @@
-use crate::{
-  general::color::Color,
-  gl_utils::gl_texture::Texture,
-};
+use crate::{general::color::Color, gl_utils::gl_texture::Texture};
 
 use super::shape::Shape;
 
@@ -14,24 +11,24 @@ pub struct Rectangle {
   pub color: Color,
 }
 
-const TEX_CORDS_CORNERS: [[f32; 2]; 4] = [[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0]];
-      
+const TEX_CORDS_CORNERS: [[f32; 2]; 4] =
+  [[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0]];
 
 impl Shape for Rectangle {
   fn get_elements(&self) -> Vec<i32> {
-    return vec![0,1,2,2,3,0];
+    return vec![0, 1, 2, 2, 3, 0];
   }
 
   fn get_vertices(&self) -> Vec<f32> {
     let mut vertices = Vec::<f32>::new();
 
     let corners = [
-      [self.x, self.y], 
+      [self.x, self.y],
       [self.x + self.width, self.y],
       [self.x + self.width, self.y - self.height],
-      [self.x, self.y - self.height]
+      [self.x, self.y - self.height],
     ];
-    
+
     for i in 0..4 {
       // X, Y
       let [x, y] = corners[i];

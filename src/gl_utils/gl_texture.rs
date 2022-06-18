@@ -30,12 +30,11 @@ impl TextureOptions {
 }
 
 impl Texture {
-
   pub fn new(
     image_name: &str,
     options: TextureOptions,
-    program: &ShaderProgram) -> Texture {
-
+    program: &ShaderProgram,
+  ) -> Texture {
     let mut id: u32 = 0;
     unsafe {
       TEXTURE_COUNT = TEXTURE_COUNT + 1;

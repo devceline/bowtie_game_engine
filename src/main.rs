@@ -11,11 +11,11 @@ mod shapes;
 use glfw::Context;
 
 use general::color::COLORS;
+use gl_utils::gl_error_reader;
 use gl_utils::gl_texture::{Texture, TextureOptions};
 use gl_utils::gl_translation::{DataType, DrawingMode, UsageMode};
 use gl_utils::shader_creator::{Shader, ShaderProgram, VertexShaderAttribute};
 use gl_utils::vertex_array_object_handler::VertexArrayObject;
-use gl_utils::gl_error_reader;
 use rendering::drawer::Drawer;
 use shapes::{rectangle::Rectangle, shape::Shape};
 
@@ -38,12 +38,12 @@ fn window_setup(glfw: &mut glfw::Glfw, window: &mut glfw::Window) {
 fn main() {
   let mut glfw_instance = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
   let (mut window, events) = glfw_instance
-      .create_window(300, 300, "rust game engine", glfw::WindowMode::Windowed)
-      .expect("Failed to create window");
+    .create_window(300, 300, "rust game engine", glfw::WindowMode::Windowed)
+    .expect("Failed to create window");
   window_setup(&mut glfw_instance, &mut window);
 
   gl_error_reader::init_debug_callback();
-
+  let mut drawer = Drawer::new(UsageMode::StaticDraw);
 
   // Initialize a vao to handle gl data
   VertexArrayObject::new();
@@ -91,7 +91,6 @@ fn main() {
     color: COLORS::Red.into(),
   };
 
-  let mut drawer = Drawer::new(UsageMode::StaticDraw);
   drawer.load_shape(rect);
 
   program.use_program();
@@ -115,9 +114,7 @@ fn main() {
         _ => {}
       }
     }
-
   }
 
   window.close();
-
 }

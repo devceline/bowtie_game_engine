@@ -76,7 +76,7 @@ pub enum UsageMode {
 impl Clone for UsageMode {
   fn clone(&self) -> Self {
     match self {
-      UsageMode::StaticDraw => UsageMode::StaticDraw
+      UsageMode::StaticDraw => UsageMode::StaticDraw,
     }
   }
 }

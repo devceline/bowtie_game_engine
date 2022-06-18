@@ -13,14 +13,14 @@ impl Color {
 
 pub enum COLORS {
   Red,
-  White
+  White,
 }
 
 impl Into<Color> for COLORS {
   fn into(self) -> Color {
-      match self {
-        COLORS::Red => Color::new(1.0, 0.0, 0.0, 1.0),
-        COLORS::White => Color::new(1.0, 1.0, 1.0, 1.0)
-      }
+    match self {
+      COLORS::Red => Color::new(1.0, 0.0, 0.0, 1.0),
+      COLORS::White => Color::new(1.0, 1.0, 1.0, 1.0),
+    }
   }
 }

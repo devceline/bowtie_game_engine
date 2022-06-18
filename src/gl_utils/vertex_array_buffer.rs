@@ -6,7 +6,7 @@ pub struct VertexArrayBuffer<T> {
   id: u32,
   data_type: DataType,
   vertices: Vec<T>,
-  usage_mode: UsageMode
+  usage_mode: UsageMode,
 }
 
 impl<T> VertexArrayBuffer<T> {
@@ -27,7 +27,7 @@ impl<T> VertexArrayBuffer<T> {
       id,
       data_type,
       vertices: vec![],
-      usage_mode
+      usage_mode,
     };
   }
 
@@ -35,8 +35,8 @@ impl<T> VertexArrayBuffer<T> {
     self.vertices.len()
   }
 
-  pub fn update_data(&mut self, vertices: &Vec<T>)  {
-    unsafe { 
+  pub fn update_data(&mut self, vertices: &Vec<T>) {
+    unsafe {
       gl::BindBuffer(gl::ARRAY_BUFFER, self.id);
       gl::BufferData(
         gl::ARRAY_BUFFER,
