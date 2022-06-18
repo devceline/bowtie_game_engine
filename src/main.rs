@@ -8,11 +8,11 @@ mod gl_utils;
 
 use gl_utils::element_array_buffer::ElementArrayBuffer;
 use gl_utils::gl_error_reader;
+use gl_utils::gl_texture::{Texture, TextureOptions};
 use gl_utils::gl_translation::{DataType, DrawingMode, UsageMode};
 use gl_utils::shader_creator::{Shader, ShaderProgram, Uniform, VertexShaderAttribute};
 use gl_utils::vertex_array_buffer::VertexArrayBuffer;
 use gl_utils::vertex_array_object_handler::VertexArrayObject;
-use gl_utils::gl_texture::{Texture, TextureOptions};
 
 fn window_setup(glfw: &mut glfw::Glfw, window: &mut glfw::Window) {
   window.make_current();
@@ -50,8 +50,22 @@ fn main() {
       String::from("main"),
       vec![
         VertexShaderAttribute::new(String::from("position"), DataType::Float32, 2, 7, true, 0),
-        VertexShaderAttribute::new(String::from("targetColor"),DataType::Float32, 3, 7, true, 2),
-        VertexShaderAttribute::new(String::from("tex_cords_in"), DataType::Float32, 2, 7, true, 5),
+        VertexShaderAttribute::new(
+          String::from("targetColor"),
+          DataType::Float32,
+          3,
+          7,
+          true,
+          2,
+        ),
+        VertexShaderAttribute::new(
+          String::from("tex_cords_in"),
+          DataType::Float32,
+          2,
+          7,
+          true,
+          5,
+        ),
       ],
     ),
     Shader::FragmentShader(String::from("main")),
@@ -64,7 +78,7 @@ fn main() {
       -1.0, 0.5, 1.0, 0.0, 1.0, 0.0, 0.0, // vertex 1
       1.0, 0.5, 1.0, 0.0, 1.0, 1.0, 0.0, // vertex 2
       1.0, -0.5, 1.0, 0.0, 1.0, 1.0, 1.0, // vertex 3
-      -1.0, -0.5, 1.0, 0.0, 0.0, 0.0, 1.0 // vertex 3
+      -1.0, -0.5, 1.0, 0.0, 0.0, 0.0, 1.0, // vertex 3
     ],
     DataType::Float32,
     UsageMode::StaticDraw,
@@ -80,7 +94,6 @@ fn main() {
 
   let texture1 = Texture::new();
   texture1.load_texture("pride_flag", TextureOptions::defaults(), &program);
-
 
   while !window.should_close() {
     window.swap_buffers();

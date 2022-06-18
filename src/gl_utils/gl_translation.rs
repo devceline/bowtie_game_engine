@@ -1,6 +1,5 @@
 extern crate png;
-use std::{mem, fmt::Display};
-
+use std::{fmt::Display, mem};
 
 pub trait ToGl {
   fn to_gl(&self) -> u32;
@@ -87,33 +86,33 @@ impl ToGl for png::ColorType {
     match self {
       png::ColorType::RGBA => gl::RGBA,
       png::ColorType::RGB => gl::RGB,
-      _ => panic!("PNG Color format {:?} not supported", self)
+      _ => panic!("PNG Color format {:?} not supported", self),
     }
   }
 }
 
 pub enum TextureWrap {
-  ClampToEdge
+  ClampToEdge,
 }
 
 pub enum TextureFilter {
   Linear,
-  LinearMipmap
+  LinearMipmap,
 }
 
 impl ToGl for TextureWrap {
   fn to_gl(&self) -> u32 {
-      match self {
-        TextureWrap::ClampToEdge => gl::CLAMP_TO_EDGE
-      }
+    match self {
+      TextureWrap::ClampToEdge => gl::CLAMP_TO_EDGE,
+    }
   }
 }
 
 impl ToGl for TextureFilter {
   fn to_gl(&self) -> u32 {
-      match self {
-        TextureFilter::Linear => gl::LINEAR,
-        TextureFilter::LinearMipmap => gl::LINEAR_MIPMAP_LINEAR
-      }
+    match self {
+      TextureFilter::Linear => gl::LINEAR,
+      TextureFilter::LinearMipmap => gl::LINEAR_MIPMAP_LINEAR,
+    }
   }
 }

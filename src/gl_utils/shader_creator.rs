@@ -90,11 +90,9 @@ impl ShaderProgram {
     }
 
     match (uniform.count, uniform.data_type) {
-      (1, DataType::Int) => {
-        unsafe {
-          gl::Uniform1i(uniform_location, uniform.values[0].into() as i32);
-        }
-      }
+      (1, DataType::Int) => unsafe {
+        gl::Uniform1i(uniform_location, uniform.values[0].into() as i32);
+      },
       (3, DataType::Float32) => {
         unsafe {
           gl::Uniform3f(
@@ -106,7 +104,10 @@ impl ShaderProgram {
         };
       }
       _ => {
-        panic!("Uniform {} for data type {} with {} values not implemented", uniform.name, uniform.data_type, uniform.count);
+        panic!(
+          "Uniform {} for data type {} with {} values not implemented",
+          uniform.name, uniform.data_type, uniform.count
+        );
       }
     }
   }
