@@ -10,7 +10,7 @@ out vec4 outColor;
 
 void main()
 {
-		vec4 tex1 = texture(patrick, tex_cords_out) * Color;
+		vec4 tex1 = texture(patrick, tex_cords_out);
 		vec4 tex2 = texture(pride_flag, tex_cords_out);
-    outColor = mix(tex1, tex2, 0.5);
+    outColor = mix(tex1, tex2, 0.5) * Color;
 }
