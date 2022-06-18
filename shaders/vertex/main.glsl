@@ -1,10 +1,10 @@
 #version 150 core
 
 in vec2 position;
-in vec3 targetColor;
+in vec4 targetColor;
 in vec2 tex_cords_in;
 
-out vec3 Color;
+out vec4 Color;
 out vec2 tex_cords_out;
 
 void main()

@@ -57,15 +57,15 @@ fn main() {
           String::from("position"),
           DataType::Float32,
           2,
-          7,
+          8,
           true,
           0,
         ),
         VertexShaderAttribute::new(
           String::from("targetColor"),
           DataType::Float32,
-          3,
-          7,
+          4,
+          8,
           true,
           2,
         ),
@@ -73,9 +73,9 @@ fn main() {
           String::from("tex_cords_in"),
           DataType::Float32,
           2,
-          7,
+          8,
           true,
-          5,
+          6,
         ),
       ],
     ),
@@ -85,16 +85,16 @@ fn main() {
   // Keeping a variable regardless of use to prevent drop() being called.
   let _vertex_array_buffer = VertexArrayBuffer::<f32>::new(
     vec![
-      // X   Y    R    G    B   T_X  T_Y
-      -0.4, 0.2, 1.0, 0.0, 1.0, 0.0, 0.0, // vertex 1
-      0.7, 0.2, 1.0, 0.0, 1.0, 1.0, 0.0, // vertex 2
-      0.7, -0.2, 1.0, 0.0, 1.0, 1.0, 1.0, // vertex 3
-      -0.4, -0.2, 1.0, 0.0, 0.0, 0.0, 1.0, // vertex 4
+      // X   Y    R    G    B    A    T_X  T_Y
+      -0.4, 0.2, 1.0, 0.0, 1.0, 1.0, 0.0, 0.0, // vertex 1
+      0.7, 0.2, 1.0, 0.0, 1.0, 1.0, 1.0, 0.0, // vertex 2
+      0.7, -0.2, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, // vertex 3
+      -0.4, -0.2, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, // vertex 4
                                            //
-      -0.9, 0.7, 1.0, 0.0, 1.0, 0.0, 0.0, // vertex 1
-      -0.7, 0.7, 1.0, 0.0, 1.0, 1.0, 0.0, // vertex 2
-      -0.7, -0.7, 1.0, 0.0, 1.0, 1.0, 1.0, // vertex 3
-      -0.9, -0.7, 1.0, 0.0, 0.0, 0.0, 1.0, // vertex 4
+      -0.9, 0.7, 1.0, 0.0, 1.0, 1.0, 0.0, 0.0, // vertex 1
+      -0.7, 0.7, 1.0, 0.0, 1.0, 1.0, 1.0, 0.0, // vertex 2
+      -0.7, -0.7, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, // vertex 3
+      -0.9, -0.7, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, // vertex 4
     ],
     DataType::Float32,
     UsageMode::StaticDraw,
