@@ -16,7 +16,7 @@ pub struct Texture {
 pub struct TextureOptions {
   wrap: TextureWrap,
   min_filter: TextureFilter,
-  mag_filter: TextureFilter
+  mag_filter: TextureFilter,
 }
 
 impl TextureOptions {
@@ -41,8 +41,6 @@ impl Texture {
 
     Texture { _id: id }
   }
-
-
 
   fn get_image_location(location: &str) -> String {
     let mut base_url = String::from("./images/");
@@ -91,7 +89,6 @@ impl Texture {
         count: 1,
         values: vec![TEXTURE_COUNT],
       });
-
 
       // Wrap
       gl::TexParameteri(
