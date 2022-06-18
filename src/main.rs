@@ -37,7 +37,7 @@ fn main() {
     .expect("Failed to create glfw window");
 
   window_setup(&mut glfw, &mut window);
-  // gl_error_reader::init_debug_callback();
+  gl_error_reader::init_debug_callback();
 
   // Initialize a vao to handle gl data
   VertexArrayObject::new();
@@ -88,9 +88,7 @@ fn main() {
     reader.next_frame(&mut buf).unwrap();
 
     gl::GenTextures(1, &mut tex);
-
     gl::ActiveTexture(gl::TEXTURE0);
-
     gl::BindTexture(gl::TEXTURE_2D, tex);
 
 

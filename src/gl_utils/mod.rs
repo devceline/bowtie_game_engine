@@ -4,3 +4,4 @@ pub mod gl_translation;
 pub mod shader_creator;
 pub mod vertex_array_buffer;
 pub mod vertex_array_object_handler;
+pub mod gl_texture;

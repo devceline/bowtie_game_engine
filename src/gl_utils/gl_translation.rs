@@ -91,3 +91,27 @@ impl ToGl for png::ColorType {
     }
   }
 }
+
+pub enum TextureWrap {
+  ClampToEdge
+}
+
+pub enum TextureFilter {
+  Linear
+}
+
+impl ToGl for TextureWrap {
+  fn to_gl(&self) -> u32 {
+      match self {
+        TextureWrap::ClampToEdge => gl::CLAMP_TO_EDGE
+      }
+  }
+}
+
+impl ToGl for TextureFilter {
+  fn to_gl(&self) -> u32 {
+      match self {
+        TextureFilter::Linear => gl::LINEAR
+      }
+  }
+}
