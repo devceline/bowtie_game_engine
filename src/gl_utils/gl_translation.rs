@@ -112,7 +112,7 @@ impl ToGl for TextureFilter {
   fn to_gl(&self) -> u32 {
     match self {
       TextureFilter::Linear => gl::LINEAR,
-      TextureFilter::LinearMipmap => gl::LINEAR_MIPMAP_LINEAR,
+      TextureFilter::LinearMipmap => gl::LINEAR_MIPMAP_NEAREST,
     }
   }
 }

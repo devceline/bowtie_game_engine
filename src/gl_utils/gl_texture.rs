@@ -15,14 +15,16 @@ pub struct Texture {
 
 pub struct TextureOptions {
   wrap: TextureWrap,
-  filter: TextureFilter,
+  min_filter: TextureFilter,
+  mag_filter: TextureFilter
 }
 
 impl TextureOptions {
   pub fn defaults() -> TextureOptions {
     TextureOptions {
       wrap: TextureWrap::ClampToEdge,
-      filter: TextureFilter::LinearMipmap,
+      min_filter: TextureFilter::LinearMipmap,
+      mag_filter: TextureFilter::Linear,
     }
   }
 }
@@ -39,6 +41,8 @@ impl Texture {
 
     Texture { _id: id }
   }
+
+
 
   fn get_image_location(location: &str) -> String {
     let mut base_url = String::from("./images/");
@@ -79,6 +83,8 @@ impl Texture {
         buf.as_ptr() as *const gl::types::GLvoid,
       );
 
+      gl::GenerateMipmap(gl::TEXTURE_2D);
+
       program.set_uniform(Uniform {
         name: String::from(image_name),
         data_type: DataType::Int,
@@ -86,7 +92,6 @@ impl Texture {
         values: vec![TEXTURE_COUNT],
       });
 
-      gl::GenerateMipmap(gl::TEXTURE_2D);
 
       // Wrap
       gl::TexParameteri(
@@ -104,13 +109,19 @@ impl Texture {
       gl::TexParameteri(
         gl::TEXTURE_2D,
         gl::TEXTURE_MAG_FILTER,
-        options.filter.to_gl() as i32,
+        options.mag_filter.to_gl() as i32,
       );
       gl::TexParameteri(
         gl::TEXTURE_2D,
         gl::TEXTURE_MIN_FILTER,
-        options.filter.to_gl() as i32,
+        options.min_filter.to_gl() as i32,
       );
     };
+  }
+}
+
+impl Drop for Texture {
+  fn drop(&mut self) {
+    unsafe { gl::DeleteTextures(1, &self._id) };
   }
 }
