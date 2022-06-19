@@ -62,7 +62,7 @@ fn get_c_string(original_string: String) -> CString {
 }
 
 pub struct ShaderProgram {
-  program_id: u32,
+  pub program_id: u32,
   shader_map: HashMap<u32, Shader>,
 }
 
