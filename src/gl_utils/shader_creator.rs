@@ -131,8 +131,9 @@ impl ShaderProgram {
 
   fn load_shader_src(&self, shader: &Shader, id: u32) {
     let location = self.get_shader_location(shader);
-    let source_code = fs::read_to_string(location)
-      .expect("Could not locate shader at location {}");
+    let source_code = fs::read_to_string(&location).expect(
+      format!("Could not locate shader at location {}", &location).as_str(),
+    );
 
     let source_code_ptr: *const *const i8 = &(source_code.as_ptr() as *const i8);
 
