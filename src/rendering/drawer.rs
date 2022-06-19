@@ -1,3 +1,5 @@
+extern crate gl;
+
 use crate::general::color;
 use crate::gl_utils::element_array_buffer::ElementArrayBuffer;
 use crate::gl_utils::gl_texture::Texture;
@@ -23,7 +25,7 @@ pub struct Drawer<'a> {
 impl<'a> Drawer<'a> {
   pub fn new(
     usage_mode: UsageMode,
-    shader_program: &'a ShaderProgram,
+    shader_program: *const ShaderProgram,
   ) -> Drawer<'a> {
     Drawer {
       vertex_array_buffer: VertexArrayBuffer::<f32>::new(
@@ -34,7 +36,7 @@ impl<'a> Drawer<'a> {
         DataType::UnsignedInt,
         usage_mode,
       ),
-      shader_program,
+      shader_program: unsafe { shader_program.as_ref().unwrap() },
       vertices: vec![],
       elements: vec![],
       elements_count: 0,
@@ -58,18 +60,21 @@ impl<'a> Drawer<'a> {
     }
   }
 
-  pub fn load_sprite_dynamic(&mut self, sprite: &'a dyn Drawable<'a>) {
-    self.dynamic_sprites.push(sprite);
-    Drawer::load_sprite(
-      &mut self.elements,
-      &mut self.vertices,
-      sprite,
-      self.elements_count,
-    );
-    self.vertex_array_buffer.update_data(&self.vertices);
-    self.element_array_buffer.update_data(&self.elements);
+  pub fn load_sprite_dynamic(&mut self, sprite: *const dyn Drawable<'a>) {
+    unsafe {
+      let sprite_instance = sprite.as_ref().unwrap();
+      self.dynamic_sprites.push(sprite_instance);
+      Drawer::load_sprite(
+        &mut self.elements,
+        &mut self.vertices,
+        sprite_instance,
+        self.elements_count,
+      );
+      self.vertex_array_buffer.update_data(&self.vertices);
+      self.element_array_buffer.update_data(&self.elements);
 
-    sprite.get_texture_ptr().load_texture();
+      sprite_instance.get_texture_ptr().load_texture();
+    };
   }
 
   pub fn clear_screen(&mut self, color: color::Color) {
@@ -101,6 +106,11 @@ impl<'a> Drawer<'a> {
   pub fn prep_textures(&self) {
     for sprite in &self.dynamic_sprites {
       sprite.get_texture_ptr().set_uniform(self.shader_program);
+    }
+    unsafe {
+      gl::Enable(gl::BLEND);
+      gl::BlendEquation(gl::FUNC_ADD);
+      gl::BlendFunc(gl::SRC_ALPHA, gl::ONE_MINUS_SRC_ALPHA);
     }
   }
 
