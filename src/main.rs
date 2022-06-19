@@ -7,6 +7,7 @@ mod gl_utils;
 mod math;
 mod rendering;
 mod shapes;
+mod sprites;
 
 use glfw::Context;
 
@@ -43,7 +44,6 @@ fn main() {
   window_setup(&mut glfw_instance, &mut window);
 
   gl_error_reader::init_debug_callback();
-  let mut drawer = Drawer::new(UsageMode::StaticDraw);
 
   // Initialize a vao to handle gl data
   let _vao = VertexArrayObject::new();
@@ -83,6 +83,8 @@ fn main() {
     Shader::FragmentShader(String::from("main")),
   ]);
 
+  let mut drawer = Drawer::new(UsageMode::StaticDraw, &program);
+
   let rectangle = Rectangle {
     x: -0.5,
     y: 0.5,
@@ -93,13 +95,13 @@ fn main() {
 
   drawer.load_shape_dynamic(&rectangle);
 
-
   program.use_program();
-
 
   let _texture1 =
     Texture::new("pride_flag", TextureOptions::defaults(), &program);
+  _texture1.load_texture(&program);
   let _texture2 = Texture::new("patrick", TextureOptions::defaults(), &program);
+  _texture2.load_texture(&program);
 
   while !window.should_close() {
     window.swap_buffers();
