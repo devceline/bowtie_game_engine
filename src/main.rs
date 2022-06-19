@@ -112,8 +112,8 @@ fn main() {
   let mut character = Sprite::new(Rectangle {
     x: -0.7,
     y: -0.6,
-    width: 0.2,
-    height: 0.2,
+    width: 0.3,
+    height: 0.4,
     color: COLORS::White.into(),
   }, Texture::new("character", TextureOptions::defaults(), &program));
 
@@ -140,17 +140,20 @@ fn main() {
         glfw::WindowEvent::Key(glfw::Key::Escape, _, glfw::Action::Press, _) => {
           window.set_should_close(true);
         }
-        glfw::WindowEvent::Key(glfw::Key::Right, _, glfw::Action::Press, _) => {
+        glfw::WindowEvent::Key(glfw::Key::Right, _, glfw::Action::Repeat, _) => {
            character.move_right(0.02);
         }
-        glfw::WindowEvent::Key(glfw::Key::Left, _, glfw::Action::Press, _) => {
+        glfw::WindowEvent::Key(glfw::Key::Left, _, glfw::Action::Repeat, _) => {
           character.move_left(0.02);
         }
-        glfw::WindowEvent::Key(glfw::Key::Up, _, glfw::Action::Press, _) => {
+        glfw::WindowEvent::Key(glfw::Key::Up, _, glfw::Action::Repeat, _) => {
            character.move_up(0.02);
         }
-        glfw::WindowEvent::Key(glfw::Key::Down, _, glfw::Action::Press, _) => {
+        glfw::WindowEvent::Key(glfw::Key::Down, _, glfw::Action::Repeat, _) => {
           character.move_down(0.02);
+        },
+        glfw::WindowEvent::Key(glfw::Key::K, _, glfw::Action::Press, _) => {
+          drawer.unload_sprite_dynamic(&character);
         }
         _ => {}
       }

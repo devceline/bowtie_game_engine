@@ -77,6 +77,11 @@ impl<'a> Drawer<'a> {
     };
   }
 
+  pub fn unload_sprite_dynamic(&mut self, sprite: *const dyn Drawable<'a>) {
+    let to_remove_idx = self.dynamic_sprites.iter().position(|spr| (*spr as *const dyn Drawable<'a>) == sprite).unwrap();
+    self.dynamic_sprites.remove(to_remove_idx);
+  }
+
   pub fn clear_screen(&mut self, color: color::Color) {
     let clear_rect = Sprite::new(Rectangle {
       x: -1.0,
