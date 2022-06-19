@@ -84,6 +84,22 @@ fn main() {
   ]);
 
   drawer.load_shape(Rectangle {
+    x: -1.0,
+    y: 1.0,
+    width: 2.0,
+    height: 1.0,
+    color: COLORS::Red.into(),
+  });
+
+  drawer.load_shape(Rectangle {
+    x: -1.0,
+    y: 0.0,
+    width: 2.0,
+    height: 1.0,
+    color: COLORS::Violet.into(),
+  });
+
+  drawer.load_shape(Rectangle {
     x: -0.8,
     y: 0.8,
     width: 1.1,
@@ -96,14 +112,13 @@ fn main() {
     y: 0.2,
     width: 1.1,
     height: 0.4,
-    color: COLORS::Red.into(),
+    color: COLORS::Green.into(),
   });
 
   program.use_program();
 
   let _texture1 =
     Texture::new("pride_flag", TextureOptions::defaults(), &program);
-
   let _texture2 = Texture::new("patrick", TextureOptions::defaults(), &program);
 
   while !window.should_close() {
