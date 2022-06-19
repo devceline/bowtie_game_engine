@@ -9,17 +9,19 @@ use super::gl_translation::{DataType, TextureFilter, TextureWrap, ToGl};
 
 static mut TEXTURE_COUNT: u32 = 0;
 
+#[derive(Debug)]
 pub struct TextureOptions {
   wrap: TextureWrap,
   min_filter: TextureFilter,
   mag_filter: TextureFilter,
 }
 
+#[derive(Debug)]
 pub struct Texture {
-  id: u32,
-  pub texture_id: u32,
+  id: i32,
+  pub texture_id: i32,
   options: TextureOptions,
-  image_name: String,
+  pub image_name: String,
 }
 
 impl TextureOptions {
@@ -42,9 +44,10 @@ impl Texture {
       let mut id: u32 = 0;
       gl::GenTextures(1, &mut id);
 
+      println!("Created new texture, with name and id: {}, {}", image_name, TEXTURE_COUNT );
       let tex = Texture {
-        texture_id: TEXTURE_COUNT,
-        id,
+        texture_id: TEXTURE_COUNT as i32,
+        id: id as i32,
         options,
         image_name: String::from(image_name),
       };
@@ -55,6 +58,15 @@ impl Texture {
     }
   }
 
+  pub fn none() -> Texture {
+    Texture {
+      texture_id: -1,
+      id: -1,
+      options: TextureOptions::defaults(),
+      image_name: String::from(""),
+    }
+  }
+
   fn get_image_location(location: &str) -> String {
     let mut base_url = String::from("./images/");
     base_url.push_str(location);
@@ -62,13 +74,21 @@ impl Texture {
     return base_url;
   }
 
-  pub fn load_texture(
-    &self,
-    program: &ShaderProgram,
-  ) {
+  pub fn set_uniform(&self, program: &ShaderProgram) {
+      program.set_uniform(Uniform {
+        name: format!("tex{}_sampler", self.texture_id),
+        data_type: DataType::Int,
+        count: 1,
+        values: vec![self.texture_id],
+      });
+  }
+
+  pub fn load_texture(&self) {
     unsafe {
-      gl::ActiveTexture(gl::TEXTURE0 + TEXTURE_COUNT);
-      gl::BindTexture(gl::TEXTURE_2D, self.id);
+      gl::ActiveTexture(gl::TEXTURE0 + (self.texture_id as u32));
+      gl::BindTexture(gl::TEXTURE_2D, self.id as u32);
+
+      println!("Bound to texture {}", self.texture_id);
 
       // Loading file bytes
       let decoder = png::Decoder::new(
@@ -94,18 +114,11 @@ impl Texture {
 
       gl::GenerateMipmap(gl::TEXTURE_2D);
 
-      program.set_uniform(Uniform {
-        name: String::from(&self.image_name),
-        data_type: DataType::Int,
-        count: 1,
-        values: vec![TEXTURE_COUNT],
-      });
-
       // Wrap
       gl::TexParameteri(
         gl::TEXTURE_2D,
         gl::TEXTURE_WRAP_S,
-         self.options.wrap.to_gl() as i32,
+        self.options.wrap.to_gl() as i32,
       );
       gl::TexParameteri(
         gl::TEXTURE_2D,
@@ -130,6 +143,7 @@ impl Texture {
 
 impl Drop for Texture {
   fn drop(&mut self) {
-    unsafe { gl::DeleteTextures(1, &self.id) };
+    let id_u32 = self.id as u32;
+    unsafe { gl::DeleteTextures(1, &id_u32) };
   }
 }
