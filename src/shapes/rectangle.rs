@@ -2,6 +2,7 @@ use crate::{general::color::Color, gl_utils::gl_texture::Texture};
 
 use super::shape::Shape;
 
+#[derive(Debug)]
 pub struct Rectangle {
   pub width: f32,
   pub height: f32,
@@ -19,8 +20,56 @@ impl Shape for Rectangle {
     return vec![0, 1, 2, 2, 3, 0];
   }
 
-  fn get_corners() -> i32 {
+  fn get_corners(&self) -> i32 {
     return 4;
+  }
+
+  fn move_up(&mut self, amount: f32) -> bool {
+      let new_amount = self.y - amount;
+
+      if new_amount < 1.0 {
+        return false;
+      }
+
+      self.y = new_amount;
+
+      return true;
+  }
+
+  fn move_down(&mut self, amount: f32) -> bool {
+      let new_amount = self.y + amount;
+
+      if new_amount > 1.0 {
+        return false;
+      }
+
+      self.y = new_amount;
+
+      return true;
+  }
+
+  fn move_right(&mut self, amount: f32) -> bool {
+      let new_amount = self.x + amount;
+
+      if new_amount > 1.0 {
+        return false;
+      }
+
+      self.x = new_amount;
+
+      return true;
+  }
+
+  fn move_left(&mut self, amount: f32) -> bool {
+      let new_amount = self.x - amount;
+
+      if new_amount < 1.0 {
+        return false;
+      }
+
+      self.x = new_amount;
+
+      return true;
   }
 
   fn get_vertices(&self) -> Vec<f32> {
@@ -54,3 +103,5 @@ impl Shape for Rectangle {
     return vertices;
   }
 }
+
+
