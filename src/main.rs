@@ -38,7 +38,7 @@ fn window_setup(glfw: &mut glfw::Glfw, window: &mut glfw::Window) {
 fn main() {
   let mut glfw_instance = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
   let (mut window, events) = glfw_instance
-    .create_window(400, 400, "rust game engine", glfw::WindowMode::Windowed)
+    .create_window(300, 300, "rust game engine", glfw::WindowMode::Windowed)
     .expect("Failed to create window");
   window_setup(&mut glfw_instance, &mut window);
 
@@ -46,7 +46,7 @@ fn main() {
   let mut drawer = Drawer::new(UsageMode::StaticDraw);
 
   // Initialize a vao to handle gl data
-  VertexArrayObject::new();
+  let _vao = VertexArrayObject::new();
 
   // Initialize a program and load a vertex and fragment shader
   let mut program = ShaderProgram::new();
@@ -83,39 +83,19 @@ fn main() {
     Shader::FragmentShader(String::from("main")),
   ]);
 
-  drawer.load_shape(Rectangle {
-    x: -1.0,
-    y: 1.0,
-    width: 2.0,
-    height: 1.0,
-    color: COLORS::Red.into(),
-  });
-
-  drawer.load_shape(Rectangle {
-    x: -1.0,
-    y: 0.0,
-    width: 2.0,
-    height: 1.0,
-    color: COLORS::Violet.into(),
-  });
-
-  drawer.load_shape(Rectangle {
-    x: -0.8,
-    y: 0.8,
-    width: 1.1,
-    height: 0.4,
+  let rectangle = Rectangle {
+    x: -0.5,
+    y: 0.5,
+    width: 0.5,
+    height: 0.5,
     color: COLORS::White.into(),
-  });
+  };
 
-  drawer.load_shape(Rectangle {
-    x: -0.4,
-    y: 0.2,
-    width: 1.1,
-    height: 0.4,
-    color: COLORS::Green.into(),
-  });
+  drawer.load_shape_dynamic(&rectangle);
+
 
   program.use_program();
+
 
   let _texture1 =
     Texture::new("pride_flag", TextureOptions::defaults(), &program);
@@ -125,7 +105,10 @@ fn main() {
     window.swap_buffers();
     glfw_instance.poll_events();
 
+
+    drawer.clear_screen(COLORS::Black.into());
     drawer.draw(DrawingMode::Triangles);
+
 
     for (_, event) in glfw::flush_messages(&events) {
       match event {
