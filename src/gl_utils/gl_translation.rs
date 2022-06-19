@@ -101,10 +101,12 @@ impl ToGl for png::ColorType {
   }
 }
 
+#[derive(Debug)]
 pub enum TextureWrap {
   ClampToEdge,
 }
 
+#[derive(Debug)]
 pub enum TextureFilter {
   Linear,
   LinearMipmap,
