@@ -11,13 +11,8 @@ pub struct Rectangle {
   pub color: Color,
 }
 
-const TEX_CORDS_CORNERS: [[f32; 2]; 4] =
-  [[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0]];
 
 impl Shape for Rectangle {
-  fn get_elements(&self) -> Vec<i32> {
-    return vec![0, 1, 2, 2, 3, 0];
-  }
 
   fn get_x(&self) -> f32 {
       self.x
@@ -35,40 +30,34 @@ impl Shape for Rectangle {
     self.y = y;
   }
 
+  fn get_width(&self) -> f32 {
+      self.width
+  }
+
+  fn get_height(&self) -> f32 {
+      self.height
+  }
+
+  fn set_height(&mut self, height: f32) {
+    self.height = height;
+  }
+
+  fn set_width(&mut self, width: f32) {
+    self.width = width;
+  }
+
+  fn get_color(&self) -> Color {
+    self.color
+  }
+
+  fn set_color(&mut self, color: Color) {
+    self.color = color;
+  }
+
   fn get_corners(&self) -> i32 {
     return 4;
   }
 
-  fn get_vertices(&self) -> Vec<f32> {
-    let mut vertices = Vec::<f32>::new();
-
-    let corners = [
-      [self.x, self.y],
-      [self.x + self.width, self.y],
-      [self.x + self.width, self.y - self.height],
-      [self.x, self.y - self.height],
-    ];
-
-    for i in 0..4 {
-      // X, Y
-      let [x, y] = corners[i];
-      vertices.push(x);
-      vertices.push(y);
-
-      // Color
-      vertices.push(self.color.r);
-      vertices.push(self.color.g);
-      vertices.push(self.color.b);
-      vertices.push(self.color.a);
-
-      // Texture Cords
-      let [tx, ty] = TEX_CORDS_CORNERS[i];
-      vertices.push(tx);
-      vertices.push(ty);
-    }
-
-    return vertices;
-  }
 }
 
 
