@@ -19,6 +19,7 @@ use gl_utils::shader_creator::{Shader, ShaderProgram, VertexShaderAttribute};
 use gl_utils::vertex_array_object_handler::VertexArrayObject;
 use rendering::drawer::Drawer;
 use shapes::rectangle::Rectangle;
+use sprites::sprite::Sprite;
 
 fn window_setup(glfw: &mut glfw::Glfw, window: &mut glfw::Window) {
   window.make_current();
@@ -58,7 +59,7 @@ fn main() {
           String::from("position"),
           DataType::Float32,
           2,
-          8,
+          9,
           true,
           0,
         ),
@@ -66,7 +67,7 @@ fn main() {
           String::from("targetColor"),
           DataType::Float32,
           4,
-          8,
+          9,
           true,
           2,
         ),
@@ -74,10 +75,19 @@ fn main() {
           String::from("tex_cords_in"),
           DataType::Float32,
           2,
-          8,
+          9,
           true,
           6,
         ),
+        VertexShaderAttribute::new(
+          String::from("tex_id"),
+          DataType::Float32,
+          1,
+          9,
+          true,
+          8,
+        ),
+
       ],
     ),
     Shader::FragmentShader(String::from("main")),
@@ -85,23 +95,28 @@ fn main() {
 
   let mut drawer = Drawer::new(UsageMode::StaticDraw, &program);
 
-  let rectangle = Rectangle {
+  let sprite1 = Sprite::new(Rectangle {
     x: -0.5,
     y: 0.5,
     width: 0.5,
     height: 0.5,
     color: COLORS::White.into(),
-  };
+  }, Texture::new("patrick", TextureOptions::defaults(), &program));
+  let sprite2 = Sprite::new(Rectangle {
+    x: 0.0,
+    y: 1.0,
+    width: 0.3,
+    height: 0.5,
+    color: COLORS::White.into(),
+  }, Texture::new("pride_flag", TextureOptions::defaults(), &program));
 
-  drawer.load_shape_dynamic(&rectangle);
+  drawer.load_sprite_dynamic(&sprite1);
+  drawer.load_sprite_dynamic(&sprite2);
 
   program.use_program();
 
-  let _texture1 =
-    Texture::new("pride_flag", TextureOptions::defaults(), &program);
-  _texture1.load_texture(&program);
-  let _texture2 = Texture::new("patrick", TextureOptions::defaults(), &program);
-  _texture2.load_texture(&program);
+  drawer.prep_textures();
+
 
   while !window.should_close() {
     window.swap_buffers();
