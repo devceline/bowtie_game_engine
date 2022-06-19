@@ -40,7 +40,7 @@ fn window_setup(glfw: &mut glfw::Glfw, window: &mut glfw::Window) {
 fn main() {
   let mut glfw_instance = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
   let (mut window, events) = glfw_instance
-    .create_window(300, 300, "rust game engine", glfw::WindowMode::Windowed)
+    .create_window(700, 700, "rust game engine", glfw::WindowMode::Windowed)
     .expect("Failed to create window");
   window_setup(&mut glfw_instance, &mut window);
 
@@ -95,23 +95,31 @@ fn main() {
 
   let mut drawer = Drawer::new(UsageMode::StaticDraw, &program);
 
-  let sprite1 = Sprite::new(Rectangle {
-    x: -0.5,
-    y: 0.5,
-    width: 0.5,
-    height: 0.5,
-    color: COLORS::White.into(),
-  }, Texture::new("patrick", TextureOptions::defaults(), &program));
-  let sprite2 = Sprite::new(Rectangle {
-    x: 0.0,
+  let sky = Sprite::new(Rectangle {
+    x: -1.0,
     y: 1.0,
-    width: 0.3,
+    width: 2.0,
+    height: 2.0,
+    color: COLORS::White.into()
+  }, Texture::new("sky", TextureOptions::defaults(), &program));
+  let floor = Sprite::new(Rectangle {
+    x: -1.0,
+    y: -0.5,
+    width: 2.0,
     height: 0.5,
     color: COLORS::White.into(),
-  }, Texture::new("pride_flag", TextureOptions::defaults(), &program));
+  }, Texture::new("floor", TextureOptions::defaults(), &program));
+  let mut character = Sprite::new(Rectangle {
+    x: -0.7,
+    y: -0.6,
+    width: 0.2,
+    height: 0.2,
+    color: COLORS::White.into(),
+  }, Texture::new("character", TextureOptions::defaults(), &program));
 
-  drawer.load_sprite_dynamic(&sprite1);
-  drawer.load_sprite_dynamic(&sprite2);
+  drawer.load_sprite_dynamic(&sky);
+  drawer.load_sprite_dynamic(&floor);
+  drawer.load_sprite_dynamic(&character);
 
   program.use_program();
 
@@ -131,6 +139,18 @@ fn main() {
       match event {
         glfw::WindowEvent::Key(glfw::Key::Escape, _, glfw::Action::Press, _) => {
           window.set_should_close(true);
+        }
+        glfw::WindowEvent::Key(glfw::Key::Right, _, glfw::Action::Press, _) => {
+           character.move_right(0.02);
+        }
+        glfw::WindowEvent::Key(glfw::Key::Left, _, glfw::Action::Press, _) => {
+          character.move_left(0.02);
+        }
+        glfw::WindowEvent::Key(glfw::Key::Up, _, glfw::Action::Press, _) => {
+           character.move_up(0.02);
+        }
+        glfw::WindowEvent::Key(glfw::Key::Down, _, glfw::Action::Press, _) => {
+          character.move_down(0.02);
         }
         _ => {}
       }
