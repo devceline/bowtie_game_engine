@@ -2,6 +2,7 @@
 
 uniform sampler2D tex0_sampler;
 uniform sampler2D tex1_sampler;
+uniform sampler2D tex2_sampler;
 
 in vec4 Color;
 in vec2 tex_cords_out;
@@ -15,6 +16,9 @@ void main()
 	}
 	else if (Tex_id == 1.0f) {
 		outColor = texture(tex1_sampler, tex_cords_out);
+	}
+	else if (Tex_id == 2.0f) {
+		outColor = texture(tex2_sampler, tex_cords_out);
 	}
 	else {
 		outColor = vec4(Color);
