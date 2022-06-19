@@ -14,6 +14,8 @@ impl Color {
 pub enum COLORS {
   Red,
   White,
+  Green,
+  Violet,
 }
 
 impl Into<Color> for COLORS {
@@ -21,6 +23,8 @@ impl Into<Color> for COLORS {
     match self {
       COLORS::Red => Color::new(1.0, 0.0, 0.0, 1.0),
       COLORS::White => Color::new(1.0, 1.0, 1.0, 1.0),
+      COLORS::Green => Color::new(0.0, 1.0, 0.0, 1.0),
+      COLORS::Violet => Color::new(1.0, 0.0, 1.0, 1.0),
     }
   }
 }
