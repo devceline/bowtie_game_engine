@@ -32,22 +32,22 @@ where
     self.texture.load_texture();
   }
 
-  fn move_up(&mut self, amount: f32) -> bool {
-    let new_amount = self.shape.get_y() - amount;
+  pub fn move_up(&mut self, amount: f32) -> bool {
+    let new_amount = self.shape.get_y() + amount;
 
-    if new_amount < 1.0 {
+    if new_amount <= -1.0 {
       return false;
     }
 
-    self.shape.set_y(amount);
+    self.shape.set_y(new_amount);
 
     return true;
   }
 
-  fn move_down(&mut self, amount: f32) -> bool {
-    let new_amount = self.shape.get_y() + amount;
+  pub fn move_down(&mut self, amount: f32) -> bool {
+    let new_amount = self.shape.get_y() - amount;
 
-    if new_amount > 1.0 {
+    if new_amount >= 1.0 {
       return false;
     }
 
@@ -59,7 +59,7 @@ where
   const TEX_CORDS_CORNERS: [[f32; 2]; 4] =
     [[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0]];
 
-  fn move_right(&mut self, amount: f32) -> bool {
+  pub fn move_right(&mut self, amount: f32) -> bool {
     let new_amount = self.shape.get_x() + amount;
 
     if new_amount > 1.0 {
@@ -71,10 +71,10 @@ where
     return true;
   }
 
-  fn move_left(&mut self, amount: f32) -> bool {
+  pub fn move_left(&mut self, amount: f32) -> bool {
     let new_amount = self.shape.get_x() - amount;
 
-    if new_amount < 1.0 {
+    if new_amount <= -1.0 {
       return false;
     }
 
