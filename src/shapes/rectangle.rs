@@ -19,7 +19,7 @@ impl Shape for Rectangle {
   }
 
   fn get_y(&self) -> f32 {
-      self.x
+      self.y
   }
 
   fn set_x(&mut self, x: f32) {
