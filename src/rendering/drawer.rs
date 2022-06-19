@@ -1,11 +1,13 @@
 use crate::general::color;
 use crate::gl_utils::element_array_buffer::ElementArrayBuffer;
+use crate::gl_utils::gl_texture::Texture;
 use crate::gl_utils::gl_translation::{DataType, DrawingMode, ToGl, UsageMode};
 use crate::gl_utils::shader_creator::ShaderProgram;
 use crate::gl_utils::vertex_array_buffer::VertexArrayBuffer;
 use crate::shapes::rectangle::Rectangle;
 use crate::shapes::shape::Shape;
 use crate::sprites::drawable::Drawable;
+use crate::sprites::sprite::Sprite;
 
 pub struct Drawer<'a> {
   vertex_array_buffer: VertexArrayBuffer<f32>,
@@ -21,7 +23,7 @@ pub struct Drawer<'a> {
 impl<'a> Drawer<'a> {
   pub fn new(
     usage_mode: UsageMode,
-    shader_program: &'a ShaderProgram 
+    shader_program: &'a ShaderProgram,
   ) -> Drawer<'a> {
     Drawer {
       vertex_array_buffer: VertexArrayBuffer::<f32>::new(
@@ -37,24 +39,7 @@ impl<'a> Drawer<'a> {
       elements: vec![],
       elements_count: 0,
       dynamic_shapes: vec![],
-      dynamic_sprites: vec![]
-    }
-  }
-
-  fn load_shape(
-    elements: &mut Vec<i32>,
-    vertices: &mut Vec<f32>,
-    shape: &'a dyn Shape,
-    elements_count: i32,
-  ) {
-    unsafe {
-      for i in (*shape).get_vertices() {
-        vertices.push(i);
-      }
-
-      for i in (*shape).get_elements() {
-        elements.push(i + elements_count.to_owned());
-      }
+      dynamic_sprites: vec![],
     }
   }
 
@@ -63,25 +48,17 @@ impl<'a> Drawer<'a> {
     vertices: &mut Vec<f32>,
     drawable: &'a dyn Drawable<'a>,
     elements_count: i32,
-    ) -> () {
-      Drawer::load_shape(elements, vertices,  drawable.get_shape_ptr(), elements_count);
+  ) -> () {
+    for i in drawable.get_vertices() {
+      vertices.push(i);
+    }
+
+    for i in drawable.get_elements() {
+      elements.push(i + elements_count.to_owned());
+    }
   }
 
-
-  pub fn load_shape_dynamic(&mut self, shape: &'a dyn Shape) {
-    self.dynamic_shapes.push(shape);
-    Drawer::load_shape(
-      &mut self.elements,
-      &mut self.vertices,
-      shape,
-      self.elements_count,
-    );
-    self.vertex_array_buffer.update_data(&self.vertices);
-    self.element_array_buffer.update_data(&self.elements);
-  }
-
-  pub fn load_sprite_dynamic(&mut self, sprite: &'a dyn Drawable<'a> )
-  {
+  pub fn load_sprite_dynamic(&mut self, sprite: &'a dyn Drawable<'a>) {
     self.dynamic_sprites.push(sprite);
     Drawer::load_sprite(
       &mut self.elements,
@@ -92,17 +69,17 @@ impl<'a> Drawer<'a> {
     self.vertex_array_buffer.update_data(&self.vertices);
     self.element_array_buffer.update_data(&self.elements);
 
-    sprite.get_texture_ptr().load_texture(self.shader_program);
+    sprite.get_texture_ptr().load_texture();
   }
 
   pub fn clear_screen(&mut self, color: color::Color) {
-    let clear_rect = Rectangle {
+    let clear_rect = Sprite::new(Rectangle {
       x: -1.0,
       y: 1.0,
       width: 2.0,
       height: 2.0,
       color,
-    };
+    }, Texture::none());
 
     self
       .vertex_array_buffer
@@ -121,26 +98,41 @@ impl<'a> Drawer<'a> {
     }
   }
 
+  pub fn prep_textures(&self) {
+    for sprite in &self.dynamic_sprites {
+      sprite.get_texture_ptr().set_uniform(self.shader_program);
+    }
+  }
+
   pub fn draw(&mut self, mode: DrawingMode) {
-    let dynamic_shapes = &self.dynamic_shapes;
+    let dynamic_sprites = &self.dynamic_sprites;
 
     self.vertices.clear();
     self.elements.clear();
+    self.elements_count = 0;
 
-    for i in 0..dynamic_shapes.len() {
-      Drawer::load_shape(
+    for i in 0..dynamic_sprites.len() {
+      Drawer::load_sprite(
         &mut self.elements,
         &mut self.vertices,
-        self.dynamic_shapes[i],
+        dynamic_sprites[i],
         self.elements_count,
       );
-      self.vertex_array_buffer.update_data(&self.vertices);
-      self.element_array_buffer.update_data(&self.elements);
+      self.elements_count += dynamic_sprites[i].get_shape_ptr().get_corners();
     }
 
-    println!("Elements: {:?}", self.elements);
-    println!("Vertices: {:?}", self.vertices);
-    println!("Shapes: {:?}", self.dynamic_shapes);
+    self.vertex_array_buffer.update_data(&self.vertices);
+    self.element_array_buffer.update_data(&self.elements);
+
+    // println!("Elements: {:?}", self.elements);
+    // println!("Vertices: {:?}", self.vertices);
+    // println!("Shapes: {:?}", self.dynamic_shapes);
+    // println!("Sprites: {:?}", self.dynamic_sprites);
+
+    // println!("Column:  X   Y      R     G   B   A   T_X   T_Y   T_I");
+    // println!("Tex id:{:?}", &self.dynamic_sprites[0].get_vertices()[0..9]);
+    // println!("Tex id:{:?}", &self.dynamic_sprites[1].get_vertices()[0..9]);
+
 
     unsafe {
       gl::DrawElements(
