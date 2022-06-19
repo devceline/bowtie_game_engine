@@ -6,6 +6,8 @@ Game engine written in rust
 
 - Render shapes through a drawing abstraction:
   - Rectangles
+- Render sprites with different textures
+- Respond to keys for movement
 - That's it. Yep.
 
 
