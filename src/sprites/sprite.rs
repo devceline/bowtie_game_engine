@@ -32,6 +32,21 @@ where
     self.texture.load_texture();
   }
 
+  pub fn set_x(&mut self, x: f32) {
+    self.shape.set_x(x);
+  }
+  pub fn set_y(&mut self, y: f32) {
+    self.shape.set_y(y);
+  }
+
+  pub fn get_x(&self) -> f32 {
+    self.shape.get_x()
+  }
+
+  pub fn get_y(&self) -> f32 {
+    self.shape.get_y()
+  }
+
   pub fn move_up(&mut self, amount: f32) -> bool {
     let new_amount = self.shape.get_y() + amount;
 
