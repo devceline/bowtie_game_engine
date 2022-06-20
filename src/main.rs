@@ -117,9 +117,20 @@ fn main() {
     color: COLORS::White.into(),
   }, Texture::new("character", TextureOptions::defaults(), &program));
 
+  let mut fireball = Sprite::new(Rectangle {
+    x: -0.7,
+    y: -0.6,
+    width: 0.15,
+    height: 0.1,
+    color: COLORS::Red.into()
+  }, Texture::new("fireball", TextureOptions::defaults(), &program));
+
+  let mut fireball_moving = false;
+
   drawer.load_sprite_dynamic(&sky);
   drawer.load_sprite_dynamic(&floor);
   drawer.load_sprite_dynamic(&character);
+  drawer.load_sprite_dynamic(&fireball);
 
   program.use_program();
 
@@ -134,6 +145,20 @@ fn main() {
     drawer.clear_screen(COLORS::Black.into());
     drawer.draw(DrawingMode::Triangles);
 
+    if fireball_moving {
+      if !fireball.move_right(0.1) {
+        fireball_moving = false;
+        fireball.set_x(character.get_x());
+        fireball.set_y(character.get_y() - 0.2);
+        drawer.unload_sprite_dynamic(&fireball);
+      }
+    }
+    else {
+        fireball.set_x(character.get_x());
+        fireball.set_y(character.get_y() - 0.2);
+        drawer.unload_sprite_dynamic(&fireball);
+    }
+
 
     for (_, event) in glfw::flush_messages(&events) {
       match event {
@@ -143,7 +168,13 @@ fn main() {
         glfw::WindowEvent::Key(glfw::Key::Right, _, glfw::Action::Repeat, _) => {
            character.move_right(0.02);
         }
+        glfw::WindowEvent::Key(glfw::Key::Right, _, glfw::Action::Press, _) => {
+           character.move_right(0.02);
+        }
         glfw::WindowEvent::Key(glfw::Key::Left, _, glfw::Action::Repeat, _) => {
+          character.move_left(0.02);
+        }
+        glfw::WindowEvent::Key(glfw::Key::Left, _, glfw::Action::Press, _) => {
           character.move_left(0.02);
         }
         glfw::WindowEvent::Key(glfw::Key::Up, _, glfw::Action::Repeat, _) => {
@@ -152,6 +183,10 @@ fn main() {
         glfw::WindowEvent::Key(glfw::Key::Down, _, glfw::Action::Repeat, _) => {
           character.move_down(0.02);
         },
+        glfw::WindowEvent::Key(glfw::Key::Space, _, glfw::Action::Press, _) => {
+          fireball_moving = true;
+          drawer.load_sprite_dynamic(&fireball);
+        }
         glfw::WindowEvent::Key(glfw::Key::K, _, glfw::Action::Press, _) => {
           drawer.unload_sprite_dynamic(&character);
         }
