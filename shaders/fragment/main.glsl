@@ -12,6 +12,7 @@ in float Tex_id;
 
 void main()
 {
+	// TODO: Refactor this, figure it out.
 	if (Tex_id == 0.0f) {
 		outColor = texture(tex0_sampler, tex_cords_out);
 	}

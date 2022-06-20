@@ -71,6 +71,7 @@ where
     return true;
   }
 
+  // TODO: Refactor this to be in TShape
   const TEX_CORDS_CORNERS: [[f32; 2]; 4] =
     [[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0]];
 

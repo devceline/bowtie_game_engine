@@ -69,19 +69,10 @@ impl ToGl for DrawingMode {
   }
 }
 
+#[derive(Copy, Clone, Debug)]
 pub enum UsageMode {
   StaticDraw,
 }
-
-impl Clone for UsageMode {
-  fn clone(&self) -> Self {
-    match self {
-      UsageMode::StaticDraw => UsageMode::StaticDraw,
-    }
-  }
-}
-
-impl Copy for UsageMode {}
 
 impl ToGl for UsageMode {
   fn to_gl(&self) -> u32 {

@@ -76,7 +76,7 @@ extern "system" fn debug_message_callback(
     }
 
     println!(
-      "({}) ({}): ({}) {:?}",
+      "(Severity {}) (Type {}): (Source {}) {:?}",
       severity,
       message_type,
       source,

@@ -7,7 +7,6 @@ use crate::gl_utils::gl_translation::{DataType, DrawingMode, ToGl, UsageMode};
 use crate::gl_utils::shader_creator::ShaderProgram;
 use crate::gl_utils::vertex_array_buffer::VertexArrayBuffer;
 use crate::shapes::rectangle::Rectangle;
-use crate::shapes::shape::Shape;
 use crate::sprites::drawable::Drawable;
 use crate::sprites::sprite::Sprite;
 
@@ -17,7 +16,6 @@ pub struct Drawer<'a> {
   vertices: Vec<f32>,
   elements: Vec<i32>,
   elements_count: i32,
-  dynamic_shapes: Vec<&'a dyn Shape>,
   dynamic_sprites: Vec<&'a dyn Drawable<'a>>,
   shader_program: &'a ShaderProgram,
 }
@@ -40,11 +38,14 @@ impl<'a> Drawer<'a> {
       vertices: vec![],
       elements: vec![],
       elements_count: 0,
-      dynamic_shapes: vec![],
       dynamic_sprites: vec![],
     }
   }
 
+  /*
+   * Loads sprite into this drawer
+   * It pushes the sprite's vertices and elements to have it be rendered
+   */
   fn load_sprite(
     elements: &mut Vec<i32>,
     vertices: &mut Vec<f32>,
@@ -60,6 +61,10 @@ impl<'a> Drawer<'a> {
     }
   }
 
+  /*
+   * Add sprite to drawer to be rendered on the next draw call.
+   * Naturally, the sprite needs to have the same lifetime as the drawer.
+   */
   pub fn load_sprite_dynamic(&mut self, sprite: *const dyn Drawable<'a>) {
     unsafe {
       let sprite_instance = sprite.as_ref().unwrap();
@@ -77,6 +82,9 @@ impl<'a> Drawer<'a> {
     };
   }
 
+  /*
+   * Removes sprite from drawer to be removed on the next draw call.
+   */
   pub fn unload_sprite_dynamic(&mut self, sprite: *const dyn Drawable<'a>) {
     let to_remove_idx = self
       .dynamic_sprites
@@ -90,6 +98,9 @@ impl<'a> Drawer<'a> {
     }
   }
 
+  /*
+   * Renders a rectangle as wide and tall as the window to clear it
+   */
   pub fn clear_screen(&mut self, color: color::Color) {
     let clear_rect = Sprite::new(
       Rectangle {
@@ -119,6 +130,10 @@ impl<'a> Drawer<'a> {
     }
   }
 
+  /*
+   * Actually loads the sprite's textures.
+   * This needs to be done once, but has to be done before the draw call.
+   */
   pub fn prep_textures(&self) {
     for sprite in &self.dynamic_sprites {
       sprite.get_texture_ptr().set_uniform(self.shader_program);
@@ -130,6 +145,9 @@ impl<'a> Drawer<'a> {
     }
   }
 
+  /*
+   * Renders the dynamically loaded sprites
+   */
   pub fn draw(&mut self, mode: DrawingMode) {
     let dynamic_sprites = &self.dynamic_sprites;
 
@@ -149,15 +167,6 @@ impl<'a> Drawer<'a> {
 
     self.vertex_array_buffer.update_data(&self.vertices);
     self.element_array_buffer.update_data(&self.elements);
-
-    // println!("Elements: {:?}", self.elements);
-    // println!("Vertices: {:?}", self.vertices);
-    // println!("Shapes: {:?}", self.dynamic_shapes);
-    // println!("Sprites: {:?}", self.dynamic_sprites);
-
-    // println!("Column:  X   Y      R     G   B   A   T_X   T_Y   T_I");
-    // println!("Tex id:{:?}", &self.dynamic_sprites[0].get_vertices()[0..9]);
-    // println!("Tex id:{:?}", &self.dynamic_sprites[1].get_vertices()[0..9]);
 
     unsafe {
       gl::DrawElements(

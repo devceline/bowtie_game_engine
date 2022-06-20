@@ -49,6 +49,7 @@ impl<T> VertexArrayBuffer<T> {
 
   pub fn draw(&self, drawing_mode: DrawingMode) {
     unsafe {
+      gl::BindBuffer(gl::ARRAY_BUFFER, self.id);
       gl::DrawArrays(drawing_mode.to_gl(), 0, self.vertices.len() as i32);
     }
   }

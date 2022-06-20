@@ -24,8 +24,11 @@ pub struct Texture {
   pub image_name: String,
 }
 
-impl TextureOptions {
-  pub fn defaults() -> TextureOptions {
+impl Default for TextureOptions {
+  /**
+   * Creates linear filtered texture, clamped to edge
+   */
+  fn default() -> Self {
     TextureOptions {
       wrap: TextureWrap::ClampToEdge,
       min_filter: TextureFilter::LinearMipmap,
@@ -35,47 +38,48 @@ impl TextureOptions {
 }
 
 impl Texture {
-  pub fn new(
-    image_name: &str,
-    options: TextureOptions,
-    _program: &ShaderProgram,
-  ) -> Texture {
+  /**
+   * Create new texture ready to be loaded
+   */
+  pub fn new(image_name: &str, options: TextureOptions) -> Texture {
     unsafe {
       let mut id: u32 = 0;
       gl::GenTextures(1, &mut id);
 
-      println!(
-        "Created new texture, with name and id: {}, {}",
-        image_name, TEXTURE_COUNT
-      );
+      // Create a texture that is ready to be loaded
       let tex = Texture {
         texture_id: TEXTURE_COUNT as i32,
         id: id as i32,
         options,
         image_name: String::from(image_name),
       };
+
+      // Incrementing texture count to have accurate Texture ID
       TEXTURE_COUNT = TEXTURE_COUNT + 1;
 
       return tex;
     }
   }
 
+  /**
+   * Function used to denote that lack of texture
+   */
   pub fn none() -> Texture {
     Texture {
       texture_id: -1,
       id: -1,
-      options: TextureOptions::defaults(),
+      options: TextureOptions::default(),
       image_name: String::from(""),
     }
   }
 
-  fn get_image_location(location: &str) -> String {
-    let mut base_url = String::from("./images/");
-    base_url.push_str(location);
-    base_url.push_str(".png");
-    return base_url;
+  fn get_image_location(image_name: &str) -> String {
+    return format!("./images/{image_name}.png");
   }
 
+  /*
+   * Sets the sampler fragment shader Uniform
+   */
   pub fn set_uniform(&self, program: &ShaderProgram) {
     program.set_uniform(Uniform {
       name: format!("tex{}_sampler", self.texture_id),
@@ -87,10 +91,9 @@ impl Texture {
 
   pub fn load_texture(&self) {
     unsafe {
+      // BindTexture requires a specific texture to be activated first
       gl::ActiveTexture(gl::TEXTURE0 + (self.texture_id as u32));
       gl::BindTexture(gl::TEXTURE_2D, self.id as u32);
-
-      println!("Bound to texture {}", self.texture_id);
 
       // Loading file bytes
       let decoder = png::Decoder::new(
@@ -114,6 +117,7 @@ impl Texture {
         buf.as_ptr() as *const gl::types::GLvoid,
       );
 
+      // Using mipmaps for performance
       gl::GenerateMipmap(gl::TEXTURE_2D);
 
       // Wrap

@@ -26,6 +26,7 @@ fn window_setup(glfw: &mut glfw::Glfw, window: &mut glfw::Window) {
 
   gl::load_with(|s| glfw.get_proc_address_raw(s));
 
+  // OpenGL 3.2
   glfw.window_hint(glfw::WindowHint::ContextVersionMajor(3));
   glfw.window_hint(glfw::WindowHint::ContextVersionMinor(2));
   glfw.window_hint(glfw::WindowHint::OpenGlProfile(
@@ -102,7 +103,7 @@ fn main() {
       height: 2.0,
       color: COLORS::White.into(),
     },
-    Texture::new("sky", TextureOptions::defaults(), &program),
+    Texture::new("sky", TextureOptions::default()),
   );
   let floor = Sprite::new(
     Rectangle {
@@ -112,7 +113,7 @@ fn main() {
       height: 0.5,
       color: COLORS::White.into(),
     },
-    Texture::new("floor", TextureOptions::defaults(), &program),
+    Texture::new("floor", TextureOptions::default()),
   );
   let mut character = Sprite::new(
     Rectangle {
@@ -122,7 +123,7 @@ fn main() {
       height: 0.4,
       color: COLORS::White.into(),
     },
-    Texture::new("character", TextureOptions::defaults(), &program),
+    Texture::new("character", TextureOptions::default()),
   );
 
   let mut fireball = Sprite::new(
@@ -133,7 +134,7 @@ fn main() {
       height: 0.1,
       color: COLORS::Red.into(),
     },
-    Texture::new("fireball", TextureOptions::defaults(), &program),
+    Texture::new("fireball", TextureOptions::default()),
   );
 
   let mut fireball_moving = false;
