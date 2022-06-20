@@ -59,9 +59,8 @@ impl From<&Texture> for Texture {
 }
 
 impl Texture {
-  /**
-   * Create new texture ready to be loaded
-   */
+  /// Creates a new texture ready to be loaded
+  /// It will generate a texture buffer on the gl state machine
   pub fn new(image_name: &str, options: TextureOptions) -> Texture {
     unsafe {
       let mut id: u32 = 0;
@@ -83,9 +82,7 @@ impl Texture {
     }
   }
 
-  /**
-   * Function used to denote that lack of texture
-   */
+  /// Function used to denote that lack of texture
   pub fn none() -> Texture {
     Texture {
       texture_id: -1,
@@ -100,9 +97,7 @@ impl Texture {
     return format!("./images/{image_name}.png");
   }
 
-  /*
-   * Sets the sampler fragment shader Uniform
-   */
+  /// Sets the sampler fragment shader Uniform
   pub fn set_uniform(&self, program: &ShaderProgram) {
     program.set_uniform(Uniform {
       name: format!("tex{}_sampler", self.texture_id),
