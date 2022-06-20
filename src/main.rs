@@ -13,7 +13,7 @@ use glfw::Context;
 
 use general::color::COLORS;
 use gl_utils::gl_error_reader;
-use gl_utils::gl_texture::{Texture, TextureOptions};
+use gl_utils::gl_texture::{Texture, LoadableTexture, TextureOptions};
 use gl_utils::gl_translation::{DataType, DrawingMode, UsageMode};
 use gl_utils::shader_creator::{Shader, ShaderProgram, VertexShaderAttribute};
 use gl_utils::vertex_array_object_handler::VertexArrayObject;
@@ -95,6 +95,9 @@ fn main() {
 
   let mut drawer = Drawer::new(UsageMode::StaticDraw, &program);
 
+  let enemy_texture = Texture::new("enemy", TextureOptions::default());
+  enemy_texture.load_texture();
+
   let sky = Sprite::new(
     Rectangle::new(-1.0, 1.0, 2.0, 2.0, COLORS::White.into()),
     Texture::new("sky", TextureOptions::default()),
@@ -108,6 +111,18 @@ fn main() {
     Texture::new("character", TextureOptions::default()),
   );
 
+  let before_sprite_creation = std::time::Instant::now();
+  let mut enemies = Vec::<Sprite<Rectangle>>::new();
+  for i in 0..30 {
+
+    enemies.push(Sprite::new(
+      Rectangle::new(0.7 - (i as f32 / 10.0), if i > 19 { 0.4 } else { -0.4} , 0.2, 0.3, COLORS::White.into()),
+      Texture::from(&enemy_texture),
+    ));
+  }
+  println!("Took {} to create enemies, before loading", before_sprite_creation.elapsed().as_millis());
+
+
   let mut fireball = Sprite::new(
     Rectangle::new(-0.7, -0.6, 0.15, 0.1, COLORS::Red.into()),
     Texture::new("fireball", TextureOptions::default()),
@@ -115,20 +130,37 @@ fn main() {
 
   let mut fireball_moving = false;
 
+  let before_loading_sprites = std::time::Instant::now();
+
   drawer.load_sprite_dynamic(&sky);
   drawer.load_sprite_dynamic(&floor);
   drawer.load_sprite_dynamic(&character);
   drawer.load_sprite_dynamic(&fireball);
+  for enemy in &enemies {
+    drawer.load_sprite_dynamic(enemy);
+  }
+
+  println!("Took {} to load sprites", before_loading_sprites.elapsed().as_millis());
 
   program.use_program();
 
   drawer.prep_textures();
+
+  let mut frames = 0;
+  let mut now = std::time::Instant::now();
 
   while !window.should_close() {
     window.swap_buffers();
     glfw_instance.poll_events();
 
     drawer.clear_screen(COLORS::Black.into());
+    if now.elapsed().as_secs() < 1 {
+      frames += 1;
+    } else {
+      println!("FPS: {frames}");
+      frames = 0;
+      now = std::time::Instant::now();
+    }
     drawer.draw(DrawingMode::Triangles);
 
     if fireball_moving {
@@ -141,6 +173,7 @@ fn main() {
     } else {
       fireball.set_x(character.get_x());
       fireball.set_y(character.get_y() - 0.2);
+      character.set_color_overlay(COLORS::White.into());
       drawer.unload_sprite_dynamic(&fireball);
     }
 
@@ -169,6 +202,7 @@ fn main() {
         }
         glfw::WindowEvent::Key(glfw::Key::Space, _, glfw::Action::Press, _) => {
           fireball_moving = true;
+          character.set_color_overlay(COLORS::Red.into());
           drawer.load_sprite_dynamic(&fireball);
         }
         glfw::WindowEvent::Key(glfw::Key::K, _, glfw::Action::Press, _) => {
