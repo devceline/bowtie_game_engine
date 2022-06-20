@@ -12,21 +12,25 @@ in float Tex_id;
 
 void main()
 {
-	// TODO: Refactor this, figure it out.
-	if (Tex_id == 0.0f) {
-		outColor = texture(tex0_sampler, tex_cords_out);
-	}
-	else if (Tex_id == 1.0f) {
-		outColor = texture(tex1_sampler, tex_cords_out);
-	}
-	else if (Tex_id == 2.0f) {
-		outColor = texture(tex2_sampler, tex_cords_out);
-	}
-	else if (Tex_id == 3.0f) {
-		outColor = texture(tex3_sampler, tex_cords_out);
-	}
-	else {
+	
+	int tex_int_idx = int(Tex_id);
+
+	switch(tex_int_idx) {
+		case 0:
+			outColor = texture(tex0_sampler, tex_cords_out);
+			break;
+		case 1:
+			outColor = texture(tex1_sampler, tex_cords_out);
+			break;
+		case 2:
+			outColor = texture(tex2_sampler, tex_cords_out);
+			break;
+		case 3:
+			outColor = texture(tex3_sampler, tex_cords_out);
+			break;
+		default:
 		outColor = vec4(Color);
+
 	}
 
 
