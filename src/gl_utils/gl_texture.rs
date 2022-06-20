@@ -9,7 +9,11 @@ use super::gl_translation::{DataType, TextureFilter, TextureWrap, ToGl};
 
 static mut TEXTURE_COUNT: u32 = 0;
 
-#[derive(Debug)]
+pub trait LoadableTexture {
+  fn load_texture(&self);
+}
+
+#[derive(Debug, Copy, Clone)]
 pub struct TextureOptions {
   wrap: TextureWrap,
   min_filter: TextureFilter,
@@ -18,10 +22,11 @@ pub struct TextureOptions {
 
 #[derive(Debug)]
 pub struct Texture {
-  id: i32,
   pub texture_id: i32,
-  options: TextureOptions,
   pub image_name: String,
+  id: i32,
+  options: TextureOptions,
+  is_loaded: bool
 }
 
 impl Default for TextureOptions {
@@ -33,6 +38,21 @@ impl Default for TextureOptions {
       wrap: TextureWrap::ClampToEdge,
       min_filter: TextureFilter::LinearMipmap,
       mag_filter: TextureFilter::Linear,
+    }
+  }
+}
+
+impl From<&Texture> for Texture {
+  fn from(texture_ref: &Texture) -> Self {
+    // if !texture_ref.is_loaded {
+    // panic!("Can only create textures from already loaded texture refs");
+    // }
+    Texture {
+      texture_id: texture_ref.texture_id,
+      id: texture_ref.id,
+      options: texture_ref.options,
+      image_name: String::from(texture_ref.image_name.as_str()),
+      is_loaded: true
     }
   }
 }
@@ -52,6 +72,7 @@ impl Texture {
         id: id as i32,
         options,
         image_name: String::from(image_name),
+        is_loaded: false,
       };
 
       // Incrementing texture count to have accurate Texture ID
@@ -70,6 +91,7 @@ impl Texture {
       id: -1,
       options: TextureOptions::default(),
       image_name: String::from(""),
+      is_loaded: true
     }
   }
 
@@ -89,7 +111,13 @@ impl Texture {
     });
   }
 
-  pub fn load_texture(&self) {
+}
+
+impl LoadableTexture for Texture {
+  fn load_texture(&self) {
+    if self.is_loaded {
+      return;
+    }
     unsafe {
       // BindTexture requires a specific texture to be activated first
       gl::ActiveTexture(gl::TEXTURE0 + (self.texture_id as u32));
@@ -144,7 +172,9 @@ impl Texture {
         self.options.min_filter.to_gl() as i32,
       );
     };
+    // self.is_loaded = true;
   }
+
 }
 
 impl Drop for Texture {
