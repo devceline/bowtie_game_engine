@@ -102,16 +102,8 @@ impl<'a> Drawer<'a> {
    * Renders a rectangle as wide and tall as the window to clear it
    */
   pub fn clear_screen(&mut self, color: color::Color) {
-    let clear_rect = Sprite::new(
-      Rectangle::new(
-        -1.0,
-        1.0,
-        2.0,
-        2.0,
-        color,
-      ),
-      Texture::none(),
-    );
+    let clear_rect =
+      Sprite::new(Rectangle::new(-1.0, 1.0, 2.0, 2.0, color), Texture::none());
 
     self
       .vertex_array_buffer
@@ -162,7 +154,10 @@ impl<'a> Drawer<'a> {
         dynamic_sprites[i],
         self.elements_count,
       );
-      self.elements_count += dynamic_sprites[i].get_shape_ptr().get_coordinate_corners().len() as i32;
+      self.elements_count += dynamic_sprites[i]
+        .get_shape_ptr()
+        .get_coordinate_corners()
+        .len() as i32;
     }
 
     self.vertex_array_buffer.update_data(&self.vertices);

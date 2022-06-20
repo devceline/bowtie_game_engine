@@ -13,6 +13,6 @@ pub trait Shape: Debug {
   fn set_width(&mut self, width: f32);
   fn get_color(&self) -> Color;
   fn set_color(&mut self, color: Color);
-  fn get_coordinate_corners(&self) -> [[f32;2]; 4];
-  fn get_texture_corners(&self) -> [[f32;2]; 4];
+  fn get_coordinate_corners(&self) -> [[f32; 2]; 4];
+  fn get_texture_corners(&self) -> [[f32; 2]; 4];
 }
