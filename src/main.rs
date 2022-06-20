@@ -87,7 +87,6 @@ fn main() {
           true,
           8,
         ),
-
       ],
     ),
     Shader::FragmentShader(String::from("main")),
@@ -95,35 +94,47 @@ fn main() {
 
   let mut drawer = Drawer::new(UsageMode::StaticDraw, &program);
 
-  let sky = Sprite::new(Rectangle {
-    x: -1.0,
-    y: 1.0,
-    width: 2.0,
-    height: 2.0,
-    color: COLORS::White.into()
-  }, Texture::new("sky", TextureOptions::defaults(), &program));
-  let floor = Sprite::new(Rectangle {
-    x: -1.0,
-    y: -0.5,
-    width: 2.0,
-    height: 0.5,
-    color: COLORS::White.into(),
-  }, Texture::new("floor", TextureOptions::defaults(), &program));
-  let mut character = Sprite::new(Rectangle {
-    x: -0.7,
-    y: -0.6,
-    width: 0.3,
-    height: 0.4,
-    color: COLORS::White.into(),
-  }, Texture::new("character", TextureOptions::defaults(), &program));
+  let sky = Sprite::new(
+    Rectangle {
+      x: -1.0,
+      y: 1.0,
+      width: 2.0,
+      height: 2.0,
+      color: COLORS::White.into(),
+    },
+    Texture::new("sky", TextureOptions::defaults(), &program),
+  );
+  let floor = Sprite::new(
+    Rectangle {
+      x: -1.0,
+      y: -0.5,
+      width: 2.0,
+      height: 0.5,
+      color: COLORS::White.into(),
+    },
+    Texture::new("floor", TextureOptions::defaults(), &program),
+  );
+  let mut character = Sprite::new(
+    Rectangle {
+      x: -0.7,
+      y: -0.6,
+      width: 0.3,
+      height: 0.4,
+      color: COLORS::White.into(),
+    },
+    Texture::new("character", TextureOptions::defaults(), &program),
+  );
 
-  let mut fireball = Sprite::new(Rectangle {
-    x: -0.7,
-    y: -0.6,
-    width: 0.15,
-    height: 0.1,
-    color: COLORS::Red.into()
-  }, Texture::new("fireball", TextureOptions::defaults(), &program));
+  let mut fireball = Sprite::new(
+    Rectangle {
+      x: -0.7,
+      y: -0.6,
+      width: 0.15,
+      height: 0.1,
+      color: COLORS::Red.into(),
+    },
+    Texture::new("fireball", TextureOptions::defaults(), &program),
+  );
 
   let mut fireball_moving = false;
 
@@ -136,11 +147,9 @@ fn main() {
 
   drawer.prep_textures();
 
-
   while !window.should_close() {
     window.swap_buffers();
     glfw_instance.poll_events();
-
 
     drawer.clear_screen(COLORS::Black.into());
     drawer.draw(DrawingMode::Triangles);
@@ -152,13 +161,11 @@ fn main() {
         fireball.set_y(character.get_y() - 0.2);
         drawer.unload_sprite_dynamic(&fireball);
       }
+    } else {
+      fireball.set_x(character.get_x());
+      fireball.set_y(character.get_y() - 0.2);
+      drawer.unload_sprite_dynamic(&fireball);
     }
-    else {
-        fireball.set_x(character.get_x());
-        fireball.set_y(character.get_y() - 0.2);
-        drawer.unload_sprite_dynamic(&fireball);
-    }
-
 
     for (_, event) in glfw::flush_messages(&events) {
       match event {
@@ -166,10 +173,10 @@ fn main() {
           window.set_should_close(true);
         }
         glfw::WindowEvent::Key(glfw::Key::Right, _, glfw::Action::Repeat, _) => {
-           character.move_right(0.02);
+          character.move_right(0.02);
         }
         glfw::WindowEvent::Key(glfw::Key::Right, _, glfw::Action::Press, _) => {
-           character.move_right(0.02);
+          character.move_right(0.02);
         }
         glfw::WindowEvent::Key(glfw::Key::Left, _, glfw::Action::Repeat, _) => {
           character.move_left(0.02);
@@ -178,11 +185,11 @@ fn main() {
           character.move_left(0.02);
         }
         glfw::WindowEvent::Key(glfw::Key::Up, _, glfw::Action::Repeat, _) => {
-           character.move_up(0.02);
+          character.move_up(0.02);
         }
         glfw::WindowEvent::Key(glfw::Key::Down, _, glfw::Action::Repeat, _) => {
           character.move_down(0.02);
-        },
+        }
         glfw::WindowEvent::Key(glfw::Key::Space, _, glfw::Action::Press, _) => {
           fireball_moving = true;
           drawer.load_sprite_dynamic(&fireball);

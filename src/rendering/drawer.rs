@@ -78,23 +78,29 @@ impl<'a> Drawer<'a> {
   }
 
   pub fn unload_sprite_dynamic(&mut self, sprite: *const dyn Drawable<'a>) {
-    let to_remove_idx = self.dynamic_sprites.iter().position(|spr| (*spr as *const dyn Drawable<'a>) == sprite);
+    let to_remove_idx = self
+      .dynamic_sprites
+      .iter()
+      .position(|spr| (*spr as *const dyn Drawable<'a>) == sprite);
     match to_remove_idx {
-        Some(idx) => {
-          self.dynamic_sprites.remove(idx);
-        },
-        None => {},
+      Some(idx) => {
+        self.dynamic_sprites.remove(idx);
+      }
+      None => {}
     }
   }
 
   pub fn clear_screen(&mut self, color: color::Color) {
-    let clear_rect = Sprite::new(Rectangle {
-      x: -1.0,
-      y: 1.0,
-      width: 2.0,
-      height: 2.0,
-      color,
-    }, Texture::none());
+    let clear_rect = Sprite::new(
+      Rectangle {
+        x: -1.0,
+        y: 1.0,
+        width: 2.0,
+        height: 2.0,
+        color,
+      },
+      Texture::none(),
+    );
 
     self
       .vertex_array_buffer
@@ -152,7 +158,6 @@ impl<'a> Drawer<'a> {
     // println!("Column:  X   Y      R     G   B   A   T_X   T_Y   T_I");
     // println!("Tex id:{:?}", &self.dynamic_sprites[0].get_vertices()[0..9]);
     // println!("Tex id:{:?}", &self.dynamic_sprites[1].get_vertices()[0..9]);
-
 
     unsafe {
       gl::DrawElements(

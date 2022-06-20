@@ -165,7 +165,8 @@ impl ShaderProgram {
       GlErrorResult::Error(error) => {
         println!(
           "Shader with id {} could not compile because: {}",
-          self.get_shader_location(shader), error
+          self.get_shader_location(shader),
+          error
         );
       }
       _ => {}

@@ -11,15 +11,13 @@ pub struct Rectangle {
   pub color: Color,
 }
 
-
 impl Shape for Rectangle {
-
   fn get_x(&self) -> f32 {
-      self.x
+    self.x
   }
 
   fn get_y(&self) -> f32 {
-      self.y
+    self.y
   }
 
   fn set_x(&mut self, x: f32) {
@@ -31,11 +29,11 @@ impl Shape for Rectangle {
   }
 
   fn get_width(&self) -> f32 {
-      self.width
+    self.width
   }
 
   fn get_height(&self) -> f32 {
-      self.height
+    self.height
   }
 
   fn set_height(&mut self, height: f32) {
@@ -57,7 +55,4 @@ impl Shape for Rectangle {
   fn get_corners(&self) -> i32 {
     return 4;
   }
-
 }
-
-

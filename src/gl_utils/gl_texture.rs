@@ -44,7 +44,10 @@ impl Texture {
       let mut id: u32 = 0;
       gl::GenTextures(1, &mut id);
 
-      println!("Created new texture, with name and id: {}, {}", image_name, TEXTURE_COUNT );
+      println!(
+        "Created new texture, with name and id: {}, {}",
+        image_name, TEXTURE_COUNT
+      );
       let tex = Texture {
         texture_id: TEXTURE_COUNT as i32,
         id: id as i32,
@@ -52,7 +55,6 @@ impl Texture {
         image_name: String::from(image_name),
       };
       TEXTURE_COUNT = TEXTURE_COUNT + 1;
-
 
       return tex;
     }
@@ -75,12 +77,12 @@ impl Texture {
   }
 
   pub fn set_uniform(&self, program: &ShaderProgram) {
-      program.set_uniform(Uniform {
-        name: format!("tex{}_sampler", self.texture_id),
-        data_type: DataType::Int,
-        count: 1,
-        values: vec![self.texture_id],
-      });
+    program.set_uniform(Uniform {
+      name: format!("tex{}_sampler", self.texture_id),
+      data_type: DataType::Int,
+      count: 1,
+      values: vec![self.texture_id],
+    });
   }
 
   pub fn load_texture(&self) {

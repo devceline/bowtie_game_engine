@@ -3,8 +3,8 @@ use crate::{
   shapes::shape::Shape,
 };
 
-use std::marker::PhantomData;
 use super::drawable::Drawable;
+use std::marker::PhantomData;
 
 #[derive(Debug)]
 pub struct Sprite<'a, TShape>
@@ -13,7 +13,7 @@ where
 {
   shape: TShape,
   texture: Texture,
-  phantom: PhantomData<&'a TShape>
+  phantom: PhantomData<&'a TShape>,
 }
 
 impl<'a, TShape: 'a> Sprite<'a, TShape>
@@ -24,7 +24,7 @@ where
     Sprite {
       shape,
       texture,
-      phantom: PhantomData
+      phantom: PhantomData,
     }
   }
 
@@ -97,7 +97,6 @@ where
 
     return true;
   }
-
 }
 
 impl<'a, TShape> Drawable<'a> for Sprite<'a, TShape>
@@ -117,7 +116,6 @@ where
   }
 
   fn get_vertices(&self) -> Vec<f32> {
-
     let mut vertices = Vec::<f32>::new();
 
     let shape = &self.shape;
@@ -125,7 +123,10 @@ where
     let corners = [
       [shape.get_x(), shape.get_y()],
       [shape.get_x() + shape.get_width(), shape.get_y()],
-      [shape.get_x() + shape.get_width(), shape.get_y() - shape.get_height()],
+      [
+        shape.get_x() + shape.get_width(),
+        shape.get_y() - shape.get_height(),
+      ],
       [shape.get_x(), shape.get_y() - shape.get_height()],
     ];
 
@@ -147,9 +148,7 @@ where
       vertices.push(ty);
 
       vertices.push(self.texture.texture_id as f32);
-
     }
-      return vertices;
+    return vertices;
   }
-
 }

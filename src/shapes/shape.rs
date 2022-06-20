@@ -12,7 +12,6 @@ pub trait Shape: Debug {
   fn set_height(&mut self, height: f32);
   fn set_width(&mut self, width: f32);
   fn get_color(&self) -> Color;
-  fn set_color(&mut self, color: Color) ;
+  fn set_color(&mut self, color: Color);
   fn get_corners(&self) -> i32;
 }
-
