@@ -113,10 +113,21 @@ fn main() {
 
   let before_sprite_creation = std::time::Instant::now();
   let mut enemies = Vec::<Sprite<Rectangle>>::new();
-  for i in 0..30 {
-
+  for i in 0..100 {
     enemies.push(Sprite::new(
-      Rectangle::new(0.7 - (i as f32 / 10.0), if i > 19 { 0.4 } else { -0.4} , 0.2, 0.3, COLORS::White.into()),
+      Rectangle::new((i as f32 / 100.0) - 0.5, (i as f32 / 100.0) - 0.5 , 0.2, 0.3, COLORS::White.into()),
+      Texture::from(&enemy_texture),
+    ));
+  }
+  for i in 0..100 {
+    enemies.push(Sprite::new(
+      Rectangle::new((i as f32 / 100.0) - 0.3, (i as f32 / 100.0) - 0.5 , 0.2, 0.3, COLORS::White.into()),
+      Texture::from(&enemy_texture),
+    ));
+  }
+  for i in 0..100 {
+    enemies.push(Sprite::new(
+      Rectangle::new((i as f32 / 100.0) - 0.1, (i as f32 / 100.0) - 0.5 , 0.2, 0.3, COLORS::White.into()),
       Texture::from(&enemy_texture),
     ));
   }
@@ -154,6 +165,8 @@ fn main() {
     glfw_instance.poll_events();
 
     drawer.clear_screen(COLORS::Black.into());
+    drawer.draw(DrawingMode::Triangles);
+
     if now.elapsed().as_secs() < 1 {
       frames += 1;
     } else {
@@ -161,7 +174,6 @@ fn main() {
       frames = 0;
       now = std::time::Instant::now();
     }
-    drawer.draw(DrawingMode::Triangles);
 
     if fireball_moving {
       if !fireball.move_right(0.1) {

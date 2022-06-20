@@ -26,7 +26,7 @@ pub struct Texture {
   pub image_name: String,
   id: i32,
   options: TextureOptions,
-  is_loaded: bool
+  is_from_ref: bool
 }
 
 impl Default for TextureOptions {
@@ -43,16 +43,17 @@ impl Default for TextureOptions {
 }
 
 impl From<&Texture> for Texture {
+  /*
+   * Loads texture from texutre reference
+   * NOTE: Texture has to be loaded before hand
+   */
   fn from(texture_ref: &Texture) -> Self {
-    // if !texture_ref.is_loaded {
-    // panic!("Can only create textures from already loaded texture refs");
-    // }
     Texture {
       texture_id: texture_ref.texture_id,
       id: texture_ref.id,
       options: texture_ref.options,
       image_name: String::from(texture_ref.image_name.as_str()),
-      is_loaded: true
+      is_from_ref: true
     }
   }
 }
@@ -72,7 +73,7 @@ impl Texture {
         id: id as i32,
         options,
         image_name: String::from(image_name),
-        is_loaded: false,
+        is_from_ref: false,
       };
 
       // Incrementing texture count to have accurate Texture ID
@@ -91,7 +92,7 @@ impl Texture {
       id: -1,
       options: TextureOptions::default(),
       image_name: String::from(""),
-      is_loaded: true
+      is_from_ref: true
     }
   }
 
@@ -115,7 +116,7 @@ impl Texture {
 
 impl LoadableTexture for Texture {
   fn load_texture(&self) {
-    if self.is_loaded {
+    if self.is_from_ref {
       return;
     }
     unsafe {
