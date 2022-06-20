@@ -71,10 +71,6 @@ where
     return true;
   }
 
-  // TODO: Refactor this to be in TShape
-  const TEX_CORDS_CORNERS: [[f32; 2]; 4] =
-    [[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0]];
-
   pub fn move_right(&mut self, amount: f32) -> bool {
     let new_amount = self.shape.get_x() + amount;
 
@@ -121,19 +117,12 @@ where
 
     let shape = &self.shape;
 
-    let corners = [
-      [shape.get_x(), shape.get_y()],
-      [shape.get_x() + shape.get_width(), shape.get_y()],
-      [
-        shape.get_x() + shape.get_width(),
-        shape.get_y() - shape.get_height(),
-      ],
-      [shape.get_x(), shape.get_y() - shape.get_height()],
-    ];
+    let coordinate_corners = &self.shape.get_coordinate_corners();
+    let texture_corners = &self.shape.get_texture_corners();
 
     for i in 0..4 {
       // X, Y
-      let [x, y] = corners[i];
+      let [x, y] = coordinate_corners[i];
       vertices.push(x);
       vertices.push(y);
 
@@ -144,7 +133,7 @@ where
       vertices.push(shape.get_color().a);
 
       // Texture Cords
-      let [tx, ty] = Sprite::<TShape>::TEX_CORDS_CORNERS[i];
+      let [tx, ty] = texture_corners[i];
       vertices.push(tx);
       vertices.push(ty);
 

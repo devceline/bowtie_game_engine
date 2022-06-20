@@ -103,13 +103,13 @@ impl<'a> Drawer<'a> {
    */
   pub fn clear_screen(&mut self, color: color::Color) {
     let clear_rect = Sprite::new(
-      Rectangle {
-        x: -1.0,
-        y: 1.0,
-        width: 2.0,
-        height: 2.0,
+      Rectangle::new(
+        -1.0,
+        1.0,
+        2.0,
+        2.0,
         color,
-      },
+      ),
       Texture::none(),
     );
 
@@ -162,7 +162,7 @@ impl<'a> Drawer<'a> {
         dynamic_sprites[i],
         self.elements_count,
       );
-      self.elements_count += dynamic_sprites[i].get_shape_ptr().get_corners();
+      self.elements_count += dynamic_sprites[i].get_shape_ptr().get_coordinate_corners().len() as i32;
     }
 
     self.vertex_array_buffer.update_data(&self.vertices);

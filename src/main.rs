@@ -96,44 +96,44 @@ fn main() {
   let mut drawer = Drawer::new(UsageMode::StaticDraw, &program);
 
   let sky = Sprite::new(
-    Rectangle {
-      x: -1.0,
-      y: 1.0,
-      width: 2.0,
-      height: 2.0,
-      color: COLORS::White.into(),
-    },
+    Rectangle::new(
+      -1.0,
+      1.0,
+      2.0,
+      2.0,
+      COLORS::White.into(),
+    ),
     Texture::new("sky", TextureOptions::default()),
   );
   let floor = Sprite::new(
-    Rectangle {
-      x: -1.0,
-      y: -0.5,
-      width: 2.0,
-      height: 0.5,
-      color: COLORS::White.into(),
-    },
+    Rectangle::new(
+      -1.0,
+      -0.5,
+      2.0,
+      0.5,
+     COLORS::White.into(),
+    ),
     Texture::new("floor", TextureOptions::default()),
   );
   let mut character = Sprite::new(
-    Rectangle {
-      x: -0.7,
-      y: -0.6,
-      width: 0.3,
-      height: 0.4,
-      color: COLORS::White.into(),
-    },
+    Rectangle::new(
+      -0.7,
+      -0.6,
+      0.3,
+      0.4,
+      COLORS::White.into(),
+    ),
     Texture::new("character", TextureOptions::default()),
   );
 
   let mut fireball = Sprite::new(
-    Rectangle {
-      x: -0.7,
-      y: -0.6,
-      width: 0.15,
-      height: 0.1,
-      color: COLORS::Red.into(),
-    },
+    Rectangle::new(
+      -0.7,
+      -0.6,
+      0.15,
+      0.1,
+      COLORS::Red.into(),
+    ),
     Texture::new("fireball", TextureOptions::default()),
   );
 
