@@ -4,6 +4,7 @@ uniform sampler2D tex0_sampler;
 uniform sampler2D tex1_sampler;
 uniform sampler2D tex2_sampler;
 uniform sampler2D tex3_sampler;
+uniform sampler2D tex4_sampler;
 
 in vec4 Color;
 in vec2 tex_cords_out;
@@ -14,24 +15,26 @@ void main()
 {
 	
 	int tex_int_idx = int(Tex_id);
+	vec4 base_texture = vec4(1.0, 1.0, 1.0, 1.0);
 
 	switch(tex_int_idx) {
 		case 0:
-			outColor = texture(tex0_sampler, tex_cords_out);
+			base_texture = texture(tex0_sampler, tex_cords_out);
 			break;
 		case 1:
-			outColor = texture(tex1_sampler, tex_cords_out);
+			base_texture = texture(tex1_sampler, tex_cords_out);
 			break;
 		case 2:
-			outColor = texture(tex2_sampler, tex_cords_out);
+			base_texture = texture(tex2_sampler, tex_cords_out);
 			break;
 		case 3:
-			outColor = texture(tex3_sampler, tex_cords_out);
+			base_texture = texture(tex3_sampler, tex_cords_out);
 			break;
-		default:
-		outColor = vec4(Color);
-
+		case 4: 
+			base_texture = texture(tex4_sampler, tex_cords_out);
+			break;
 	}
 
+	outColor = base_texture * vec4(Color);
 
 }

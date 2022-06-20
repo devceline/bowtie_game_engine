@@ -1,6 +1,6 @@
 use crate::{
-  gl_utils::{gl_texture::Texture, shader_creator::ShaderProgram},
-  shapes::shape::Shape,
+  gl_utils::{gl_texture::Texture, gl_texture::LoadableTexture},
+  shapes::shape::Shape, general::color::Color,
 };
 
 use super::drawable::Drawable;
@@ -28,7 +28,7 @@ where
     }
   }
 
-  pub fn load_texture(&self) {
+  pub fn load_texture(&mut self) {
     self.texture.load_texture();
   }
 
@@ -81,6 +81,10 @@ where
     self.shape.set_x(new_amount);
 
     return true;
+  }
+
+  pub fn set_color_overlay(&mut self, color: Color) {
+    self.shape.set_color(color);
   }
 
   pub fn move_left(&mut self, amount: f32) -> bool {
