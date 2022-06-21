@@ -17,14 +17,17 @@ use general::color::COLORS;
 use gl_utils::gl_error_reader;
 use gl_utils::gl_texture::{LoadableTexture, Texture, TextureOptions};
 use gl_utils::gl_translation::{DataType, DrawingMode, UsageMode};
-use gl_utils::shader_creator::{Shader, ShaderProgram, VertexShaderAttribute};
+use gl_utils::shader_creator::{ Shader, ShaderProgram, VertexShaderAttribute};
 use gl_utils::vertex_array_object_handler::VertexArrayObject;
+use gl_utils::uniform::UniformMatrixFloat;
 
 use rendering::drawer::Drawer;
 use shapes::rectangle::Rectangle;
 use sprites::sprite::Sprite;
 
 use game_objects::game_world::GameWorld;
+
+use crate::math::matrix::Matrix;
 
 fn window_setup(glfw: &mut glfw::Glfw, window: &mut glfw::Window) {
   window.make_current();
@@ -103,6 +106,17 @@ fn main() {
   // Initialize a program and load a vertex and fragment shader
   let program = get_program();
 
+  // Transformation test
+  let trans = Matrix::new(vec![
+    vec![1.0, 0.0, 0.0, 0.0],
+    vec![0.0, 1.0, 0.0, 0.0],
+    vec![0.0, 0.0, 1.0, 0.0],
+    vec![0.0, 0.0, 0.0, 1.0],
+  ]);
+
+  let trans_uniform = UniformMatrixFloat::new("trans", trans);
+  program.set_uniform(&trans_uniform);
+
   let mut drawer = Drawer::new(UsageMode::StaticDraw, &program);
 
   let enemy_texture = Texture::new("enemy", TextureOptions::default());
@@ -126,46 +140,42 @@ fn main() {
 
   let before_sprite_creation = std::time::Instant::now();
   let mut enemies = Vec::<Sprite<Rectangle>>::new();
-  for i in 0..100 {
-    enemies.push(Sprite::new(
-      Rectangle::new(
-        (i as f32 / 100.0) - 0.5,
-        (i as f32 / 100.0) - 0.5,
-        0.2,
-        0.3,
-        COLORS::White.into(),
-      ),
-      Texture::from(&enemy_texture),
-    ));
-  }
-  for i in 0..100 {
-    enemies.push(Sprite::new(
-      Rectangle::new(
-        (i as f32 / 100.0) - 0.3,
-        (i as f32 / 100.0) - 0.5,
-        0.2,
-        0.3,
-        COLORS::White.into(),
-      ),
-      Texture::from(&enemy_texture),
-    ));
-  }
-  for i in 0..100 {
-    enemies.push(Sprite::new(
-      Rectangle::new(
-        (i as f32 / 100.0) - 0.1,
-        (i as f32 / 100.0) - 0.5,
-        0.2,
-        0.3,
-        COLORS::White.into(),
-      ),
-      Texture::from(&enemy_texture),
-    ));
-  }
-  println!(
-    "Took {} to create enemies, before loading",
-    before_sprite_creation.elapsed().as_millis()
-  );
+  // for i in 0..100 {
+  //   enemies.push(Sprite::new(
+  //     Rectangle::new(
+  //       (i as f32 / 100.0) - 0.5,
+  //       (i as f32 / 100.0) - 0.5,
+  //       0.2,
+  //       0.3,
+  //       COLORS::White.into(),
+  //     ),
+  //     Texture::from(&enemy_texture),
+  //   ));
+  // }
+  // for i in 0..100 {
+  //   enemies.push(Sprite::new(
+  //     Rectangle::new(
+  //       (i as f32 / 100.0) - 0.3,
+  //       (i as f32 / 100.0) - 0.5,
+  //       0.2,
+  //       0.3,
+  //       COLORS::White.into(),
+  //     ),
+  //     Texture::from(&enemy_texture),
+  //   ));
+  // }
+  // for i in 0..100 {
+  //   enemies.push(Sprite::new(
+  //     Rectangle::new(
+  //       (i as f32 / 100.0) - 0.1,
+  //       (i as f32 / 100.0) - 0.5,
+  //       0.2,
+  //       0.3,
+  //       COLORS::White.into(),
+  //     ),
+  //     Texture::from(&enemy_texture),
+  //   ));
+  // }
 
   let mut fireball = Sprite::new(
     Rectangle::new(-0.7, -0.6, 0.15, 0.1, COLORS::Red.into()),

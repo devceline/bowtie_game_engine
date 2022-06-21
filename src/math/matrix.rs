@@ -7,6 +7,7 @@ pub trait Determinant<T> {
 #[derive(Debug)]
 pub struct Matrix<T> {
   _matrix: Vec<Vec<T>>,
+  flattened: Vec<T>,
   num_rows: usize,
   num_columns: usize,
 }
@@ -21,6 +22,18 @@ impl<T> Matrix<T> {
     return true;
   }
 
+  fn flatted_matrix_vec(matrix_vec: &Vec<Vec<T>>) -> Vec<T> where T : Clone {
+    let mut flattened = Vec::<T>::new();
+
+    for vec in matrix_vec {
+      for val in vec {
+        flattened.push(val.to_owned());
+      }
+    }
+
+    flattened
+  }
+
   pub fn get_num_columns(&self) -> usize {
     self.num_columns
   }
@@ -33,7 +46,11 @@ impl<T> Matrix<T> {
     self.get_num_rows()
   }
 
-  pub fn new(matrix: Vec<Vec<T>>) -> Matrix<T> {
+  pub unsafe fn get_inner_ptr(&self) -> &Vec<T> {
+    &self.flattened
+  }
+
+  pub fn new(matrix: Vec<Vec<T>>) -> Matrix<T> where T : Clone {
     if !Matrix::is_valid_matrix(&matrix) {
       panic!("Not a valid matrix");
     }
@@ -41,10 +58,13 @@ impl<T> Matrix<T> {
     let num_rows = matrix.len();
     let num_columns = matrix[0].len();
 
+    let flattened = Matrix::flatted_matrix_vec(&matrix);
+
     return Matrix {
       _matrix: matrix,
       num_rows,
       num_columns,
+      flattened
     };
   }
 }
@@ -126,7 +146,7 @@ where
 impl<TScalar, T> Mul<TScalar> for Matrix<T>
 where
   TScalar: Mul<T> + Into<T> + Copy,
-  T: Mul<T> + Mul<TScalar, Output = T>,
+  T: Mul<T> + Mul<TScalar, Output = T> + Clone,
 {
   type Output = Matrix<T>;
   fn mul(self, rhs: TScalar) -> Self::Output {
