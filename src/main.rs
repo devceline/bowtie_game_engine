@@ -117,7 +117,7 @@ fn main() {
     Texture::new("floor", TextureOptions::default()),
   );
 
-  let mut game_world = GameWorld::new(floor, sky);
+  let game_world = GameWorld::new(floor, sky);
 
   let mut character = Sprite::new(
     Rectangle::new(-0.7, -0.6, 0.3, 0.4, COLORS::White.into()),
@@ -137,7 +137,6 @@ fn main() {
       ),
       Texture::from(&enemy_texture),
     ));
-
   }
   for i in 0..100 {
     enemies.push(Sprite::new(
@@ -150,7 +149,6 @@ fn main() {
       ),
       Texture::from(&enemy_texture),
     ));
-
   }
   for i in 0..100 {
     enemies.push(Sprite::new(
@@ -163,7 +161,6 @@ fn main() {
       ),
       Texture::from(&enemy_texture),
     ));
-
   }
   println!(
     "Took {} to create enemies, before loading",
@@ -180,7 +177,6 @@ fn main() {
   drawer.load_sprite_dynamic(&game_world);
   drawer.load_sprite_dynamic(&character);
   drawer.load_sprite_dynamic(&fireball);
-
 
   for enemy in &enemies {
     drawer.load_sprite_dynamic(enemy);

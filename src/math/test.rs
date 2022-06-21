@@ -86,10 +86,10 @@ mod tests {
   fn matrix_5x5_determinant() {
     use crate::math::matrix::{Determinant, Matrix};
     let matrix = Matrix::new(vec![
-      vec![5,6,19,10,0],
-      vec![12,17,8,18,9],
-      vec![10,10,22,2,3],
-      vec![67,8,9,0,0],
+      vec![5, 6, 19, 10, 0],
+      vec![12, 17, 8, 18, 9],
+      vec![10, 10, 22, 2, 3],
+      vec![67, 8, 9, 0, 0],
       vec![-3, 45, 3, 2, 1],
     ]);
     let test_det = 6709072;
@@ -122,17 +122,27 @@ mod tests {
   #[test]
   fn matrix_3x3_dot_3x3_ok() {
     use crate::math::matrix::Matrix;
-    let matrix = Matrix::new(vec![vec![12, 7, 8], vec![99, -1, 8], vec![7, 6, -1]]);
-    let rhs = Matrix::new(vec![vec![28, 9, 0 ], vec![0, 12, 3], vec![-9, 8 ,10]]);
-    let test_mat = Matrix::new(vec![vec![264, 256, 101], vec![2700, 943, 77], vec![205, 127, 8]]);
+    let matrix =
+      Matrix::new(vec![vec![12, 7, 8], vec![99, -1, 8], vec![7, 6, -1]]);
+    let rhs = Matrix::new(vec![vec![28, 9, 0], vec![0, 12, 3], vec![-9, 8, 10]]);
+    let test_mat = Matrix::new(vec![
+      vec![264, 256, 101],
+      vec![2700, 943, 77],
+      vec![205, 127, 8],
+    ]);
     assert_eq!(matrix * rhs, test_mat);
   }
 
   fn matrix_2x1_dot_1x2_ok() {
     use crate::math::matrix::Matrix;
-    let matrix = Matrix::new(vec![vec![12, 7, 8], vec![99, -1, 8], vec![7, 6, -1]]);
-    let rhs = Matrix::new(vec![vec![28, 9, 0 ], vec![0, 12, 3], vec![-9, 8 ,10]]);
-    let test_mat = Matrix::new(vec![vec![264, 256, 101], vec![2700, 943, 77], vec![205, 127, 8]]);
+    let matrix =
+      Matrix::new(vec![vec![12, 7, 8], vec![99, -1, 8], vec![7, 6, -1]]);
+    let rhs = Matrix::new(vec![vec![28, 9, 0], vec![0, 12, 3], vec![-9, 8, 10]]);
+    let test_mat = Matrix::new(vec![
+      vec![264, 256, 101],
+      vec![2700, 943, 77],
+      vec![205, 127, 8],
+    ]);
     assert_eq!(matrix * rhs, test_mat);
   }
 

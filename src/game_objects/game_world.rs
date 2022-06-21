@@ -42,10 +42,12 @@ impl<'a> Drawable<'a> for GameWorld<'a> {
 
   fn get_elements(&self) -> Vec<i32> {
     let mut sky_elements = self.sky.get_elements();
-    let mut floor_elements: Vec<i32> = self.floor
+    let mut floor_elements: Vec<i32> = self
+      .floor
       .get_elements()
       .iter()
-      .map(|elem| elem + self.sky.get_corner_count()).collect();
+      .map(|elem| elem + self.sky.get_corner_count())
+      .collect();
     sky_elements.append(&mut floor_elements);
     sky_elements
   }
