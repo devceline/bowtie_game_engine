@@ -3,9 +3,11 @@ extern crate png;
 
 use std::fs::File;
 
-use super::shader_creator::{ShaderProgram, Uniform};
+use super::shader_creator::ShaderProgram;
 
-use super::gl_translation::{DataType, TextureFilter, TextureWrap, ToGl};
+use super::uniform::{UniformInteger, SettableUniform};
+
+use super::gl_translation::{TextureFilter, TextureWrap, ToGl};
 
 static mut TEXTURE_COUNT: u32 = 0;
 
@@ -99,12 +101,8 @@ impl Texture {
 
   /// Sets the sampler fragment shader Uniform
   pub fn set_uniform(&self, program: &ShaderProgram) {
-    program.set_uniform(Uniform {
-      name: format!("tex{}_sampler", self.texture_id),
-      data_type: DataType::Int,
-      count: 1,
-      values: vec![self.texture_id],
-    });
+    let uniform = UniformInteger::new(format!("tex{}_sampler", self.texture_id).as_str(), self.texture_id);
+    program.set_uniform(&uniform);
   }
 }
 

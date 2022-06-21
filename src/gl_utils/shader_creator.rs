@@ -4,6 +4,7 @@ use std::{collections::HashMap, ffi::CString, fs};
 
 use super::gl_error_reader::{GlError, GlErrorResult};
 use super::gl_translation::{DataType, ToGl};
+use super::uniform::SettableUniform;
 
 #[derive(Clone)]
 pub struct VertexShaderAttribute {
@@ -36,6 +37,7 @@ impl VertexShaderAttribute {
     return attrib;
   }
 }
+
 
 pub struct Uniform<T> {
   pub name: String,
@@ -79,11 +81,9 @@ impl ShaderProgram {
     }
   }
 
-  pub fn set_uniform<T>(&self, uniform: Uniform<T>)
-  where
-    T: Into<f64> + Copy,
+  pub fn set_uniform<T>(&self, uniform: &dyn SettableUniform<T>)
   {
-    let uniform_name = get_c_string(uniform.name.to_owned());
+    let uniform_name = get_c_string(uniform.get_name().to_owned());
 
     let uniform_location =
       unsafe { gl::GetUniformLocation(self.program_id, uniform_name.as_ptr()) };
@@ -92,27 +92,7 @@ impl ShaderProgram {
       panic!("Uniform {:?} was not found", uniform_name);
     }
 
-    match (uniform.count, uniform.data_type) {
-      (1, DataType::Int) => unsafe {
-        gl::Uniform1i(uniform_location, uniform.values[0].into() as i32);
-      },
-      (3, DataType::Float32) => {
-        unsafe {
-          gl::Uniform3f(
-            uniform_location,
-            uniform.values[0].into() as f32,
-            uniform.values[1].into() as f32,
-            uniform.values[2].into() as f32,
-          );
-        };
-      }
-      _ => {
-        panic!(
-          "Uniform {} for data type {} with {} values not implemented",
-          uniform.name, uniform.data_type, uniform.count
-        );
-      }
-    }
+    uniform.set_uniform(uniform_location);
   }
 
   fn get_shader_location(&self, shader: &Shader) -> String {

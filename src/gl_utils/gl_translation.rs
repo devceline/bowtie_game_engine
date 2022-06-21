@@ -5,20 +5,11 @@ pub trait ToGl {
   fn to_gl(&self) -> u32;
 }
 
+#[derive(Clone, Debug)]
 pub enum DataType {
   Float32,
   UnsignedInt,
   Int,
-}
-
-impl Clone for DataType {
-  fn clone(&self) -> Self {
-    match self {
-      DataType::Float32 => DataType::Float32,
-      DataType::UnsignedInt => DataType::UnsignedInt,
-      DataType::Int => DataType::Int,
-    }
-  }
 }
 
 impl Copy for DataType {}
@@ -48,12 +39,6 @@ impl ToGl for DataType {
       DataType::UnsignedInt => gl::UNSIGNED_INT,
       DataType::Int => gl::INT,
     }
-  }
-}
-
-impl Display for DataType {
-  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-    write!(f, "{}", self.get_data_type_string())
   }
 }
 
