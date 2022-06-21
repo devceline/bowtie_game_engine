@@ -43,19 +43,7 @@ fn window_setup(glfw: &mut glfw::Glfw, window: &mut glfw::Window) {
   window.set_key_polling(true);
 }
 
-fn main() {
-  let mut glfw_instance = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
-  let (mut window, events) = glfw_instance
-    .create_window(700, 700, "rust game engine", glfw::WindowMode::Windowed)
-    .expect("Failed to create window");
-  window_setup(&mut glfw_instance, &mut window);
-
-  gl_error_reader::init_debug_callback();
-
-  // Initialize a vao to handle gl data
-  let _vao = VertexArrayObject::new();
-
-  // Initialize a program and load a vertex and fragment shader
+fn get_program() -> ShaderProgram {
   let mut program = ShaderProgram::new();
   program.load_shaders(vec![
     Shader::VertexShader(
@@ -97,6 +85,23 @@ fn main() {
     ),
     Shader::FragmentShader(String::from("main")),
   ]);
+  program
+}
+
+fn main() {
+  let mut glfw_instance = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
+  let (mut window, events) = glfw_instance
+    .create_window(700, 700, "rust game engine", glfw::WindowMode::Windowed)
+    .expect("Failed to create window");
+  window_setup(&mut glfw_instance, &mut window);
+
+  gl_error_reader::init_debug_callback();
+
+  // Initialize a vao to handle gl data
+  let _vao = VertexArrayObject::new();
+
+  // Initialize a program and load a vertex and fragment shader
+  let program = get_program();
 
   let mut drawer = Drawer::new(UsageMode::StaticDraw, &program);
 

@@ -5,6 +5,7 @@ use std::{collections::HashMap, ffi::CString, fs};
 use super::gl_error_reader::{GlError, GlErrorResult};
 use super::gl_translation::{DataType, ToGl};
 
+#[derive(Clone)]
 pub struct VertexShaderAttribute {
   pub name: String,
   pub data_type: DataType,
@@ -43,6 +44,7 @@ pub struct Uniform<T> {
   pub values: Vec<T>,
 }
 
+#[derive(Clone)]
 pub enum Shader {
   VertexShader(String, Vec<VertexShaderAttribute>),
   FragmentShader(String),
@@ -61,6 +63,7 @@ fn get_c_string(original_string: String) -> CString {
   return CString::new(original_string).expect("Could not convert to c string");
 }
 
+#[derive(Clone)]
 pub struct ShaderProgram {
   pub program_id: u32,
   shader_map: HashMap<u32, Shader>,
