@@ -2,7 +2,7 @@ extern crate gl;
 
 use crate::general::color;
 use crate::gl_utils::element_array_buffer::ElementArrayBuffer;
-use crate::gl_utils::gl_texture::{Texture, LoadableTexture};
+use crate::gl_utils::gl_texture::{LoadableTexture, Texture};
 use crate::gl_utils::gl_translation::{DataType, DrawingMode, ToGl, UsageMode};
 use crate::gl_utils::shader_creator::ShaderProgram;
 use crate::gl_utils::vertex_array_buffer::VertexArrayBuffer;
@@ -66,7 +66,6 @@ impl<'a> Drawer<'a> {
    * Naturally, the sprite needs to have the same lifetime as the drawer.
    */
   pub fn load_sprite_dynamic(&mut self, sprite: *const dyn Drawable<'a>) {
-    let before_load = std::time::Instant::now();
     unsafe {
       let sprite_instance = sprite.as_ref().unwrap();
       self.dynamic_sprites.push(sprite_instance);
@@ -79,10 +78,8 @@ impl<'a> Drawer<'a> {
       self.vertex_array_buffer.update_data(&self.vertices);
       self.element_array_buffer.update_data(&self.elements);
 
-      sprite_instance.get_texture_ptr().load_texture();
-      println!("Took {} to load {:?}", before_load.elapsed().as_millis(), sprite_instance);
+      sprite_instance.load_texture();
     };
-
   }
 
   /*
@@ -131,7 +128,7 @@ impl<'a> Drawer<'a> {
    */
   pub fn prep_textures(&self) {
     for sprite in &self.dynamic_sprites {
-      sprite.get_texture_ptr().set_uniform(self.shader_program);
+      sprite.set_texture_uniform(self.shader_program);
     }
     unsafe {
       gl::Enable(gl::BLEND);
@@ -157,10 +154,7 @@ impl<'a> Drawer<'a> {
         dynamic_sprites[i],
         self.elements_count,
       );
-      self.elements_count += dynamic_sprites[i]
-        .get_shape_ptr()
-        .get_coordinate_corners()
-        .len() as i32;
+      self.elements_count += dynamic_sprites[i].get_corner_count()
     }
 
     self.vertex_array_buffer.update_data(&self.vertices);

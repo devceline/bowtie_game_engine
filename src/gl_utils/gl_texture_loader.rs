@@ -1,1 +1,3 @@
-// TODO: Make a struct that loads textures and keeps track of which are loaded
+struct TextureLoader {
+  textures_to_load: Vec<Texture>
+}

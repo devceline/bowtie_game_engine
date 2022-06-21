@@ -1,12 +1,16 @@
 use crate::{
-  gl_utils::{gl_texture::Texture, gl_texture::LoadableTexture},
-  shapes::shape::Shape, general::color::Color,
+  general::color::Color,
+  gl_utils::{
+    gl_texture::LoadableTexture, gl_texture::Texture,
+    shader_creator::ShaderProgram,
+  },
+  shapes::shape::Shape,
 };
 
 use super::drawable::Drawable;
 use std::marker::PhantomData;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Sprite<'a, TShape>
 where
   TShape: Shape + 'a,
@@ -104,16 +108,20 @@ impl<'a, TShape> Drawable<'a> for Sprite<'a, TShape>
 where
   TShape: Shape + 'a,
 {
-  fn get_shape_ptr(&'a self) -> &'a dyn Shape {
-    &self.shape
+  fn set_texture_uniform(&'a self, program: &ShaderProgram) -> () {
+    self.texture.set_uniform(program);
   }
 
-  fn get_texture_ptr(&'a self) -> &'a Texture {
-    &self.texture
+  fn get_corner_count(&'a self) -> i32 {
+    self.shape.get_coordinate_corners().len() as i32
   }
 
   fn get_elements(&self) -> Vec<i32> {
     return vec![0, 1, 2, 2, 3, 0];
+  }
+
+  fn load_texture(&'a self) -> () {
+    self.texture.load_texture();
   }
 
   fn get_vertices(&self) -> Vec<f32> {
@@ -144,5 +152,14 @@ where
       vertices.push(self.texture.texture_id as f32);
     }
     return vertices;
+  }
+}
+
+impl<'a, TShape> From<&Sprite<'a, TShape>> for Sprite<'a, TShape>
+where
+  TShape: Shape + Clone,
+{
+  fn from(sprite_ref: &Sprite<'a, TShape>) -> Self {
+    Sprite::new(sprite_ref.shape.to_owned(), sprite_ref.texture.to_owned())
   }
 }

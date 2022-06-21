@@ -20,13 +20,13 @@ pub struct TextureOptions {
   mag_filter: TextureFilter,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Texture {
   pub texture_id: i32,
   pub image_name: String,
   id: i32,
   options: TextureOptions,
-  is_from_ref: bool
+  is_from_ref: bool,
 }
 
 impl Default for TextureOptions {
@@ -53,7 +53,7 @@ impl From<&Texture> for Texture {
       id: texture_ref.id,
       options: texture_ref.options,
       image_name: String::from(texture_ref.image_name.as_str()),
-      is_from_ref: true
+      is_from_ref: true,
     }
   }
 }
@@ -89,7 +89,7 @@ impl Texture {
       id: -1,
       options: TextureOptions::default(),
       image_name: String::from(""),
-      is_from_ref: true
+      is_from_ref: true,
     }
   }
 
@@ -106,7 +106,6 @@ impl Texture {
       values: vec![self.texture_id],
     });
   }
-
 }
 
 impl LoadableTexture for Texture {
@@ -170,7 +169,6 @@ impl LoadableTexture for Texture {
     };
     // self.is_loaded = true;
   }
-
 }
 
 impl Drop for Texture {

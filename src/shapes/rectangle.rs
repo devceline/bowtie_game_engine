@@ -2,7 +2,7 @@ use crate::general::color::Color;
 
 use super::shape::Shape;
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub struct Rectangle {
   pub width: f32,
   pub height: f32,
