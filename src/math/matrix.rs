@@ -3,7 +3,7 @@ use std::{fmt::Debug, ops::Mul};
 #[derive(Debug)]
 pub struct Matrix<T>
 where
-  T:  Mul<T>,
+  T: Mul<T>,
 {
   _matrix: Vec<Vec<T>>,
   num_rows: usize,
@@ -42,7 +42,7 @@ where
 impl<TScalar, T> Mul<TScalar> for Matrix<T>
 where
   TScalar: Mul<T> + Into<T> + Copy,
-  T: Mul<T> + Mul<TScalar, Output = T>
+  T: Mul<T> + Mul<TScalar, Output = T>,
 {
   type Output = Matrix<T>;
   fn mul(self, rhs: TScalar) -> Self::Output {
@@ -60,7 +60,10 @@ where
   }
 }
 
-impl<T> PartialEq for Matrix<T> where T: PartialEq<T> + Mul<T> {
+impl<T> PartialEq for Matrix<T>
+where
+  T: PartialEq<T> + Mul<T>,
+{
   fn eq(&self, other: &Self) -> bool {
     if self.num_columns != other.num_columns {
       return false;
@@ -78,6 +81,6 @@ impl<T> PartialEq for Matrix<T> where T: PartialEq<T> + Mul<T> {
     return true;
   }
   fn ne(&self, other: &Self) -> bool {
-      !self.eq(other)
+    !self.eq(other)
   }
 }

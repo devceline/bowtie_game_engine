@@ -1,4 +1,4 @@
-pub mod statistics;
 pub mod matrix;
+pub mod statistics;
 
 mod test;
