@@ -75,6 +75,7 @@ impl<'a> Drawer<'a> {
         sprite_instance,
         self.elements_count,
       );
+
       self.vertex_array_buffer.update_data(&self.vertices);
       self.element_array_buffer.update_data(&self.elements);
 
@@ -161,11 +162,12 @@ impl<'a> Drawer<'a> {
     self.element_array_buffer.update_data(&self.elements);
 
     unsafe {
-      gl::DrawElements(
+      gl::DrawElementsInstanced(
         mode.to_gl(),
         self.elements.len() as i32,
         self.element_array_buffer.data_type.to_gl(),
         0 as *const gl::types::GLvoid,
+        self.dynamic_sprites.len() as i32,
       );
     }
   }
