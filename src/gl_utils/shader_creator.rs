@@ -98,6 +98,7 @@ impl ShaderProgram {
   }
 
   fn get_shader_location(&self, shader: &Shader) -> String {
+    println!("{:?}", std::env::current_dir());
     let mut base_url = String::from("./shaders/");
     match shader {
       Shader::VertexShader(_name, _attributes) => {
@@ -201,7 +202,6 @@ impl ShaderProgram {
                   for i in 0..4 {
                     let pos = attrib_location + i.to_owned();
                     gl::EnableVertexAttribArray(pos);
-                    // glVertexAttribPointer(pos1, 4, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 4 * 4, (void*)(0));
                     gl::VertexAttribPointer(
                       pos,
                       4,
@@ -212,12 +212,7 @@ impl ShaderProgram {
                         + (attribute.data_type.get_size() * (i as i32 * 4)))
                         as *const gl::types::GLvoid,
                     );
-                    println!(
-                      "Enabling pos {}, with offset {}",
-                      pos,
-                      attribute.original_offset + ((i as i32) * 4)
-                    );
-                    gl::VertexAttribDivisor(pos, 1);
+                    // gl::VertexAttribDivisor(pos, 1);
                   }
                 }
               }
