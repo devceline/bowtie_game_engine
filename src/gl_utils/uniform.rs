@@ -83,8 +83,9 @@ impl SettableUniform<Matrix<f32>> for UniformMatrixFloat {
       self.name.to_owned()
   }
   fn set_uniform(&self, loc: i32) {
+    
       unsafe {
-        gl::UniformMatrix4fv(loc, 1, gl::FALSE, &self.value.get_inner_ptr()[0])
+        gl::UniformMatrix4fv(loc, 1, gl::TRUE, &self.value.get_inner_ptr()[0])
       }
   }
 }
