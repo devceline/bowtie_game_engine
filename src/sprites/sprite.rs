@@ -5,6 +5,7 @@ use crate::{
     shader_creator::ShaderProgram,
   },
   shapes::shape::Shape,
+  math::matrix::{Matrix, IdentityMatrix}
 };
 
 use super::drawable::Drawable;
@@ -150,6 +151,11 @@ where
       vertices.push(ty);
 
       vertices.push(self.texture.texture_id as f32);
+
+      for entry in Matrix::<f32>::generate_identity(4).get_inner_ptr() {
+        vertices.push(entry.to_owned());
+      }
+
     }
     return vertices;
   }
