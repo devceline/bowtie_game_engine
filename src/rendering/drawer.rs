@@ -123,10 +123,8 @@ impl<'a> Drawer<'a> {
     }
   }
 
-  /*
-   * Actually loads the sprite's textures.
-   * This needs to be done once, but has to be done before the draw call.
-   */
+  /// Actually loads the sprite's textures.
+  /// This needs to be done once, but has to be done before the draw call.
   pub fn prep_textures(&self) {
     for sprite in &self.dynamic_sprites {
       sprite.set_texture_uniform(self.shader_program);
@@ -138,9 +136,7 @@ impl<'a> Drawer<'a> {
     }
   }
 
-  /*
-   * Renders the dynamically loaded sprites
-   */
+  /// Renders the dynamically loaded sprites
   pub fn draw(&mut self, mode: DrawingMode) {
     let dynamic_sprites = &self.dynamic_sprites;
 
