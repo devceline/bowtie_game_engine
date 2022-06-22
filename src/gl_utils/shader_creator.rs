@@ -39,13 +39,6 @@ impl VertexShaderAttribute {
 }
 
 
-pub struct Uniform<T> {
-  pub name: String,
-  pub data_type: DataType,
-  pub count: i8,
-  pub values: Vec<T>,
-}
-
 #[derive(Clone)]
 pub enum Shader {
   VertexShader(String, Vec<VertexShaderAttribute>),
