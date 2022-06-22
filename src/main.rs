@@ -56,7 +56,7 @@ fn get_program() -> ShaderProgram {
           String::from("position"),
           DataType::Float32,
           2,
-          9,
+          25,
           true,
           0,
         ),
@@ -64,7 +64,7 @@ fn get_program() -> ShaderProgram {
           String::from("targetColor"),
           DataType::Float32,
           4,
-          9,
+          25,
           true,
           2,
         ),
@@ -72,7 +72,7 @@ fn get_program() -> ShaderProgram {
           String::from("tex_cords_in"),
           DataType::Float32,
           2,
-          9,
+          25,
           true,
           6,
         ),
@@ -80,9 +80,17 @@ fn get_program() -> ShaderProgram {
           String::from("tex_id"),
           DataType::Float32,
           1,
-          9,
+          25,
           true,
           8,
+        ),
+        VertexShaderAttribute::new(
+          String::from("trans"),
+          DataType::Float32,
+          16,
+          25,
+          true,
+          9,
         ),
       ],
     ),
@@ -183,15 +191,15 @@ fn main() {
 
   program.use_program();
 
-  let trans = Matrix::new(vec![
-    vec![0.40808206181, -0.91294525073, 0.0, 0.0],
-    vec![0.91294525073, 0.40808206181, 0.0, 0.0],
-    vec![0.0, 0.0, 1.0, 0.0],
-    vec![0.0, 0.0, 0.0, 1.0],
-  ]);
+  // let trans = Matrix::new(vec![
+  //   vec![0.40808206181, -0.91294525073, 0.0, 0.0],
+  //   vec![0.91294525073, 0.40808206181, 0.0, 0.0],
+  //   vec![0.0, 0.0, 1.0, 0.0],
+  //   vec![0.0, 0.0, 0.0, 1.0],
+  // ]);
 
-  let trans_uniform = UniformMatrixFloat::new("trans", trans);
-  program.set_uniform(&trans_uniform);
+  // let trans_uniform = UniformMatrixFloat::new("trans", trans);
+  // program.set_uniform(&trans_uniform);
 
 
   drawer.prep_textures();
