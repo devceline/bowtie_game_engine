@@ -4,6 +4,13 @@ pub trait Determinant<T> {
   fn det(&self) -> T;
 }
 
+pub trait IdentityMatrix<T> {
+  /// Returns the identity for a given type
+  /// Eg, for i32 that would be 1
+  fn identity(&self) -> Matrix<T>;
+  fn generate_identity(num_rows: usize) -> Matrix<T>;
+}
+
 #[derive(Debug)]
 pub struct Matrix<T> {
   _matrix: Vec<Vec<T>>,
@@ -235,5 +242,52 @@ where
       }
     }
     determinant
+  }
+}
+
+impl IdentityMatrix<f32> for Matrix<f32> {
+  fn identity(&self) -> Matrix<f32> {
+      Matrix::generate_identity(self.get_num_rows())
+  }
+
+  fn generate_identity(num_rows: usize) -> Matrix<f32> {
+    let mut new_matrix = Vec::<Vec<f32>>::new();
+    new_matrix.reserve(num_rows);
+    for i in 0..num_rows {
+      let mut new_row = Vec::<f32>::new();
+      for j in 0..num_rows {
+        if i == j {
+          new_row.push(1.0);
+        }
+        else {
+          new_row.push(0.0);
+        }
+      }
+        new_matrix.push(new_row);
+    }
+    Matrix::new(new_matrix)
+  }
+}
+
+impl IdentityMatrix<i32> for Matrix<i32> {
+  fn identity(&self) -> Matrix<i32> {
+      Matrix::generate_identity(self.get_num_rows())
+  }
+  fn generate_identity(num_rows: usize, ) -> Matrix<i32> {
+    let mut new_matrix = Vec::<Vec<i32>>::new();
+    new_matrix.reserve(num_rows);
+    for i in 0..num_rows {
+      let mut new_row = Vec::<i32>::new();
+      for j in 0..num_rows {
+        if i == j {
+          new_row.push(1);
+        }
+        else {
+          new_row.push(0);
+        }
+      }
+      new_matrix.push(new_row);
+    }
+    Matrix::new(new_matrix)
   }
 }

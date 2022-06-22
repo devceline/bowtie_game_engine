@@ -154,4 +154,12 @@ mod tests {
     let rhs = Matrix::new(vec![vec![3, 4], vec![3, -2]]);
     let _ = matrix * rhs;
   }
+
+  #[test]
+  fn matrix_identity() {
+    use crate::math::matrix::{Matrix, IdentityMatrix};
+    let matrix = Matrix::new(vec![vec![0, 3, 5], vec![5, 5, 2], vec![4,4,4]]);
+    let test_mat = Matrix::new(vec![vec![1,0,0], vec![0,1,0], vec![0,0,1]]);
+    assert_eq!(matrix.identity(), test_mat);
+  }
 }
