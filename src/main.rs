@@ -26,7 +26,7 @@ use sprites::sprite::Sprite;
 
 use game_objects::game_world::GameWorld;
 
-use crate::math::matrix::{Matrix, IdentityMatrix};
+use crate::math::matrix::{Matrix, IdentityMatrix, RotationMatrix, ScaleMatrix};
 
 fn window_setup(glfw: &mut glfw::Glfw, window: &mut glfw::Window) {
   window.make_current();
@@ -207,8 +207,7 @@ fn main() {
       drawer.unload_sprite_dynamic(&fireball);
     }
 
-
-    for (_, event) in glfw::flush_messages(&events) {
+for (_, event) in glfw::flush_messages(&events) {
       match event {
         glfw::WindowEvent::Key(glfw::Key::Escape, _, glfw::Action::Press, _) => {
           window.set_should_close(true);
@@ -218,16 +217,9 @@ fn main() {
         }
         glfw::WindowEvent::Key(glfw::Key::Right, _, glfw::Action::Press, _) => {
           character.move_right(0.02);
-          character.transform(
-          Matrix::new(
-            vec![
-                vec![0.40808206181, 0.80115263573 , 0.0, 0.0],
-                vec![-0.80115263573, 0.40808206181, 0.0, 0.0],
-                vec![0.0, 0.0, 1.0, 0.0],
-                vec![0.0, 0.0, 0.0, 1.343434],
-                ]
-            )
-          );
+          character.transform(Matrix::generate_scale_matrix(-1.0, 1.0, 1.0));
+         //  character.transform(
+         //    Matrix::<f32>::generate_identity(4).rotate_z(20.0));
         }
         glfw::WindowEvent::Key(glfw::Key::Left, _, glfw::Action::Repeat, _) => {
           character.move_left(0.02);
@@ -235,14 +227,7 @@ fn main() {
         glfw::WindowEvent::Key(glfw::Key::Left, _, glfw::Action::Press, _) => {
           character.move_left(0.02);
           character.transform(
-          Matrix::new(
-            vec![
-                vec![-0.40808206181, -0.80115263573 , 0.0, 0.0],
-                vec![0.80115263573, -0.40808206181, 0.0, 0.0],
-                vec![0.0, 0.0, 1.0, 0.0],
-                vec![0.0, 0.0, 0.0, 1.343434],
-                ]
-            )
+            Matrix::<f32>::generate_identity(4)
           );
         }
         glfw::WindowEvent::Key(glfw::Key::Up, _, glfw::Action::Repeat, _) => {
