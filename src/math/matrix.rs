@@ -14,14 +14,13 @@ pub trait IdentityMatrix<T> {
   fn generate_identity(num_rows: usize) -> Matrix<T>;
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Matrix<T> {
   matrix: Vec<Vec<T>>,
   flattened: Vec<T>,
   num_rows: usize,
   num_columns: usize,
 }
-
 
 impl<T> Matrix<T> {
   fn is_valid_matrix(matrix: &Vec<Vec<T>>) -> bool {
