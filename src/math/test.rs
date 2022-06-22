@@ -1,5 +1,5 @@
 #[cfg(test)]
-mod tests {
+mod matrix_tests {
   #[test]
   fn scalar_matrix_multiply_ok() {
     use crate::math::matrix::Matrix;
@@ -133,6 +133,7 @@ mod tests {
     assert_eq!(matrix * rhs, test_mat);
   }
 
+  #[test]
   fn matrix_2x1_dot_1x2_ok() {
     use crate::math::matrix::Matrix;
     let matrix =
@@ -161,5 +162,27 @@ mod tests {
     let matrix = Matrix::new(vec![vec![0, 3, 5], vec![5, 5, 2], vec![4,4,4]]);
     let test_mat = Matrix::new(vec![vec![1,0,0], vec![0,1,0], vec![0,0,1]]);
     assert_eq!(matrix.identity(), test_mat);
+  }
+}
+
+#[cfg(test)]
+mod trig_tests {
+  #[test]
+  fn test_get_radian() {
+    use crate::math::trig::get_radian;
+
+    assert_eq!(get_radian(30.0), 0.5235988);
+
+    assert_eq!(get_radian(180.0),3.1415927);
+
+  }
+
+  #[test]
+  fn test_get_factorial() {
+    use crate::math::trig::factorial;
+
+    assert!(factorial(1) == 1);
+    assert!(factorial(5) == 120);
+    assert!(factorial(10) == 3628800);
   }
 }
