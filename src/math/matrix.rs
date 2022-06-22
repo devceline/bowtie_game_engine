@@ -1,23 +1,27 @@
-use std::ops::{Add, Index, Mul, Sub};
+use std::{
+  ops::{Add, Index, Mul, Sub},
+};
 
 pub trait Determinant<T> {
   fn det(&self) -> T;
 }
 
 pub trait IdentityMatrix<T> {
-  /// Returns the identity for a given type
-  /// Eg, for i32 that would be 1
+  /// Returns the identity for a given matrix 
   fn identity(&self) -> Matrix<T>;
+  /// Returns the identity for a given type using num rows
+  /// Eg, for i32 that would be 1
   fn generate_identity(num_rows: usize) -> Matrix<T>;
 }
 
 #[derive(Debug)]
 pub struct Matrix<T> {
-  _matrix: Vec<Vec<T>>,
+  matrix: Vec<Vec<T>>,
   flattened: Vec<T>,
   num_rows: usize,
   num_columns: usize,
 }
+
 
 impl<T> Matrix<T> {
   fn is_valid_matrix(matrix: &Vec<Vec<T>>) -> bool {
@@ -29,7 +33,10 @@ impl<T> Matrix<T> {
     return true;
   }
 
-  fn flatted_matrix_vec(matrix_vec: &Vec<Vec<T>>) -> Vec<T> where T : Clone {
+  fn flatted_matrix_vec(matrix_vec: &Vec<Vec<T>>) -> Vec<T>
+  where
+    T: Clone,
+  {
     let mut flattened = Vec::<T>::new();
 
     for vec in matrix_vec {
@@ -53,11 +60,14 @@ impl<T> Matrix<T> {
     self.get_num_rows()
   }
 
-  pub unsafe fn get_inner_ptr(&self) -> &Vec<T> {
+  pub fn get_inner_ptr(&self) -> &Vec<T> {
     &self.flattened
   }
 
-  pub fn new(matrix: Vec<Vec<T>>) -> Matrix<T> where T : Clone {
+  pub fn new(matrix: Vec<Vec<T>>) -> Matrix<T>
+  where
+    T: Clone,
+  {
     if !Matrix::is_valid_matrix(&matrix) {
       panic!("Not a valid matrix");
     }
@@ -68,10 +78,10 @@ impl<T> Matrix<T> {
     let flattened = Matrix::flatted_matrix_vec(&matrix);
 
     return Matrix {
-      _matrix: matrix,
+      matrix,
       num_rows,
       num_columns,
-      flattened
+      flattened,
     };
   }
 }
@@ -80,7 +90,7 @@ impl<T> Index<usize> for Matrix<T> {
   type Output = Vec<T>;
 
   fn index(&self, index: usize) -> &Self::Output {
-    &self._matrix[index]
+    &self.matrix[index]
   }
 }
 
@@ -159,7 +169,7 @@ where
   fn mul(self, rhs: TScalar) -> Self::Output {
     let mut new_matrix = Vec::<Vec<T>>::new();
 
-    for vec in self._matrix {
+    for vec in self.matrix {
       let mut new_vec: Vec<T> = Vec::new();
       for scalar in vec {
         new_vec.push(scalar * rhs);
@@ -247,7 +257,7 @@ where
 
 impl IdentityMatrix<f32> for Matrix<f32> {
   fn identity(&self) -> Matrix<f32> {
-      Matrix::generate_identity(self.get_num_rows())
+    Matrix::generate_identity(self.get_num_rows())
   }
 
   fn generate_identity(num_rows: usize) -> Matrix<f32> {
@@ -258,12 +268,11 @@ impl IdentityMatrix<f32> for Matrix<f32> {
       for j in 0..num_rows {
         if i == j {
           new_row.push(1.0);
-        }
-        else {
+        } else {
           new_row.push(0.0);
         }
       }
-        new_matrix.push(new_row);
+      new_matrix.push(new_row);
     }
     Matrix::new(new_matrix)
   }
@@ -271,9 +280,9 @@ impl IdentityMatrix<f32> for Matrix<f32> {
 
 impl IdentityMatrix<i32> for Matrix<i32> {
   fn identity(&self) -> Matrix<i32> {
-      Matrix::generate_identity(self.get_num_rows())
+    Matrix::generate_identity(self.get_num_rows())
   }
-  fn generate_identity(num_rows: usize, ) -> Matrix<i32> {
+  fn generate_identity(num_rows: usize) -> Matrix<i32> {
     let mut new_matrix = Vec::<Vec<i32>>::new();
     new_matrix.reserve(num_rows);
     for i in 0..num_rows {
@@ -281,8 +290,7 @@ impl IdentityMatrix<i32> for Matrix<i32> {
       for j in 0..num_rows {
         if i == j {
           new_row.push(1);
-        }
-        else {
+        } else {
           new_row.push(0);
         }
       }
