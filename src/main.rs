@@ -107,16 +107,6 @@ fn main() {
   let program = get_program();
 
   // Transformation test
-  let trans = Matrix::new(vec![
-    vec![1.0, 0.0, 0.0, 0.0],
-    vec![0.0, 1.0, 0.0, 0.0],
-    vec![0.0, 0.0, 1.0, 0.0],
-    vec![0.0, 0.0, 0.0, 1.0],
-  ]);
-
-  let trans_uniform = UniformMatrixFloat::new("trans", trans);
-  program.set_uniform(&trans_uniform);
-
   let mut drawer = Drawer::new(UsageMode::StaticDraw, &program);
 
   let enemy_texture = Texture::new("enemy", TextureOptions::default());
@@ -138,7 +128,6 @@ fn main() {
     Texture::new("character", TextureOptions::default()),
   );
 
-  let before_sprite_creation = std::time::Instant::now();
   let mut enemies = Vec::<Sprite<Rectangle>>::new();
   // for i in 0..100 {
   //   enemies.push(Sprite::new(
@@ -193,6 +182,17 @@ fn main() {
   }
 
   program.use_program();
+
+  let trans = Matrix::new(vec![
+    vec![1.0, 0.0, 0.0, 0.0],
+    vec![0.0, 1.0, 0.0, 0.0],
+    vec![0.0, 0.0, 1.0, 0.0],
+    vec![0.0, 0.0, 0.0, 1.0],
+  ]);
+
+  let trans_uniform = UniformMatrixFloat::new("trans", trans);
+  program.set_uniform(&trans_uniform);
+
 
   drawer.prep_textures();
 
