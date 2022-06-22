@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 pub const PI: f32 = 3.14159265358979;
+const ACCURACY_TAYLOR_SERIES: i32 = 12;
 
 fn factorial_memoized(num: i32, memo_arr: *mut HashMap<i32, i32>) -> i32 {
   if num == 1 || num == 0 {
@@ -24,7 +25,6 @@ fn factorial_memoized(num: i32, memo_arr: *mut HashMap<i32, i32>) -> i32 {
 
 pub fn factorial(num: i32) -> i32 {
   let mut memo_arr = HashMap::<i32, i32>::new();
-  println!("HERE");
   return factorial_memoized(num, &mut memo_arr);
 }
 
@@ -34,12 +34,31 @@ pub fn get_radian(theta: f32) -> f32 {
 
 pub fn get_sin(theta: f32) -> f32 {
   let radian = get_radian(theta);
-  let mut sin = 0.0;
+  let mut sin = radian.to_owned();
   let mut sub = true;
-  for i in 0..7 {
-    let res = radian.powi(1 + i) / (1 + i) as f32;
+  for i in 2..ACCURACY_TAYLOR_SERIES {
+    if i % 2 != 0 {
+      continue;
+    }
+    let res = radian.powi(1 + i) / factorial(1 + i) as f32;
     sin = if sub { sin - res } else { sin + res };
     sub = !sub;
   }
   sin
+}
+
+pub fn get_cos(theta: f32) -> f32 {
+  let radian = get_radian(theta);
+  let mut cos = 1.0;
+  let mut sub = true;
+  for i in 1..ACCURACY_TAYLOR_SERIES {
+    if i % 2 == 0 {
+      continue;
+    }
+    println!("x^{}!", i + 1);
+    let res = radian.powi(1 + i) / factorial(1 + i) as f32;
+    cos = if sub { cos - res } else { cos + res };
+    sub = !sub;
+  }
+  cos
 }

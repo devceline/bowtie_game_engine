@@ -185,4 +185,18 @@ mod trig_tests {
     assert!(factorial(5) == 120);
     assert!(factorial(10) == 3628800);
   }
+
+  #[test]
+  fn test_get_sin() {
+    use crate::math::trig::get_sin;
+    assert_eq!(get_sin(20.0), 0.34202015);
+    assert_eq!(get_sin(90.0), 0.9999999);
+  }
+
+  #[test]
+  fn test_get_cos() {
+    use crate::math::trig::get_cos;
+    assert_eq!(get_cos(20.0), 0.9396926);
+    assert_eq!(get_cos(50.0), 0.64278760968);
+  }
 }
