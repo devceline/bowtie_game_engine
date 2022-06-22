@@ -7,6 +7,12 @@ use super::gl_translation::{DataType, ToGl};
 use super::uniform::SettableUniform;
 
 #[derive(Clone)]
+pub enum VertexShaderAttributeType {
+  Vector,
+  Matrix4,
+}
+
+#[derive(Clone)]
 pub struct VertexShaderAttribute {
   pub name: String,
   pub data_type: DataType,
@@ -14,6 +20,8 @@ pub struct VertexShaderAttribute {
   pub stride: i32,
   pub normalized: bool,
   pub offset: i32,
+  pub original_offset: i32,
+  pub attrib_type: VertexShaderAttributeType,
 }
 
 impl VertexShaderAttribute {
@@ -24,6 +32,7 @@ impl VertexShaderAttribute {
     stride: i32,
     normalized: bool,
     offset: i32,
+    attrib_type: VertexShaderAttributeType,
   ) -> VertexShaderAttribute {
     let attrib = VertexShaderAttribute {
       name,
@@ -31,13 +40,14 @@ impl VertexShaderAttribute {
       size,
       stride: ((data_type.get_size()) * stride),
       normalized,
+      original_offset: offset,
       offset: ((data_type.get_size()) * offset),
+      attrib_type,
     };
 
     return attrib;
   }
 }
-
 
 #[derive(Clone)]
 pub enum Shader {
@@ -74,8 +84,7 @@ impl ShaderProgram {
     }
   }
 
-  pub fn set_uniform<T>(&self, uniform: &dyn SettableUniform<T>)
-  {
+  pub fn set_uniform<T>(&self, uniform: &dyn SettableUniform<T>) {
     let uniform_name = get_c_string(uniform.get_name().to_owned());
 
     let uniform_location =
@@ -159,7 +168,14 @@ impl ShaderProgram {
           for attribute in attributes {
             let attrib_name = get_c_string(attribute.name.to_owned());
             let attrib_location = unsafe {
-              gl::GetAttribLocation(self.program_id, attrib_name.as_ptr()) as u32
+              let loc = gl::GetAttribLocation(self.program_id, attrib_name.as_ptr());
+              println!("Loc for {} is {}", attribute.name, loc);
+              if loc >= 0 {
+                loc as u32
+              }
+              else {
+                panic!("Location not found");
+              }
             };
 
             let gl_normalized = if attribute.normalized {
@@ -169,16 +185,42 @@ impl ShaderProgram {
             };
 
             unsafe {
-              gl::VertexAttribPointer(
-                attrib_location,
-                attribute.size,
-                attribute.data_type.to_gl(),
-                gl_normalized,
-                attribute.stride,
-                attribute.offset as *const gl::types::GLvoid,
-              );
-
-              gl::EnableVertexAttribArray(attrib_location);
+              match attribute.attrib_type {
+                VertexShaderAttributeType::Vector => {
+                  gl::VertexAttribPointer(
+                    attrib_location,
+                    attribute.size,
+                    attribute.data_type.to_gl(),
+                    gl_normalized,
+                    attribute.stride,
+                    attribute.offset as *const gl::types::GLvoid,
+                  );
+                  gl::EnableVertexAttribArray(attrib_location);
+                }
+                VertexShaderAttributeType::Matrix4 => {
+                  for i in 0..4 {
+                    let pos = attrib_location + i.to_owned();
+                    gl::EnableVertexAttribArray(pos);
+                    // glVertexAttribPointer(pos1, 4, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 4 * 4, (void*)(0));
+                    gl::VertexAttribPointer(
+                      pos,
+                      4,
+                      attribute.data_type.to_gl(),
+                      gl_normalized,
+                      attribute.stride,
+                      ((attribute.offset)
+                        + (attribute.data_type.get_size() * (i as i32 * 4)))
+                        as *const gl::types::GLvoid,
+                    );
+                    println!(
+                      "Enabling pos {}, with offset {}",
+                      pos,
+                      attribute.original_offset + ((i as i32) * 4)
+                    );
+                    gl::VertexAttribDivisor(pos, 1);
+                  }
+                }
+              }
             }
           }
         }

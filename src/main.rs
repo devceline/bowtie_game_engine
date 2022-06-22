@@ -17,9 +17,8 @@ use general::color::COLORS;
 use gl_utils::gl_error_reader;
 use gl_utils::gl_texture::{LoadableTexture, Texture, TextureOptions};
 use gl_utils::gl_translation::{DataType, DrawingMode, UsageMode};
-use gl_utils::shader_creator::{ Shader, ShaderProgram, VertexShaderAttribute};
+use gl_utils::shader_creator::{ Shader, ShaderProgram, VertexShaderAttribute, VertexShaderAttributeType};
 use gl_utils::vertex_array_object_handler::VertexArrayObject;
-use gl_utils::uniform::UniformMatrixFloat;
 
 use rendering::drawer::Drawer;
 use shapes::rectangle::Rectangle;
@@ -56,41 +55,46 @@ fn get_program() -> ShaderProgram {
           String::from("position"),
           DataType::Float32,
           2,
-          25,
+          9 + (4*4),
           true,
           0,
+          VertexShaderAttributeType::Vector
         ),
         VertexShaderAttribute::new(
           String::from("targetColor"),
           DataType::Float32,
           4,
-          25,
+          9 + (4*4),
           true,
           2,
+          VertexShaderAttributeType::Vector
         ),
         VertexShaderAttribute::new(
           String::from("tex_cords_in"),
           DataType::Float32,
           2,
-          25,
+          9 + (4*4),
           true,
           6,
+          VertexShaderAttributeType::Vector
         ),
         VertexShaderAttribute::new(
           String::from("tex_id"),
           DataType::Float32,
           1,
-          25,
+          9 + (4 * 4),
           true,
           8,
+          VertexShaderAttributeType::Vector
         ),
         VertexShaderAttribute::new(
           String::from("trans"),
           DataType::Float32,
-          16,
-          25,
+          4,
+          9 + (4 * 4),
           true,
           9,
+          VertexShaderAttributeType::Matrix4
         ),
       ],
     ),
@@ -190,17 +194,6 @@ fn main() {
   }
 
   program.use_program();
-
-  // let trans = Matrix::new(vec![
-  //   vec![0.40808206181, -0.91294525073, 0.0, 0.0],
-  //   vec![0.91294525073, 0.40808206181, 0.0, 0.0],
-  //   vec![0.0, 0.0, 1.0, 0.0],
-  //   vec![0.0, 0.0, 0.0, 1.0],
-  // ]);
-
-  // let trans_uniform = UniformMatrixFloat::new("trans", trans);
-  // program.set_uniform(&trans_uniform);
-
 
   drawer.prep_textures();
 

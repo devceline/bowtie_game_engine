@@ -152,10 +152,20 @@ where
 
       vertices.push(self.texture.texture_id as f32);
 
-      for entry in Matrix::<f32>::generate_identity(4).get_inner_ptr() {
-        vertices.push(entry.to_owned());
-      }
+      // let trans = Matrix::new(
+      // vec![
+      //   vec![0.40808206181, -0.91294525073, 0.0, 0.0],
+      //   vec![0.91294525073, 0.40808206181, 0.0, 0.0],
+      //   vec![0.0, 0.0, 1.0, 0.0],
+      //   vec![0.0, 0.0, 0.0, 1.0],
+      // ]
+      // );
 
+       let trans = Matrix::<f32>::generate_identity(4);
+
+       for entry in trans.get_inner_ptr() {
+         vertices.push(entry.to_owned());
+       }
     }
     return vertices;
   }
