@@ -1,6 +1,5 @@
-use std::{
-  ops::{Add, Index, Mul, Sub},
-};
+use std::ops::{Add, Index, Mul, Sub};
+use crate::{math::trig};
 
 pub trait Determinant<T> {
   fn det(&self) -> T;
@@ -12,6 +11,14 @@ pub trait IdentityMatrix<T> {
   /// Returns the identity for a given type using num rows
   /// Eg, for i32 that would be 1
   fn generate_identity(num_rows: usize) -> Matrix<T>;
+}
+
+pub trait RotationMatrix<T> {
+  fn rotate_z(&self, deg: T) -> Matrix<T>;
+}
+
+pub trait ScaleMatrix<T> {
+  fn generate_scale_matrix(x: T, y: T, z: T) -> Matrix<T>;
 }
 
 #[derive(Debug, Clone)]
@@ -296,5 +303,31 @@ impl IdentityMatrix<i32> for Matrix<i32> {
       new_matrix.push(new_row);
     }
     Matrix::new(new_matrix)
+  }
+}
+
+impl RotationMatrix<f32> for Matrix<f32> {
+  fn rotate_z(&self, deg: f32) -> Matrix<f32> {
+    let rotation_z_matrix = Matrix::<f32>::new(vec![
+      vec![trig::get_cos(deg), -trig::get_sin(deg), 0.0, 0.0],
+      vec![trig::get_sin(deg), trig::get_cos(deg), 0.0, 0.0],
+      vec![0.0, 0.0, 1.0, 0.0],
+      vec![0.0, 0.0, 0.0, 1.0],
+    ]);
+
+    self.to_owned() * rotation_z_matrix
+  }
+}
+
+impl ScaleMatrix<f32> for Matrix<f32> {
+  fn generate_scale_matrix(x: f32, y: f32, z: f32) -> Matrix<f32> {
+    Matrix::new(
+      vec![
+      vec![x, 0.0, 0.0, 0.0],
+      vec![0.0, y, 0.0, 0.0],
+      vec![0.0, 0.0, z, 0.0],
+      vec![0.0, 0.0, 0.0, 1.0]
+      ]
+    )
   }
 }
