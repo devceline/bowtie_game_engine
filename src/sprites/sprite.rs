@@ -47,6 +47,15 @@ where
     }
   }
 
+  pub fn flip_vertical(&mut self) {
+    self.shape.flip_texture_corners_y()
+  }
+
+
+  pub fn flip_horizontal(&mut self) {
+    self.shape.flip_texture_corners_x()
+  }
+
   pub fn transform(&mut self, transformation_matrix: Matrix<f32>) {
     assert!(
       transformation_matrix.get_num_rows() == 4
@@ -79,7 +88,7 @@ where
   pub fn move_up(&mut self, amount: f32) -> bool {
     let new_amount = self.shape.get_y() + amount;
 
-    if new_amount <= -1.0 {
+    if new_amount >= 0.8 {
       return false;
     }
 
@@ -90,8 +99,9 @@ where
 
   pub fn move_down(&mut self, amount: f32) -> bool {
     let new_amount = self.shape.get_y() - amount;
+    println!("Currently at: {}, going to: {}", self.shape.get_y(), new_amount);
 
-    if new_amount >= 1.0 {
+    if new_amount <= -0.7 {
       return false;
     }
 

@@ -13,9 +13,6 @@ pub struct Rectangle {
 }
 
 impl Rectangle {
-  const TEX_CORDS_CORNERS: [[f32; 2]; 4] =
-    [[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0]];
-
   pub fn new(
     x: f32,
     y: f32,
@@ -29,7 +26,7 @@ impl Rectangle {
       width,
       height,
       color,
-      texture_corners: Rectangle::TEX_CORDS_CORNERS,
+      texture_corners:  [[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0]],
     }
   }
 }
@@ -77,6 +74,24 @@ impl Shape for Rectangle {
 
   fn get_texture_corners(&self) -> [[f32; 2]; 4] {
     self.texture_corners
+  }
+
+  fn flip_texture_corners_x(&mut self) {
+    let mut new_texture_corners = self.texture_corners.to_owned();
+
+    for row in 0..4 {
+      new_texture_corners[row][0] = 1.0 - self.texture_corners[row][0];
+    }
+    self.texture_corners = new_texture_corners;
+  }
+
+  fn flip_texture_corners_y(&mut self) {
+    let mut new_texture_corners = self.texture_corners.to_owned();
+
+    for row in 0..4 {
+      new_texture_corners[row][1] = 1.0 - self.texture_corners[row][1];
+    }
+    self.texture_corners = new_texture_corners;
   }
 
   fn get_coordinate_corners(&self) -> [[f32; 2]; 4] {

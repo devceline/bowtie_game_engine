@@ -15,4 +15,6 @@ pub trait Shape: Debug {
   fn set_color(&mut self, color: Color);
   fn get_coordinate_corners(&self) -> [[f32; 2]; 4];
   fn get_texture_corners(&self) -> [[f32; 2]; 4];
+  fn flip_texture_corners_x(&mut self);
+  fn flip_texture_corners_y(&mut self);
 }

@@ -175,6 +175,8 @@ fn main() {
 
   drawer.prep_textures();
 
+  let mut moving_right = true;
+
   let mut frames = 0;
   let mut now = std::time::Instant::now();
 
@@ -217,7 +219,11 @@ for (_, event) in glfw::flush_messages(&events) {
         }
         glfw::WindowEvent::Key(glfw::Key::Right, _, glfw::Action::Press, _) => {
           character.move_right(0.02);
-          character.transform(Matrix::generate_scale_matrix(-1.0, 1.0, 1.0));
+          if !moving_right {
+            character.flip_horizontal();
+            moving_right = !moving_right;
+          }
+          // character.transform(Matrix::generate_scale_matrix(-1.0, 1.0, 1.0));
          //  character.transform(
          //    Matrix::<f32>::generate_identity(4).rotate_z(20.0));
         }
@@ -226,14 +232,21 @@ for (_, event) in glfw::flush_messages(&events) {
         }
         glfw::WindowEvent::Key(glfw::Key::Left, _, glfw::Action::Press, _) => {
           character.move_left(0.02);
-          character.transform(
-            Matrix::<f32>::generate_identity(4)
-          );
+          if moving_right {
+            character.flip_horizontal();
+            moving_right = !moving_right;
+          }
         }
         glfw::WindowEvent::Key(glfw::Key::Up, _, glfw::Action::Repeat, _) => {
           character.move_up(0.02);
         }
         glfw::WindowEvent::Key(glfw::Key::Down, _, glfw::Action::Repeat, _) => {
+          character.move_down(0.02);
+        }
+        glfw::WindowEvent::Key(glfw::Key::Up, _, glfw::Action::Press, _) => {
+          character.move_up(0.02);
+        }
+        glfw::WindowEvent::Key(glfw::Key::Down, _, glfw::Action::Press, _) => {
           character.move_down(0.02);
         }
         glfw::WindowEvent::Key(glfw::Key::Space, _, glfw::Action::Press, _) => {
