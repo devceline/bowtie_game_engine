@@ -4,8 +4,8 @@ use crate::{
     gl_texture::LoadableTexture, gl_texture::Texture,
     shader_creator::ShaderProgram,
   },
+  math::matrix::{IdentityMatrix, Matrix},
   shapes::shape::Shape,
-  math::matrix::{Matrix, IdentityMatrix}
 };
 
 use super::drawable::Drawable;
@@ -17,8 +17,10 @@ where
   TShape: Shape + 'a,
 {
   shape: TShape,
+  pub name: String,
   texture: Texture,
   phantom: PhantomData<&'a TShape>,
+  transformation: Matrix<f32>,
 }
 
 impl<'a, TShape: 'a> Sprite<'a, TShape>
@@ -28,9 +30,31 @@ where
   pub fn new(shape: TShape, texture: Texture) -> Sprite<'a, TShape> {
     Sprite {
       shape,
+      name: texture.image_name.to_owned(),
       texture,
       phantom: PhantomData,
+      transformation: Matrix::<f32>::generate_identity(4),
     }
+  }
+
+  pub fn with_transformation(shape: TShape, texture: Texture, trans: Matrix<f32>) -> Sprite<'a, TShape> {
+    Sprite {
+      shape,
+      name: texture.image_name.to_owned(),
+      texture,
+      phantom: PhantomData,
+      transformation: trans,
+    }
+  }
+
+  pub fn transform(&mut self, transformation_matrix: Matrix<f32>) {
+    assert!(
+      transformation_matrix.get_num_rows() == 4
+        && transformation_matrix.get_num_columns() == 4,
+      "Not a valid transformation_matrix"
+    );
+
+    self.transformation = transformation_matrix;
   }
 
   pub fn load_texture(&mut self) {
@@ -152,20 +176,9 @@ where
 
       vertices.push(self.texture.texture_id as f32);
 
-      // let trans = Matrix::new(
-      // vec![
-      //   vec![0.40808206181, -0.91294525073, 0.0, 0.0],
-      //   vec![0.91294525073, 0.40808206181, 0.0, 0.0],
-      //   vec![0.0, 0.0, 1.0, 0.0],
-      //   vec![0.0, 0.0, 0.0, 1.0],
-      // ]
-      // );
-
-       let trans = Matrix::<f32>::generate_identity(4);
-
-       for entry in trans.get_inner_ptr() {
-         vertices.push(entry.to_owned());
-       }
+      for entry in self.transformation.get_inner_ptr() {
+        vertices.push(entry.to_owned());
+      }
     }
     return vertices;
   }
