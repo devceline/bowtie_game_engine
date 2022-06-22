@@ -26,7 +26,7 @@ use sprites::sprite::Sprite;
 
 use game_objects::game_world::GameWorld;
 
-use crate::math::matrix::Matrix;
+use crate::math::matrix::{Matrix, IdentityMatrix};
 
 fn window_setup(glfw: &mut glfw::Glfw, window: &mut glfw::Window) {
   window.make_current();
@@ -106,7 +106,7 @@ fn get_program() -> ShaderProgram {
 fn main() {
   let mut glfw_instance = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
   let (mut window, events) = glfw_instance
-    .create_window(700, 700, "rust game engine", glfw::WindowMode::Windowed)
+    .create_window(1000, 1000, "rust game engine", glfw::WindowMode::Windowed)
     .expect("Failed to create window");
   window_setup(&mut glfw_instance, &mut window);
 
@@ -141,57 +141,35 @@ fn main() {
   );
 
   let mut enemies = Vec::<Sprite<Rectangle>>::new();
-  // for i in 0..100 {
-  //   enemies.push(Sprite::new(
-  //     Rectangle::new(
-  //       (i as f32 / 100.0) - 0.5,
-  //       (i as f32 / 100.0) - 0.5,
-  //       0.2,
-  //       0.3,
-  //       COLORS::White.into(),
-  //     ),
-  //     Texture::from(&enemy_texture),
-  //   ));
-  // }
-  // for i in 0..100 {
-  //   enemies.push(Sprite::new(
-  //     Rectangle::new(
-  //       (i as f32 / 100.0) - 0.3,
-  //       (i as f32 / 100.0) - 0.5,
-  //       0.2,
-  //       0.3,
-  //       COLORS::White.into(),
-  //     ),
-  //     Texture::from(&enemy_texture),
-  //   ));
-  // }
-  // for i in 0..100 {
-  //   enemies.push(Sprite::new(
-  //     Rectangle::new(
-  //       (i as f32 / 100.0) - 0.1,
-  //       (i as f32 / 100.0) - 0.5,
-  //       0.2,
-  //       0.3,
-  //       COLORS::White.into(),
-  //     ),
-  //     Texture::from(&enemy_texture),
-  //   ));
-  // }
+  for i in 0..1{
+    enemies.push(Sprite::new(
+      Rectangle::new(
+        (i as f32 / 100.0) - 0.5,
+        (i as f32 / 100.0) - 0.5,
+        0.2,
+        0.3,
+        COLORS::White.into(),
+      ),
+      Texture::from(&enemy_texture),
+    ));
+  }
 
   let mut fireball = Sprite::new(
     Rectangle::new(-0.7, -0.6, 0.15, 0.1, COLORS::Red.into()),
     Texture::new("fireball", TextureOptions::default()),
   );
 
+  
   let mut fireball_moving = false;
 
   drawer.load_sprite_dynamic(&game_world);
+  
   drawer.load_sprite_dynamic(&character);
-  drawer.load_sprite_dynamic(&fireball);
-
   for enemy in &enemies {
     drawer.load_sprite_dynamic(enemy);
   }
+
+  drawer.load_sprite_dynamic(&fireball);
 
   program.use_program();
 
@@ -216,6 +194,7 @@ fn main() {
     }
 
     if fireball_moving {
+
       if !fireball.move_right(0.1) {
         fireball_moving = false;
         fireball.set_x(character.get_x());
@@ -225,9 +204,9 @@ fn main() {
     } else {
       fireball.set_x(character.get_x());
       fireball.set_y(character.get_y() - 0.2);
-      character.set_color_overlay(COLORS::White.into());
       drawer.unload_sprite_dynamic(&fireball);
     }
+
 
     for (_, event) in glfw::flush_messages(&events) {
       match event {
@@ -239,12 +218,32 @@ fn main() {
         }
         glfw::WindowEvent::Key(glfw::Key::Right, _, glfw::Action::Press, _) => {
           character.move_right(0.02);
+          character.transform(
+          Matrix::new(
+            vec![
+                vec![0.40808206181, 0.80115263573 , 0.0, 0.0],
+                vec![-0.80115263573, 0.40808206181, 0.0, 0.0],
+                vec![0.0, 0.0, 1.0, 0.0],
+                vec![0.0, 0.0, 0.0, 1.343434],
+                ]
+            )
+          );
         }
         glfw::WindowEvent::Key(glfw::Key::Left, _, glfw::Action::Repeat, _) => {
           character.move_left(0.02);
         }
         glfw::WindowEvent::Key(glfw::Key::Left, _, glfw::Action::Press, _) => {
           character.move_left(0.02);
+          character.transform(
+          Matrix::new(
+            vec![
+                vec![-0.40808206181, -0.80115263573 , 0.0, 0.0],
+                vec![0.80115263573, -0.40808206181, 0.0, 0.0],
+                vec![0.0, 0.0, 1.0, 0.0],
+                vec![0.0, 0.0, 0.0, 1.343434],
+                ]
+            )
+          );
         }
         glfw::WindowEvent::Key(glfw::Key::Up, _, glfw::Action::Repeat, _) => {
           character.move_up(0.02);
@@ -254,7 +253,6 @@ fn main() {
         }
         glfw::WindowEvent::Key(glfw::Key::Space, _, glfw::Action::Press, _) => {
           fireball_moving = true;
-          character.set_color_overlay(COLORS::Red.into());
           drawer.load_sprite_dynamic(&fireball);
         }
         glfw::WindowEvent::Key(glfw::Key::K, _, glfw::Action::Press, _) => {

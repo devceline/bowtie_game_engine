@@ -1,4 +1,4 @@
-#version 150 core
+#version 330 core
 
 uniform sampler2D tex0_sampler;
 uniform sampler2D tex1_sampler;
