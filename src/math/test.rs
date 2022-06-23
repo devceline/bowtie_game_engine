@@ -158,9 +158,10 @@ mod matrix_tests {
 
   #[test]
   fn matrix_identity() {
-    use crate::math::matrix::{Matrix, IdentityMatrix};
-    let matrix = Matrix::new(vec![vec![0, 3, 5], vec![5, 5, 2], vec![4,4,4]]);
-    let test_mat = Matrix::new(vec![vec![1,0,0], vec![0,1,0], vec![0,0,1]]);
+    use crate::math::matrix::{IdentityMatrix, Matrix};
+    let matrix = Matrix::new(vec![vec![0, 3, 5], vec![5, 5, 2], vec![4, 4, 4]]);
+    let test_mat =
+      Matrix::new(vec![vec![1, 0, 0], vec![0, 1, 0], vec![0, 0, 1]]);
     assert_eq!(matrix.identity(), test_mat);
   }
 }
@@ -173,8 +174,7 @@ mod trig_tests {
 
     assert_eq!(get_radian(30.0), 0.5235988);
 
-    assert_eq!(get_radian(180.0),3.1415927);
-
+    assert_eq!(get_radian(180.0), 3.1415927);
   }
 
   #[test]

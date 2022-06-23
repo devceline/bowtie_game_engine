@@ -1,12 +1,12 @@
+use crate::math::trig;
 use std::ops::{Add, Index, Mul, Sub};
-use crate::{math::trig};
 
 pub trait Determinant<T> {
   fn det(&self) -> T;
 }
 
 pub trait IdentityMatrix<T> {
-  /// Returns the identity for a given matrix 
+  /// Returns the identity for a given matrix
   fn identity(&self) -> Matrix<T>;
   /// Returns the identity for a given type using num rows
   /// Eg, for i32 that would be 1
@@ -321,13 +321,11 @@ impl RotationMatrix<f32> for Matrix<f32> {
 
 impl ScaleMatrix<f32> for Matrix<f32> {
   fn generate_scale_matrix(x: f32, y: f32, z: f32) -> Matrix<f32> {
-    Matrix::new(
-      vec![
+    Matrix::new(vec![
       vec![x, 0.0, 0.0, 0.0],
       vec![0.0, y, 0.0, 0.0],
       vec![0.0, 0.0, z, 0.0],
-      vec![0.0, 0.0, 0.0, 1.0]
-      ]
-    )
+      vec![0.0, 0.0, 0.0, 1.0],
+    ])
   }
 }

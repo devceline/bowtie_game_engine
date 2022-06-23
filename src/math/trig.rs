@@ -9,17 +9,17 @@ fn factorial_memoized(num: i32, memo_arr: *mut HashMap<i32, i32>) -> i32 {
   }
 
   unsafe {
-  let result: i32 = match (*memo_arr).get(&num) {
-    Some(res) => res.to_owned(),
-    None => {
-      let n_less_1 = factorial_memoized(num.to_owned() - 1, memo_arr) * num.to_owned();
-      (*memo_arr)
-        .insert(num.to_owned(), n_less_1);
-      return n_less_1;
-    }
-  };
+    let result: i32 = match (*memo_arr).get(&num) {
+      Some(res) => res.to_owned(),
+      None => {
+        let n_less_1 =
+          factorial_memoized(num.to_owned() - 1, memo_arr) * num.to_owned();
+        (*memo_arr).insert(num.to_owned(), n_less_1);
+        return n_less_1;
+      }
+    };
 
-  return result;
+    return result;
   }
 }
 

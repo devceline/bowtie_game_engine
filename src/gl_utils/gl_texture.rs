@@ -5,7 +5,7 @@ use std::fs::File;
 
 use super::shader_creator::ShaderProgram;
 
-use super::uniform::{UniformInteger, SettableUniform};
+use super::uniform::{SettableUniform, UniformInteger};
 
 use super::gl_translation::{TextureFilter, TextureWrap, ToGl};
 
@@ -17,9 +17,9 @@ pub trait LoadableTexture {
 
 #[derive(Debug, Copy, Clone)]
 pub struct TextureOptions {
-  wrap: TextureWrap,
-  min_filter: TextureFilter,
-  mag_filter: TextureFilter,
+  pub wrap: TextureWrap,
+  pub min_filter: TextureFilter,
+  pub mag_filter: TextureFilter,
 }
 
 #[derive(Debug, Clone)]
@@ -101,7 +101,13 @@ impl Texture {
 
   /// Sets the sampler fragment shader Uniform
   pub fn set_uniform(&self, program: &ShaderProgram) {
-    let uniform = UniformInteger::new(format!("tex{}_sampler", self.texture_id).as_str(), self.texture_id);
+    if self.texture_id == -1 {
+      return;
+    }
+    let uniform = UniformInteger::new(
+      format!("tex{}_sampler", self.texture_id).as_str(),
+      self.texture_id,
+    );
     program.set_uniform(&uniform);
   }
 }

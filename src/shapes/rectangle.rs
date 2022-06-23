@@ -26,7 +26,7 @@ impl Rectangle {
       width,
       height,
       color,
-      texture_corners:  [[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0]],
+      texture_corners: [[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0]],
     }
   }
 }

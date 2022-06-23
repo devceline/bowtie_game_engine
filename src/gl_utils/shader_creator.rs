@@ -169,12 +169,12 @@ impl ShaderProgram {
           for attribute in attributes {
             let attrib_name = get_c_string(attribute.name.to_owned());
             let attrib_location = unsafe {
-              let loc = gl::GetAttribLocation(self.program_id, attrib_name.as_ptr());
+              let loc =
+                gl::GetAttribLocation(self.program_id, attrib_name.as_ptr());
               println!("Loc for {} is {}", attribute.name, loc);
               if loc >= 0 {
                 loc as u32
-              }
-              else {
+              } else {
                 panic!("Location not found");
               }
             };
