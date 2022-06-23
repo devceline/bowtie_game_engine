@@ -190,25 +190,12 @@ fn main() {
 
   drawer.prep_textures();
 
-  let mut moving_right = true;
-
-  let mut frames = 0;
-  let mut now = std::time::Instant::now();
-
   while !window.should_close() {
     window.swap_buffers();
     glfw_instance.poll_events();
 
     drawer.clear_screen(COLORS::Black.into());
     drawer.draw(DrawingMode::Triangles);
-
-    if now.elapsed().as_secs() < 1 {
-      frames += 1;
-    } else {
-      println!("FPS: {frames}");
-      frames = 0;
-      now = std::time::Instant::now();
-    }
 
     if fireball_moving {
       if !fireball.move_right(0.1) {
@@ -226,7 +213,7 @@ fn main() {
     for (_, event) in glfw::flush_messages(&events) {
       futures::executor::block_on(handle_events(event.to_owned(), &mut character));
       match event {
-        glfw::WindowEvent::Key(glfw::Key::Escape, _, glfw::Action::Press, _) => {
+        glfw::WindowEvent::Key(glfw::Key::Escape, _, _, _) => {
           window.set_should_close(true);
         }
         _ => {}
