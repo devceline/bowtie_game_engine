@@ -17,13 +17,11 @@ pub struct Drawer<'a> {
   elements: Vec<i32>,
   elements_count: i32,
   dynamic_sprites: Vec<&'a dyn Drawable<'a>>,
-  shader_program: &'a ShaderProgram,
 }
 
 impl<'a> Drawer<'a> {
   pub fn new(
     usage_mode: UsageMode,
-    shader_program: *const ShaderProgram,
   ) -> Drawer<'a> {
     Drawer {
       vertex_array_buffer: VertexArrayBuffer::<f32>::new(
@@ -34,7 +32,6 @@ impl<'a> Drawer<'a> {
         DataType::UnsignedInt,
         usage_mode,
       ),
-      shader_program: unsafe { shader_program.as_ref().unwrap() },
       vertices: vec![],
       elements: vec![],
       elements_count: 0,
@@ -125,9 +122,9 @@ impl<'a> Drawer<'a> {
 
   /// Actually loads the sprite's textures.
   /// This needs to be done once, but has to be done before the draw call.
-  pub fn prep_textures(&self) {
+  pub fn prep_textures(&self, program: &ShaderProgram) {
     for sprite in &self.dynamic_sprites {
-      sprite.set_texture_uniform(self.shader_program);
+      sprite.set_texture_uniform(program);
     }
     unsafe {
       gl::Enable(gl::BLEND);

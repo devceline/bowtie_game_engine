@@ -6,6 +6,7 @@ extern crate png;
 mod game_objects;
 mod general;
 mod gl_utils;
+mod god_object;
 mod math;
 mod rendering;
 mod shapes;
@@ -24,6 +25,8 @@ use gl_utils::shader_creator::{
 };
 use gl_utils::vertex_array_object_handler::VertexArrayObject;
 
+use god_object::god_object::GodObject;
+use god_object::god_object::GodObject;
 use rendering::drawer::Drawer;
 use shapes::rectangle::Rectangle;
 use sprites::sprite::Sprite;
@@ -55,64 +58,6 @@ fn window_setup(glfw: &mut glfw::Glfw, window: &mut glfw::Window) {
   window.set_sticky_keys(true);
 }
 
-fn get_program() -> ShaderProgram {
-  let mut program = ShaderProgram::new();
-  program.load_shaders(vec![
-    Shader::VertexShader(
-      String::from("main"),
-      vec![
-        VertexShaderAttribute::new(
-          String::from("position"),
-          DataType::Float32,
-          2,
-          9 + (4 * 4),
-          true,
-          0,
-          VertexShaderAttributeType::Vector,
-        ),
-        VertexShaderAttribute::new(
-          String::from("targetColor"),
-          DataType::Float32,
-          4,
-          9 + (4 * 4),
-          true,
-          2,
-          VertexShaderAttributeType::Vector,
-        ),
-        VertexShaderAttribute::new(
-          String::from("tex_cords_in"),
-          DataType::Float32,
-          2,
-          9 + (4 * 4),
-          true,
-          6,
-          VertexShaderAttributeType::Vector,
-        ),
-        VertexShaderAttribute::new(
-          String::from("tex_id"),
-          DataType::Float32,
-          1,
-          9 + (4 * 4),
-          true,
-          8,
-          VertexShaderAttributeType::Vector,
-        ),
-        VertexShaderAttribute::new(
-          String::from("trans"),
-          DataType::Float32,
-          4,
-          9 + (4 * 4),
-          true,
-          9,
-          VertexShaderAttributeType::Matrix4,
-        ),
-      ],
-    ),
-    Shader::FragmentShader(String::from("main")),
-  ]);
-  program
-}
-
 fn main() {
   let mut glfw_instance = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
   let (mut window, events) = glfw_instance
@@ -122,14 +67,8 @@ fn main() {
 
   gl_error_reader::init_debug_callback();
 
-  // Initialize a vao to handle gl data
-  let _vao = VertexArrayObject::new();
-
   // Initialize a program and load a vertex and fragment shader
-  let program = get_program();
-
-  // Transformation test
-  let mut drawer = Drawer::new(UsageMode::StaticDraw, &program);
+  let god_object = GodObject::new();
 
   let enemy_texture = Texture::new("enemy", TextureOptions::default());
   enemy_texture.load_texture();
@@ -211,7 +150,10 @@ fn main() {
     }
 
     for (_, event) in glfw::flush_messages(&events) {
-      futures::executor::block_on(handle_events(event.to_owned(), &mut character));
+      futures::executor::block_on(handle_events(
+        event.to_owned(),
+        &mut character,
+      ));
       match event {
         glfw::WindowEvent::Key(glfw::Key::Escape, _, _, _) => {
           window.set_should_close(true);

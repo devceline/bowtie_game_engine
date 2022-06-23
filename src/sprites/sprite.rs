@@ -11,7 +11,6 @@ use crate::{
 use super::drawable::Drawable;
 use std::marker::PhantomData;
 
-
 #[derive(Debug, Clone)]
 pub struct Sprite<'a, TShape>
 where
@@ -55,15 +54,19 @@ where
     }
   }
 
-  fn handle_direction_change(&mut self, direction: Direction, event: &glfw::WindowEvent) {
-      match event {
-        glfw::WindowEvent::Key(_, _, glfw::Action::Release, _) => {
-          self.direction = self.direction.subtract_direction(direction);
-        }
-        _ => {
-          self.direction = self.direction.add_direction(direction);
-        }
+  fn handle_direction_change(
+    &mut self,
+    direction: Direction,
+    event: &glfw::WindowEvent,
+  ) {
+    match event {
+      glfw::WindowEvent::Key(_, _, glfw::Action::Release, _) => {
+        self.direction = self.direction.subtract_direction(direction);
       }
+      _ => {
+        self.direction = self.direction.add_direction(direction);
+      }
+    }
   }
 
   pub async fn respond_to_event(&mut self, event: &glfw::WindowEvent) {

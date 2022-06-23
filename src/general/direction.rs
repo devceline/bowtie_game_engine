@@ -1,4 +1,3 @@
-
 #[derive(Debug, Copy, Clone)]
 pub enum Direction {
   Up,
@@ -35,23 +34,23 @@ impl Direction {
       Direction::UpLeft => match other {
         Direction::Up => Direction::Left,
         Direction::Left => Direction::Up,
-        _ => self.to_owned()
-      }
+        _ => self.to_owned(),
+      },
       Direction::UpRight => match other {
         Direction::Right => Direction::Up,
         Direction::Up => Direction::Right,
-        _ => self.to_owned()
-      }
+        _ => self.to_owned(),
+      },
       Direction::DownRight => match other {
         Direction::Down => Direction::Right,
         Direction::Right => Direction::Down,
-        _ => self.to_owned()
-      }
+        _ => self.to_owned(),
+      },
       Direction::DownLeft => match other {
         Direction::Down => Direction::Left,
         Direction::Left => Direction::Down,
-        _ => self.to_owned()
-      }
+        _ => self.to_owned(),
+      },
     };
 
     res
@@ -86,23 +85,23 @@ impl Direction {
       Direction::UpLeft => match other {
         Direction::Right => Direction::Stationary,
         Direction::Down => Direction::Stationary,
-        _ => self.to_owned()
-      }
+        _ => self.to_owned(),
+      },
       Direction::UpRight => match other {
         Direction::Left => Direction::Stationary,
         Direction::Down => Direction::Stationary,
-        _ => self.to_owned()
-      }
+        _ => self.to_owned(),
+      },
       Direction::DownRight => match other {
         Direction::Left => Direction::Stationary,
         Direction::Up => Direction::Stationary,
-        _ => self.to_owned()
-      }
+        _ => self.to_owned(),
+      },
       Direction::DownLeft => match other {
         Direction::Right => Direction::Stationary,
         Direction::Up => Direction::Stationary,
-        _ => self.to_owned()
-      }
+        _ => self.to_owned(),
+      },
     };
 
     res

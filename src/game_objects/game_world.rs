@@ -1,3 +1,4 @@
+use crate::god_object::entity::Entity;
 use crate::shapes::rectangle::Rectangle;
 use crate::sprites::drawable::Drawable;
 use crate::sprites::sprite::Sprite;
@@ -7,6 +8,7 @@ pub struct GameWorld<'a> {
   floor: Sprite<'a, Rectangle>,
   sky: Sprite<'a, Rectangle>,
 }
+
 
 impl<'a> GameWorld<'a> {
   pub fn new(
@@ -55,5 +57,12 @@ impl<'a> Drawable<'a> for GameWorld<'a> {
   fn load_texture(&'a self) -> () {
     self.sky.load_texture();
     self.floor.load_texture();
+  }
+}
+
+impl<'a> Entity<'a> for GameWorld<'a> {
+  fn get_drawable(&'a self) -> *const dyn Drawable<'a> {
+    let floo: *const dyn Drawable<'a> = &self.floor;
+    return floo;
   }
 }
