@@ -186,7 +186,7 @@ where
   pub fn move_right(&mut self, amount: f32) -> bool {
     let new_amount = self.shape.get_x() + amount;
 
-    if new_amount > 0.8 {
+    if new_amount > 0.7 {
       return false;
     }
 

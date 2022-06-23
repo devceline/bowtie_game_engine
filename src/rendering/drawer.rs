@@ -2,7 +2,7 @@ extern crate gl;
 
 use crate::general::color;
 use crate::gl_utils::element_array_buffer::ElementArrayBuffer;
-use crate::gl_utils::gl_texture::{LoadableTexture, Texture};
+use crate::gl_utils::gl_texture::Texture;
 use crate::gl_utils::gl_translation::{DataType, DrawingMode, ToGl, UsageMode};
 use crate::gl_utils::shader_creator::ShaderProgram;
 use crate::gl_utils::vertex_array_buffer::VertexArrayBuffer;
