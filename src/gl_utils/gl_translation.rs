@@ -80,6 +80,7 @@ impl ToGl for png::ColorType {
 #[derive(Debug, Copy, Clone)]
 pub enum TextureWrap {
   ClampToEdge,
+  ClampToBorder,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -92,6 +93,7 @@ impl ToGl for TextureWrap {
   fn to_gl(&self) -> u32 {
     match self {
       TextureWrap::ClampToEdge => gl::CLAMP_TO_EDGE,
+      TextureWrap::ClampToBorder => gl::CLAMP_TO_BORDER,
     }
   }
 }
