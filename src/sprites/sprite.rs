@@ -1,5 +1,5 @@
 use crate::{
-  general::color::Color,
+  general::{color::Color, direction::Direction},
   gl_utils::{
     gl_texture::LoadableTexture, gl_texture::Texture,
     shader_creator::ShaderProgram,
@@ -11,12 +11,14 @@ use crate::{
 use super::drawable::Drawable;
 use std::marker::PhantomData;
 
+
 #[derive(Debug, Clone)]
 pub struct Sprite<'a, TShape>
 where
   TShape: Shape + 'a,
 {
   shape: TShape,
+  direction: Direction,
   pub name: String,
   texture: Texture,
   phantom: PhantomData<&'a TShape>,
@@ -31,15 +33,21 @@ where
     Sprite {
       shape,
       name: texture.image_name.to_owned(),
+      direction: Direction::Stationary,
       texture,
       phantom: PhantomData,
       transformation: Matrix::<f32>::generate_identity(4),
     }
   }
 
-  pub fn with_transformation(shape: TShape, texture: Texture, trans: Matrix<f32>) -> Sprite<'a, TShape> {
+  pub fn with_transformation(
+    shape: TShape,
+    texture: Texture,
+    trans: Matrix<f32>,
+  ) -> Sprite<'a, TShape> {
     Sprite {
       shape,
+      direction: Direction::Stationary,
       name: texture.image_name.to_owned(),
       texture,
       phantom: PhantomData,
@@ -47,10 +55,76 @@ where
     }
   }
 
+  fn handle_direction_change(&mut self, direction: Direction, event: &glfw::WindowEvent) {
+      match event {
+        glfw::WindowEvent::Key(_, _, glfw::Action::Release, _) => {
+          self.direction = self.direction.subtract_direction(direction);
+        }
+        _ => {
+          self.direction = self.direction.add_direction(direction);
+        }
+      }
+  }
+
+  pub async fn respond_to_event(&mut self, event: &glfw::WindowEvent) {
+    match event {
+      glfw::WindowEvent::Key(glfw::Key::Right, _, _, _) => {
+        self.handle_direction_change(Direction::Right, event);
+      }
+      glfw::WindowEvent::Key(glfw::Key::Left, _, _, _) => {
+        self.handle_direction_change(Direction::Left, event);
+      }
+      glfw::WindowEvent::Key(glfw::Key::Up, _, _, _) => {
+        self.handle_direction_change(Direction::Up, event);
+      }
+      glfw::WindowEvent::Key(glfw::Key::Down, _, _, _) => {
+        self.handle_direction_change(Direction::Down, event);
+      }
+      _ => {
+        self.direction = Direction::Stationary;
+      }
+    }
+
+    self.move_character(self.direction, 0.04);
+  }
+
+  pub fn move_character(&mut self, direction: Direction, amount: f32) {
+    match direction {
+      Direction::Right => {
+        self.move_right(amount);
+      }
+      Direction::Left => {
+        self.move_left(amount);
+      }
+      Direction::Up => {
+        self.move_up(amount);
+      }
+      Direction::Down => {
+        self.move_down(amount);
+      }
+      Direction::UpRight => {
+        self.move_right(amount);
+        self.move_up(amount);
+      }
+      Direction::UpLeft => {
+        self.move_left(amount);
+        self.move_up(amount);
+      }
+      Direction::DownRight => {
+        self.move_right(amount);
+        self.move_down(amount);
+      }
+      Direction::DownLeft => {
+        self.move_left(amount);
+        self.move_down(amount);
+      }
+      _ => {}
+    }
+  }
+
   pub fn flip_vertical(&mut self) {
     self.shape.flip_texture_corners_y()
   }
-
 
   pub fn flip_horizontal(&mut self) {
     self.shape.flip_texture_corners_x()
@@ -99,7 +173,6 @@ where
 
   pub fn move_down(&mut self, amount: f32) -> bool {
     let new_amount = self.shape.get_y() - amount;
-    println!("Currently at: {}, going to: {}", self.shape.get_y(), new_amount);
 
     if new_amount <= -0.7 {
       return false;
@@ -113,7 +186,7 @@ where
   pub fn move_right(&mut self, amount: f32) -> bool {
     let new_amount = self.shape.get_x() + amount;
 
-    if new_amount > 1.0 {
+    if new_amount > 0.8 {
       return false;
     }
 
