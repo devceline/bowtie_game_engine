@@ -1,15 +1,16 @@
 use crate::{
-  general::{
-    color::COLORS
-  },
+  components::collide::CollisionComponent,
+  general::color::COLORS,
   gl_utils::{
     gl_translation::{DataType, DrawingMode, UsageMode},
     shader_creator::{
       Shader, ShaderProgram, VertexShaderAttribute, VertexShaderAttributeType,
-    }, vertex_array_object_handler::VertexArrayObject,
+    },
+    vertex_array_object_handler::VertexArrayObject,
   },
   rendering::drawer::Drawer,
 };
+use std::collections::HashMap;
 
 use super::entity::Entity;
 
@@ -18,9 +19,10 @@ use super::entity::Entity;
 /// And controlling the game's state through entitiy data
 pub struct BowTie<'d> {
   entities: Vec<*mut dyn Entity<'d>>,
+  colliding_objects: HashMap<i32, Vec<i32>>,
   drawer: Drawer<'d>,
   shading_program: ShaderProgram,
-  _vao: VertexArrayObject
+  _vao: VertexArrayObject,
 }
 
 fn get_program() -> ShaderProgram {
@@ -86,13 +88,14 @@ impl<'d> BowTie<'d> {
     let _vao = VertexArrayObject::new();
     BowTie {
       entities: vec![],
+      colliding_objects: HashMap::new(),
       drawer: Drawer::new(UsageMode::StaticDraw),
       shading_program: get_program(),
-      _vao 
+      _vao,
     }
   }
 
-  /// Loads the entity into the drawer and the game's state 
+  /// Loads the entity into the drawer and the game's state
   /// To handle rendering and physics
   pub fn load_entity<'g>(&'g mut self, entity: *mut dyn Entity<'d>) {
     self.entities.push(entity);
@@ -104,10 +107,18 @@ impl<'d> BowTie<'d> {
 
   /// Updates the entities with the existing systems
   pub fn update_entities(&mut self) {
-    for entity in &self.entities {}
+    for entity in self.entities.to_owned() {
+      unsafe {
+        for comp in entity.as_mut().unwrap().get_components() {
+          let mut entities_copy = self.entities.to_owned();
+          let thing = entity.to_owned();
+          comp.as_mut().unwrap().act(&mut entities_copy, thing);
+        }
+      }
+    }
   }
 
-  /// Prepares the god object to draw stuff. 
+  /// Prepares the god object to draw stuff.
   /// Has to be called before the main draw call
   pub fn prep_for_render(&self) {
     self.shading_program.use_program();
