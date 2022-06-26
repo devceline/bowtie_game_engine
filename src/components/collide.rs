@@ -31,8 +31,6 @@ impl<'d> Component<'d> for CollisionComponent<'d> {
     entities: &Vec<*mut dyn Entity<'d>>,
     entity: *mut dyn Entity<'d>,
   ) {
-
-
     for other_entity in entities {
       if other_entity.as_ref().unwrap() as *const _
         == entity.as_ref().unwrap() as *const _
@@ -42,12 +40,6 @@ impl<'d> Component<'d> for CollisionComponent<'d> {
 
       let current_vec =
         self.colliding_objects.entry(entity).or_insert(Vec::new());
-
-      let other_entity_id = entities
-        .iter()
-        .position(|entity_ptr| entity_ptr == other_entity)
-        .expect("Other Entity not registered in entities")
-        as i32;
 
       let other_x = other_entity.as_ref().unwrap().get_x();
       let other_y = other_entity.as_ref().unwrap().get_y();
@@ -60,7 +52,7 @@ impl<'d> Component<'d> for CollisionComponent<'d> {
       let width = entity.as_ref().unwrap().get_width();
 
       let x_collision = (x + width) >= other_x && x <= (other_x + other_width);
-      let y_collision = y >= other_y && y <= (other_y + other_height);
+      let y_collision = y + height >= other_y && y <= (other_y + other_height);
 
       let other_entity_position = (*current_vec)
         .iter()
