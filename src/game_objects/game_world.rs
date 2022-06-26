@@ -60,8 +60,3 @@ impl<'a> Drawable<'a> for GameWorld<'a> {
   }
 }
 
-impl<'a> Entity<'a> for GameWorld<'a> {
-  fn get_drawable(&'a self) -> &'a dyn Drawable<'a> {
-    &self.sky
-  }
-}

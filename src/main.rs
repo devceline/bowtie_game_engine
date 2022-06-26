@@ -11,7 +11,9 @@ mod math;
 mod rendering;
 mod shapes;
 mod sprites;
+mod components;
 
+use components::collide::CollisionComponent;
 use game_objects::playable_character;
 use glfw::Context;
 
@@ -72,25 +74,31 @@ fn main() {
   let mut god_object = BowTie::new();
 
 
-  let sky = Sprite::new(
-    Rectangle::new(-1.0, 1.0, 2.0, 2.0, COLORS::White.into()),
-    Texture::new("sky", TextureOptions::default()),
-  );
-  let floor = Sprite::new(
-    Rectangle::new(-1.0, -0.5, 2.0, 0.5, COLORS::White.into()),
-    Texture::new("floor", TextureOptions::default()),
-  );
-  let mut game_world = GameWorld::new(floor, sky);
+  // let sky = Sprite::new(
+  //   Rectangle::new(-1.0, 1.0, 2.0, 2.0, COLORS::White.into()),
+  //   Texture::new("sky", TextureOptions::default()),
+  // );
+  // let floor = Sprite::new(
+  //   Rectangle::new(-1.0, -0.5, 2.0, 0.5, COLORS::White.into()),
+  //   Texture::new("floor", TextureOptions::default()),
+  // );
+  // let mut game_world = GameWorld::new(floor, sky);
 
+  let mut collision_component = CollisionComponent::new();
 
-  let character_sprite = Sprite::new(Rectangle::new(
+  let mut playable_character = PlayableCharacter::new(Sprite::new(Rectangle::new(
       -0.5, -0.5, 0.3, 0.2, COLORS::White.into()
-      ), Texture::new("character", TextureOptions::default()));
+      ), Texture::new("character", TextureOptions::default())));
 
-  let mut playable_character = PlayableCharacter { sprite: character_sprite };
+  let mut playable_character2 = PlayableCharacter::new(Sprite::new(Rectangle::new(
+      0.5, -0.5, 0.3, 0.2, COLORS::White.into()
+      ), Texture::new("character", TextureOptions::default())));
 
-  god_object.load_entity(&mut game_world);
+  playable_character.load_components(&mut collision_component);
+  playable_character2.load_components(&mut collision_component);
+
   god_object.load_entity(&mut playable_character);
+  god_object.load_entity(&mut playable_character2);
 
   god_object.prep_for_render();
 
@@ -98,6 +106,7 @@ fn main() {
     window.swap_buffers();
     glfw_instance.poll_events();
 
+    god_object.update_entities();
     god_object.draw_entities();
 
     for (_, event) in glfw::flush_messages(&events) {
@@ -108,6 +117,9 @@ fn main() {
       match event {
         glfw::WindowEvent::Key(glfw::Key::Escape, _, _, _) => {
           window.set_should_close(true);
+        }
+        glfw::WindowEvent::Key(glfw::Key::Left, _, _, _) => {
+          playable_character.move_left();
         }
         glfw::WindowEvent::Key(glfw::Key::Right, _, _, _) => {
           playable_character.move_right();
