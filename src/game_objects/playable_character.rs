@@ -22,6 +22,19 @@ impl<'s> PlayableCharacter<'s> {
   pub fn move_right(&mut self) { 
     self.sprite.move_right(0.02);
   }
+
+  pub fn move_up(&mut self) { 
+    self.sprite.move_up(0.02);
+  }
+
+  pub fn move_down(&mut self) { 
+    self.sprite.move_down(0.02);
+  }
+
+  pub fn flip_horizontal(&mut self) {
+    self.sprite.flip_horizontal();
+  }
+
 }
 
 impl<'e> Entity<'e> for PlayableCharacter<'e> {
