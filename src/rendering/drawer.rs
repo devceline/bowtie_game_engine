@@ -62,9 +62,9 @@ impl<'a> Drawer<'a> {
    * Add sprite to drawer to be rendered on the next draw call.
    * Naturally, the sprite needs to have the same lifetime as the drawer.
    */
-  pub fn load_sprite_dynamic(&mut self, sprite: *const dyn Drawable<'a>) {
+  pub fn load_sprite_dynamic(&mut self, sprite: &'a dyn Drawable<'a>) {
     unsafe {
-      let sprite_instance = sprite.as_ref().unwrap();
+      let sprite_instance = sprite;
       self.dynamic_sprites.push(sprite_instance);
       Drawer::load_sprite(
         &mut self.elements,
