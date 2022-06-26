@@ -1,19 +1,24 @@
 use crate::{
+  general::{
+    color::COLORS
+  },
   gl_utils::{
-    gl_translation::{DataType, DrawingMode, UsageMode, UsageMode},
+    gl_translation::{DataType, DrawingMode, UsageMode},
     shader_creator::{
       Shader, ShaderProgram, VertexShaderAttribute, VertexShaderAttributeType,
-    }, vertex_array_object_handler::VertexArrayObject, vertex_array_object_handler::VertexArrayObject,
+    }, vertex_array_object_handler::VertexArrayObject,
   },
   rendering::drawer::Drawer,
-  sprites::drawable::Drawable,
 };
 
 use super::entity::Entity;
 
-pub struct GodObject<'a> {
-  entities: Vec<Box<dyn Entity<'a>>>,
-  drawer: Drawer<'a>,
+/// Public interface for the game engine's capabilities
+/// Will be responsible for rendering, handling physics systems
+/// And controlling the game's state through entitiy data
+pub struct GodObject<'d> {
+  entities: Vec<*mut dyn Entity<'d>>,
+  drawer: Drawer<'d>,
   shading_program: ShaderProgram,
   _vao: VertexArrayObject
 }
@@ -76,8 +81,8 @@ fn get_program() -> ShaderProgram {
   program
 }
 
-impl<'a> GodObject<'a> {
-  pub fn new() -> GodObject<'a> {
+impl<'d> GodObject<'d> {
+  pub fn new() -> GodObject<'d> {
     let _vao = VertexArrayObject::new();
     GodObject {
       entities: vec![],
@@ -86,22 +91,32 @@ impl<'a> GodObject<'a> {
       _vao 
     }
   }
-  pub fn load_entity(&'a mut self, entity: Box<dyn Entity<'a>>) {
+
+  /// Loads the entity into the drawer and the game's state 
+  /// To handle rendering and physics
+  pub fn load_entity<'g>(&'g mut self, entity: *mut dyn Entity<'d>) {
     self.entities.push(entity);
-    let drawable = self.entities[self.entities.len() - 1].get_drawable();
-    self.drawer.load_sprite_dynamic(drawable);
+    unsafe {
+      let drawable = (*self.entities[self.entities.len() - 1]).get_drawable();
+      self.drawer.load_sprite_dynamic(drawable);
+    }
   }
 
+  /// Updates the entities with the existing systems
   pub fn update_entities(&mut self) {
     for entity in &self.entities {}
   }
 
+  /// Prepares the god object to draw stuff. 
+  /// Has to be called before the main draw call
   pub fn prep_for_render(&self) {
     self.shading_program.use_program();
     self.drawer.prep_textures(&self.shading_program);
   }
 
+  /// Draws the entities with an actual clear screen refresh
   pub fn draw_entities(&mut self) {
+    self.drawer.clear_screen(COLORS::Black.into());
     self.drawer.draw(DrawingMode::Triangles);
   }
 }

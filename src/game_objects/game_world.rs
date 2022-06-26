@@ -61,8 +61,7 @@ impl<'a> Drawable<'a> for GameWorld<'a> {
 }
 
 impl<'a> Entity<'a> for GameWorld<'a> {
-  fn get_drawable(&'a self) -> *const dyn Drawable<'a> {
-    let floo: *const dyn Drawable<'a> = &self.floor;
-    return floo;
+  fn get_drawable(&'a self) -> &'a dyn Drawable<'a> {
+    &self.sky
   }
 }
