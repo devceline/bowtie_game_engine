@@ -28,7 +28,7 @@ use gl_utils::vertex_array_object_handler::VertexArrayObject;
 
 use god_object::entity::Entity;
 use game_objects::playable_character::PlayableCharacter;
-use god_object::god_object::GodObject;
+use god_object::god_object::BowTie;
 use rendering::drawer::Drawer;
 use shapes::rectangle::Rectangle;
 use sprites::sprite::Sprite;
@@ -69,7 +69,7 @@ fn main() {
   window_setup(&mut glfw_instance, &mut window);
 
   gl_error_reader::init_debug_callback();
-  let mut god_object = GodObject::new();
+  let mut god_object = BowTie::new();
 
 
   let sky = Sprite::new(

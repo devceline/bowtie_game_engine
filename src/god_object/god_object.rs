@@ -16,7 +16,7 @@ use super::entity::Entity;
 /// Public interface for the game engine's capabilities
 /// Will be responsible for rendering, handling physics systems
 /// And controlling the game's state through entitiy data
-pub struct GodObject<'d> {
+pub struct BowTie<'d> {
   entities: Vec<*mut dyn Entity<'d>>,
   drawer: Drawer<'d>,
   shading_program: ShaderProgram,
@@ -81,10 +81,10 @@ fn get_program() -> ShaderProgram {
   program
 }
 
-impl<'d> GodObject<'d> {
-  pub fn new() -> GodObject<'d> {
+impl<'d> BowTie<'d> {
+  pub fn new() -> BowTie<'d> {
     let _vao = VertexArrayObject::new();
-    GodObject {
+    BowTie {
       entities: vec![],
       drawer: Drawer::new(UsageMode::StaticDraw),
       shading_program: get_program(),
