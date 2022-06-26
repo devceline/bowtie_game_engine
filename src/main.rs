@@ -14,28 +14,16 @@ mod sprites;
 mod components;
 
 use components::collide::CollisionComponent;
-use game_objects::playable_character;
 use glfw::Context;
 
 use general::color::COLORS;
 use gl_utils::gl_error_reader;
-use gl_utils::gl_texture::{LoadableTexture, Texture, TextureOptions};
-use gl_utils::gl_translation::{
-  DataType, DrawingMode, TextureFilter, UsageMode,
-};
-use gl_utils::shader_creator::{
-  Shader, ShaderProgram, VertexShaderAttribute, VertexShaderAttributeType,
-};
-use gl_utils::vertex_array_object_handler::VertexArrayObject;
-
+use gl_utils::gl_texture::{Texture, TextureOptions};
 use god_object::entity::Entity;
 use game_objects::playable_character::PlayableCharacter;
 use god_object::god_object::BowTie;
-use rendering::drawer::Drawer;
 use shapes::rectangle::Rectangle;
 use sprites::sprite::Sprite;
-
-use game_objects::game_world::GameWorld;
 
 
 async fn handle_events<'a>(
@@ -84,18 +72,18 @@ fn main() {
   // );
   // let mut game_world = GameWorld::new(floor, sky);
 
-  let mut collision_component = CollisionComponent::new();
 
   let mut playable_character = PlayableCharacter::new(Sprite::new(Rectangle::new(
       -0.5, -0.5, 0.3, 0.2, COLORS::White.into()
       ), Texture::new("character", TextureOptions::default())));
+  let mut collision_component = CollisionComponent::new();
 
   let mut playable_character2 = PlayableCharacter::new(Sprite::new(Rectangle::new(
       0.5, -0.5, 0.3, 0.2, COLORS::White.into()
       ), Texture::new("character", TextureOptions::default())));
 
   playable_character.load_components(&mut collision_component);
-  playable_character2.load_components(&mut collision_component);
+  // playable_character2.load_components(&mut collision_component);
 
   god_object.load_entity(&mut playable_character);
   god_object.load_entity(&mut playable_character2);
@@ -107,6 +95,13 @@ fn main() {
     glfw_instance.poll_events();
 
     god_object.update_entities();
+    let is_collided = collision_component.get_is_collided(&mut playable_character);
+    if is_collided {
+      playable_character.set_color_overlay(COLORS::Red.into());
+    }
+    else {
+      playable_character.set_color_overlay(COLORS::White.into());
+    }
     god_object.draw_entities();
 
     for (_, event) in glfw::flush_messages(&events) {
