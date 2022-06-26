@@ -1,4 +1,4 @@
-use crate::{sprites::sprite::Sprite, shapes::rectangle::Rectangle, god_object::entity::{Entity, Component}};
+use crate::{sprites::sprite::Sprite, shapes::rectangle::Rectangle, god_object::entity::{Entity, Component}, general::color::Color};
 
 pub struct PlayableCharacter<'s> {
   sprite: Sprite<'s, Rectangle>,
@@ -9,6 +9,10 @@ impl<'s> PlayableCharacter<'s> {
 
   pub fn new(sprite: Sprite<'s, Rectangle>) -> PlayableCharacter<'s> {
     PlayableCharacter { sprite, components: vec![] }
+  }
+
+  pub fn set_color_overlay(&mut self, color: Color) {
+    self.sprite.set_color_overlay(color);
   }
 
   pub fn move_left(&mut self) { 
