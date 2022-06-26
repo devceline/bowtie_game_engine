@@ -12,6 +12,7 @@ mod rendering;
 mod shapes;
 mod sprites;
 
+use game_objects::playable_character;
 use glfw::Context;
 
 use general::color::COLORS;
@@ -25,13 +26,15 @@ use gl_utils::shader_creator::{
 };
 use gl_utils::vertex_array_object_handler::VertexArrayObject;
 
-use god_object::god_object::GodObject;
+use god_object::entity::Entity;
+use game_objects::playable_character::PlayableCharacter;
 use god_object::god_object::GodObject;
 use rendering::drawer::Drawer;
 use shapes::rectangle::Rectangle;
 use sprites::sprite::Sprite;
 
 use game_objects::game_world::GameWorld;
+
 
 async fn handle_events<'a>(
   event: glfw::WindowEvent,
@@ -66,12 +69,8 @@ fn main() {
   window_setup(&mut glfw_instance, &mut window);
 
   gl_error_reader::init_debug_callback();
+  let mut god_object = GodObject::new();
 
-  // Initialize a program and load a vertex and fragment shader
-  let god_object = GodObject::new();
-
-  let enemy_texture = Texture::new("enemy", TextureOptions::default());
-  enemy_texture.load_texture();
 
   let sky = Sprite::new(
     Rectangle::new(-1.0, 1.0, 2.0, 2.0, COLORS::White.into()),
@@ -81,82 +80,37 @@ fn main() {
     Rectangle::new(-1.0, -0.5, 2.0, 0.5, COLORS::White.into()),
     Texture::new("floor", TextureOptions::default()),
   );
+  let mut game_world = GameWorld::new(floor, sky);
 
-  let game_world = GameWorld::new(floor, sky);
 
-  let meme_sprite = Sprite::new(
-    Rectangle::new(-1.0, 1.0, 2.0, 2.0, COLORS::White.into()),
-    Texture::new("sky2", TextureOptions::default()),
-  );
+  let character_sprite = Sprite::new(Rectangle::new(
+      -0.5, -0.5, 0.3, 0.2, COLORS::White.into()
+      ), Texture::new("character", TextureOptions::default()));
 
-  let mut character = Sprite::new(
-    Rectangle::new(-0.7, -0.6, 0.3, 0.4, COLORS::White.into()),
-    Texture::new("character", TextureOptions::default()),
-  );
+  let mut playable_character = PlayableCharacter { sprite: character_sprite };
 
-  let mut enemies = Vec::<Sprite<Rectangle>>::new();
-  for i in 0..0 {
-    enemies.push(Sprite::new(
-      Rectangle::new(
-        (i as f32 / 100.0) - 0.5,
-        (i as f32 / 100.0) - 0.5,
-        0.2,
-        0.3,
-        COLORS::White.into(),
-      ),
-      Texture::from(&enemy_texture),
-    ));
-  }
+  god_object.load_entity(&mut game_world);
+  god_object.load_entity(&mut playable_character);
 
-  let mut fireball = Sprite::new(
-    Rectangle::new(-0.7, -0.6, 0.15, 0.1, COLORS::Red.into()),
-    Texture::new("fireball", TextureOptions::default()),
-  );
-
-  let mut fireball_moving = false;
-
-  drawer.load_sprite_dynamic(&game_world);
-  drawer.load_sprite_dynamic(&meme_sprite);
-
-  drawer.load_sprite_dynamic(&character);
-  for enemy in &enemies {
-    drawer.load_sprite_dynamic(enemy);
-  }
-
-  drawer.load_sprite_dynamic(&fireball);
-
-  program.use_program();
-
-  drawer.prep_textures();
+  god_object.prep_for_render();
 
   while !window.should_close() {
     window.swap_buffers();
     glfw_instance.poll_events();
 
-    drawer.clear_screen(COLORS::Black.into());
-    drawer.draw(DrawingMode::Triangles);
-
-    if fireball_moving {
-      if !fireball.move_right(0.1) {
-        fireball_moving = false;
-        fireball.set_x(character.get_x());
-        fireball.set_y(character.get_y() - 0.2);
-        drawer.unload_sprite_dynamic(&fireball);
-      }
-    } else {
-      fireball.set_x(character.get_x());
-      fireball.set_y(character.get_y() - 0.2);
-      drawer.unload_sprite_dynamic(&fireball);
-    }
+    god_object.draw_entities();
 
     for (_, event) in glfw::flush_messages(&events) {
-      futures::executor::block_on(handle_events(
-        event.to_owned(),
-        &mut character,
-      ));
+      // futures::executor::block_on(handle_events(
+      //   event.to_owned(),
+      //   &mut character,
+      // ));
       match event {
         glfw::WindowEvent::Key(glfw::Key::Escape, _, _, _) => {
           window.set_should_close(true);
+        }
+        glfw::WindowEvent::Key(glfw::Key::Right, _, _, _) => {
+          playable_character.move_right();
         }
         _ => {}
       }
