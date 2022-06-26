@@ -162,6 +162,14 @@ where
     self.shape.get_y()
   }
 
+  pub fn get_height(&self) -> f32 {
+    self.shape.get_height()
+  }
+
+  pub fn get_width(&self) -> f32 {
+    self.shape.get_width()
+  }
+
   pub fn move_up(&mut self, amount: f32) -> bool {
     let new_amount = self.shape.get_y() + amount;
 
