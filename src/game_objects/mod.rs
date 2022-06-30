@@ -1,2 +1,2 @@
-pub mod game_world;
+pub mod floor;
 pub mod playable_character;
