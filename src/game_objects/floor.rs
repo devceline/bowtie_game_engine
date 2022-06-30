@@ -4,7 +4,7 @@ use crate::{
     direction::Direction,
   },
   gl_utils::gl_texture::{Texture, TextureOptions},
-  god_object::entity::{Component, Entity},
+  bowtie::entity::{Component, Entity},
   shapes::rectangle::Rectangle,
   sprites::sprite::Sprite,
 };
@@ -62,5 +62,5 @@ impl<'s> Entity<'s> for Floor<'s> {
     self.sprite.get_width()
   }
 
-  fn recieve_message(&mut self, message: crate::god_object::entity::Message) {}
+  fn recieve_message(&mut self, message: crate::bowtie::entity::Message) {}
 }

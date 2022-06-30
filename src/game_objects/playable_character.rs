@@ -6,7 +6,7 @@ use crate::{
     gravity::GravityComponent,
   },
   general::{color::Color, direction::Direction},
-  god_object::entity::{Component, Entity, Message},
+  bowtie::entity::{Component, Entity, Message},
   math::general::absolute_value_f32,
   shapes::rectangle::Rectangle,
   sprites::sprite::Sprite,
@@ -68,7 +68,7 @@ impl<'e> Entity<'e> for PlayableCharacter<'e> {
 
   fn get_components(
     &mut self,
-  ) -> &Vec<*mut dyn crate::god_object::entity::Component<'e>> {
+  ) -> &Vec<*mut dyn crate::bowtie::entity::Component<'e>> {
     &self.components
   }
 

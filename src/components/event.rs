@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::god_object::entity::{Component, Entity, Message};
+use crate::bowtie::entity::{Component, Entity, Message};
 
 pub struct EventComponent<'s> {
   events: HashMap<*mut dyn Entity<'s>, Vec<Message>>,

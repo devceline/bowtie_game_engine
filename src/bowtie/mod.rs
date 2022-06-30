@@ -1,2 +1,2 @@
 pub mod entity;
-pub mod god_object;
+pub mod bowtie;

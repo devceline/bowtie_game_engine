@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::god_object::entity::{Component, Entity, Message};
+use crate::bowtie::entity::{Component, Entity, Message};
 
 pub struct GravityComponent<'s> {
   speed: f32,

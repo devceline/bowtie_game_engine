@@ -2,7 +2,7 @@ use std::{collections::HashMap, marker::PhantomData};
 
 use crate::{
   general::direction::Direction,
-  god_object::entity::{Component, Entity, Message},
+  bowtie::entity::{Component, Entity, Message},
   math::general::absolute_value_f32,
 };
 
