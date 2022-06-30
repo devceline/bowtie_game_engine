@@ -54,44 +54,7 @@ where
     }
   }
 
-  fn handle_direction_change(
-    &mut self,
-    direction: Direction,
-    event: &glfw::WindowEvent,
-  ) {
-    match event {
-      glfw::WindowEvent::Key(_, _, glfw::Action::Release, _) => {
-        self.direction = self.direction.subtract_direction(direction);
-      }
-      _ => {
-        self.direction = self.direction.add_direction(direction);
-      }
-    }
-  }
-
-  pub async fn respond_to_event(&mut self, event: &glfw::WindowEvent) {
-    match event {
-      glfw::WindowEvent::Key(glfw::Key::Right, _, _, _) => {
-        self.handle_direction_change(Direction::Right, event);
-      }
-      glfw::WindowEvent::Key(glfw::Key::Left, _, _, _) => {
-        self.handle_direction_change(Direction::Left, event);
-      }
-      glfw::WindowEvent::Key(glfw::Key::Up, _, _, _) => {
-        self.handle_direction_change(Direction::Up, event);
-      }
-      glfw::WindowEvent::Key(glfw::Key::Down, _, _, _) => {
-        self.handle_direction_change(Direction::Down, event);
-      }
-      _ => {
-        self.direction = Direction::Stationary;
-      }
-    }
-
-    self.move_character(self.direction, 0.04);
-  }
-
-  pub fn move_character(&mut self, direction: Direction, amount: f32) {
+  pub fn move_sprite(&mut self, direction: Direction, amount: f32) {
     match direction {
       Direction::Right => {
         self.move_right(amount);
