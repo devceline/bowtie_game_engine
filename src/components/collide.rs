@@ -1,9 +1,14 @@
 use std::{collections::HashMap, marker::PhantomData};
 
-use crate::god_object::entity::{Component, Entity};
+use crate::{
+  general::direction::Direction,
+  god_object::entity::{Component, Entity, Message},
+  math::general::absolute_value_f32,
+};
 
 pub struct CollisionComponent<'d> {
-  colliding_objects: HashMap<*mut dyn Entity<'d>, Vec<*mut dyn Entity<'d>>>,
+  colliding_objects:
+    HashMap<*mut dyn Entity<'d>, Vec<(*mut dyn Entity<'d>, Direction)>>,
   _marker: PhantomData<&'d i32>,
 }
 
@@ -15,6 +20,69 @@ impl<'d> CollisionComponent<'d> {
     }
   }
 
+  fn get_collision_direction(
+    x: f32,
+    y: f32,
+    width: f32,
+    height: f32,
+    other_x: f32,
+    other_y: f32,
+    other_height: f32,
+    other_width: f32,
+  ) -> Direction {
+    let mut direction = Direction::Stationary;
+
+    let x_range = absolute_value_f32(x - other_x);
+    let y_range = absolute_value_f32(y - other_y);
+
+    let in_x_range = x_range <= width || x_range <= other_width;
+    let in_y_range = y_range <= height;
+
+    if !(in_x_range && in_y_range) {
+      return direction;
+    }
+
+    let left_width = x;
+    let right_width = x + width;
+
+    let other_left_width = other_x;
+    let other_right_width = other_x + other_width;
+
+    let head_height = y;
+    let feet_height = y - height;
+
+    let other_head_height = other_y;
+    let other_feet_height = other_y - other_height;
+
+    let down_collision =
+      feet_height <= other_head_height && feet_height >= other_feet_height;
+
+    let up_collision =
+      head_height >= other_feet_height && head_height <= other_head_height;
+
+    let right_collision =
+      right_width >= other_left_width && right_width <= other_right_width;
+
+    let left_collision =
+      left_width > other_left_width && left_width < other_right_width;
+
+    if right_collision {
+      direction = direction.add_direction(Direction::Right);
+    }
+    if left_collision {
+      direction = direction.add_direction(Direction::Left);
+    }
+
+    if down_collision {
+      direction = direction.add_direction(Direction::Down);
+    }
+    if up_collision {
+      direction = direction.add_direction(Direction::Up);
+    }
+
+    return direction;
+  }
+
   pub fn get_is_collided(&self, entity_ref: *mut dyn Entity<'d>) -> bool {
     let is_collided = match self.colliding_objects.get(&entity_ref) {
       Some(collision_vec) => collision_vec.len() > 0,
@@ -23,57 +91,105 @@ impl<'d> CollisionComponent<'d> {
 
     return is_collided;
   }
+
+  pub fn get_message_name() -> String {
+    String::from("collided_with")
+  }
+
+  pub fn get_entity_collision_direction(
+    &self,
+    entity_ref: *mut dyn Entity<'d>,
+  ) -> Direction {
+    let mut collision_direction = Direction::Stationary;
+
+    match self.colliding_objects.get(&entity_ref) {
+      Some(collision_vec) => {
+        for (_, collision_dir) in collision_vec {
+          collision_direction =
+            collision_direction.add_direction(collision_dir.to_owned());
+        }
+      }
+      None => {}
+    }
+
+    return collision_direction;
+  }
 }
 
 impl<'d> Component<'d> for CollisionComponent<'d> {
+  fn get_name(&self) -> &str {
+    "collision"
+  }
+
   unsafe fn act(
     &mut self,
-    entities: &Vec<*mut dyn Entity<'d>>,
+    _entities: &Vec<*mut dyn Entity<'d>>,
     entity: *mut dyn Entity<'d>,
-  ) {
-    for other_entity in entities {
+  ) -> Option<Message> {
+    let keys = self
+      .colliding_objects
+      .keys()
+      .map(|k| k.to_owned())
+      .collect::<Vec<*mut (dyn Entity<'d>)>>();
+    let current_vec = self.colliding_objects.entry(entity).or_insert(Vec::new());
+
+    for other_entity in keys {
       if other_entity.as_ref().unwrap() as *const _
         == entity.as_ref().unwrap() as *const _
       {
         continue;
       }
 
-      let current_vec =
-        self.colliding_objects.entry(entity).or_insert(Vec::new());
+      let entity_unwrapped = entity.as_ref().unwrap();
+      let other_entity_unwrapped = other_entity.as_ref().unwrap();
 
-      let other_x = other_entity.as_ref().unwrap().get_x();
-      let other_y = other_entity.as_ref().unwrap().get_y();
-      let other_height = other_entity.as_ref().unwrap().get_height();
-      let other_width = other_entity.as_ref().unwrap().get_width();
+      let other_x = other_entity_unwrapped.get_x();
+      let other_y = other_entity_unwrapped.get_y();
+      let other_height = other_entity_unwrapped.get_height();
+      let other_width = other_entity_unwrapped.get_width();
 
-      let x = entity.as_ref().unwrap().get_x();
-      let y = entity.as_ref().unwrap().get_y();
-      let height = entity.as_ref().unwrap().get_height();
-      let width = entity.as_ref().unwrap().get_width();
+      let x = entity_unwrapped.get_x();
+      let y = entity_unwrapped.get_y();
+      let height = entity_unwrapped.get_height();
+      let width = entity_unwrapped.get_width();
 
-      let x_collision = (x + width) >= other_x && x <= (other_x + other_width);
-      let y_collision = y + height >= other_y && y <= (other_y + other_height);
+      let collision_direction = CollisionComponent::get_collision_direction(
+        x,
+        y,
+        width,
+        height,
+        other_x,
+        other_y,
+        other_height,
+        other_width,
+      );
 
       let other_entity_position = (*current_vec)
         .iter()
-        .position(|ex_collided_entity| ex_collided_entity == other_entity);
+        .position(|(ex_collided_entity, _)| *ex_collided_entity == other_entity);
 
-      if x_collision && y_collision {
+      if collision_direction != Direction::Stationary {
         match other_entity_position {
           Some(_) => {}
           None => {
-            (*current_vec).push(other_entity.to_owned());
+            (*current_vec).push((other_entity.to_owned(), collision_direction));
           }
         }
       } else {
-          match other_entity_position {
-            Some(pos) => {
-              (*current_vec).remove(pos);
-            }
-            None => {
-            }
+        match other_entity_position {
+          Some(pos) => {
+            (*current_vec).remove(pos);
           }
+          None => {}
+        }
       }
     }
+
+    let new_collision_direction = self.get_entity_collision_direction(entity);
+
+    Some(Message::new(
+      CollisionComponent::get_message_name(),
+      HashMap::from([(String::from("with"), new_collision_direction.into())]),
+    ))
   }
 }
