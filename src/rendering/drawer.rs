@@ -20,9 +20,7 @@ pub struct Drawer<'a> {
 }
 
 impl<'a> Drawer<'a> {
-  pub fn new(
-    usage_mode: UsageMode,
-  ) -> Drawer<'a> {
+  pub fn new(usage_mode: UsageMode) -> Drawer<'a> {
     Drawer {
       vertex_array_buffer: VertexArrayBuffer::<f32>::new(
         DataType::Float32,
