@@ -1,5 +1,4 @@
 use crate::{
-  components::collide::CollisionComponent,
   general::color::COLORS,
   gl_utils::{
     gl_translation::{DataType, DrawingMode, UsageMode},
@@ -10,7 +9,6 @@ use crate::{
   },
   rendering::drawer::Drawer,
 };
-use std::collections::HashMap;
 
 use super::entity::Entity;
 
@@ -19,7 +17,6 @@ use super::entity::Entity;
 /// And controlling the game's state through entitiy data
 pub struct BowTie<'d> {
   entities: Vec<*mut dyn Entity<'d>>,
-  colliding_objects: HashMap<i32, Vec<i32>>,
   drawer: Drawer<'d>,
   shading_program: ShaderProgram,
   _vao: VertexArrayObject,
@@ -88,7 +85,6 @@ impl<'d> BowTie<'d> {
     let _vao = VertexArrayObject::new();
     BowTie {
       entities: vec![],
-      colliding_objects: HashMap::new(),
       drawer: Drawer::new(UsageMode::StaticDraw),
       shading_program: get_program(),
       _vao,
@@ -112,7 +108,11 @@ impl<'d> BowTie<'d> {
         for comp in entity.as_mut().unwrap().get_components() {
           let mut entities_copy = self.entities.to_owned();
           let thing = entity.to_owned();
-          comp.as_mut().unwrap().act(&mut entities_copy, thing);
+          let message = comp.as_mut().unwrap().act(&mut entities_copy, thing);
+          match message {
+            Some(m) => entity.as_mut().unwrap().recieve_message(m),
+            None => {}
+          }
         }
       }
     }
@@ -127,7 +127,7 @@ impl<'d> BowTie<'d> {
 
   /// Draws the entities with an actual clear screen refresh
   pub fn draw_entities(&mut self) {
-    self.drawer.clear_screen(COLORS::Black.into());
+    self.drawer.clear_screen(COLORS::White.into());
     self.drawer.draw(DrawingMode::Triangles);
   }
 }
