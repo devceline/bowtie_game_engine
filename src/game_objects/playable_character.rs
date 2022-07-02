@@ -1,9 +1,7 @@
-use std::ptr::NonNull;
-
 use crate::{
   bowtie::entity::{Component, Entity, Message},
   components::{
-    collide::CollisionComponent, event::EventComponent,
+    collide::CollisionComponent,
     gravity::GravityComponent,
   },
   general::{color::Color, direction::Direction},
@@ -147,7 +145,7 @@ impl<'s> PlayableCharacter<'s> {
         self.move_character(Direction::Left, is_release, self.speed);
       }
       glfw::WindowEvent::Key(glfw::Key::Up, _, _, _) => {
-        self.move_character(Direction::Up, is_release, self.speed * 5.0);
+        self.move_character(Direction::Up, is_release, self.speed * 1.5);
       }
       glfw::WindowEvent::Key(glfw::Key::Down, _, _, _) => {
         self.move_character(Direction::Down, is_release, self.speed);

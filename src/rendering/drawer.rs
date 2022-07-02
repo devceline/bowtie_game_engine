@@ -79,7 +79,7 @@ impl<'a> Drawer<'a> {
   /*
    * Removes sprite from drawer to be removed on the next draw call.
    */
-  pub fn unload_sprite_dynamic(&mut self, sprite: *const dyn Drawable<'a>) {
+  pub fn unload_sprite_dynamic(&mut self, sprite: &'a dyn Drawable<'a>) {
     let to_remove_idx = self
       .dynamic_sprites
       .iter()

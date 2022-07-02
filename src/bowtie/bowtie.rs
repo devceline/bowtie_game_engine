@@ -103,6 +103,22 @@ impl<'d> BowTie<'d> {
     }
   }
 
+  pub fn unload_entity<'g>(&'g mut self, entity: *mut dyn Entity<'d>) {
+    let pos_option = self.entities.iter().position(|entity_ref| entity_ref.to_owned() == entity.to_owned());
+
+    match pos_option {
+      Some(pos) => {
+        unsafe {
+          let drawable = (*self.entities[pos]).get_drawable();
+          self.drawer.unload_sprite_dynamic(drawable);
+        }
+        self.entities.remove(pos);
+      }
+      None => {}
+    }
+
+  }
+
   /// Updates the entities with the existing systems
   pub fn update_entities(&mut self) {
     for entity in self.entities.to_owned() {
