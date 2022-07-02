@@ -6,6 +6,11 @@ use crate::{
   math::general::absolute_value_f32,
 };
 
+/// Collision Component
+///
+/// Sends a message reporting the current direction of collision
+///
+/// If an entity has not collided, the `Direction` will be `Direction::Stationary`
 pub struct CollisionComponent<'d> {
   colliding_objects:
     HashMap<*mut dyn Entity<'d>, Vec<(*mut dyn Entity<'d>, Direction)>>,
@@ -42,29 +47,29 @@ impl<'d> CollisionComponent<'d> {
       return direction;
     }
 
-    let left_width = x;
-    let right_width = x + width;
+    let left_position = x;
+    let right_position = x + width;
 
-    let other_left_width = other_x;
-    let other_right_width = other_x + other_width;
+    let other_left_position = other_x;
+    let other_right_position = other_x + other_width;
 
-    let head_height = y;
-    let feet_height = y - height;
+    let top_position = y;
+    let bottom_position = y - height;
 
-    let other_head_height = other_y;
-    let other_feet_height = other_y - other_height;
+    let other_top_position = other_y;
+    let other_bottom_position = other_y - other_height;
 
     let down_collision =
-      feet_height <= other_head_height && feet_height >= other_feet_height;
+      bottom_position <= other_top_position && bottom_position >= other_bottom_position;
 
     let up_collision =
-      head_height >= other_feet_height && head_height <= other_head_height;
+      top_position >= other_bottom_position && top_position <= other_top_position;
 
     let right_collision =
-      right_width >= other_left_width && right_width <= other_right_width;
+      right_position >= other_left_position && right_position <= other_right_position;
 
     let left_collision =
-      left_width > other_left_width && left_width < other_right_width;
+      left_position > other_left_position && left_position < other_right_position;
 
     if right_collision {
       direction = direction.add_direction(Direction::Right);
@@ -126,11 +131,13 @@ impl<'d> Component<'d> for CollisionComponent<'d> {
     _entities: &Vec<*mut dyn Entity<'d>>,
     entity: *mut dyn Entity<'d>,
   ) -> Option<Message> {
+
     let keys = self
       .colliding_objects
       .keys()
       .map(|k| k.to_owned())
       .collect::<Vec<*mut (dyn Entity<'d>)>>();
+
     let current_vec = self.colliding_objects.entry(entity).or_insert(Vec::new());
 
     for other_entity in keys {

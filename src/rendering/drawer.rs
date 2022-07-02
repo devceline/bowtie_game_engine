@@ -61,21 +61,19 @@ impl<'a> Drawer<'a> {
    * Naturally, the sprite needs to have the same lifetime as the drawer.
    */
   pub fn load_sprite_dynamic(&mut self, sprite: &'a dyn Drawable<'a>) {
-    unsafe {
-      let sprite_instance = sprite;
-      self.dynamic_sprites.push(sprite_instance);
-      Drawer::load_sprite(
-        &mut self.elements,
-        &mut self.vertices,
-        sprite_instance,
-        self.elements_count,
-      );
+    let sprite_instance = sprite;
+    self.dynamic_sprites.push(sprite_instance);
+    Drawer::load_sprite(
+      &mut self.elements,
+      &mut self.vertices,
+      sprite_instance,
+      self.elements_count,
+    );
 
-      self.vertex_array_buffer.update_data(&self.vertices);
-      self.element_array_buffer.update_data(&self.elements);
+    self.vertex_array_buffer.update_data(&self.vertices);
+    self.element_array_buffer.update_data(&self.elements);
 
-      sprite_instance.load_texture();
-    };
+    sprite_instance.load_texture();
   }
 
   /*

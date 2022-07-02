@@ -2,6 +2,9 @@ use std::collections::HashMap;
 
 use crate::bowtie::entity::{Component, Entity, Message};
 
+/// Gravity Component
+///
+/// Sends a message about y position updates in `f32`
 pub struct GravityComponent<'s> {
   speed: f32,
   acceleration: f32,

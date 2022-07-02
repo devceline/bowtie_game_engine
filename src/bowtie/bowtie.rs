@@ -22,6 +22,8 @@ pub struct BowTie<'d> {
   _vao: VertexArrayObject,
 }
 
+/// Initiates a shader program with pre-defined vertex attributes
+// TODO: This needs to be more flexible
 fn get_program() -> ShaderProgram {
   let mut program = ShaderProgram::new();
   program.load_shaders(vec![
@@ -107,8 +109,8 @@ impl<'d> BowTie<'d> {
       unsafe {
         for comp in entity.as_mut().unwrap().get_components() {
           let mut entities_copy = self.entities.to_owned();
-          let thing = entity.to_owned();
-          let message = comp.as_mut().unwrap().act(&mut entities_copy, thing);
+          let entity_clown = entity.to_owned();
+          let message = comp.as_mut().unwrap().act(&mut entities_copy, entity_clown);
           match message {
             Some(m) => entity.as_mut().unwrap().recieve_message(m),
             None => {}
