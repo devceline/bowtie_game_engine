@@ -110,7 +110,8 @@ impl<'d> BowTie<'d> {
         for comp in entity.as_mut().unwrap().get_components() {
           let mut entities_copy = self.entities.to_owned();
           let entity_clown = entity.to_owned();
-          let message = comp.as_mut().unwrap().act(&mut entities_copy, entity_clown);
+          let message =
+            comp.as_mut().unwrap().act(&mut entities_copy, entity_clown);
           match message {
             Some(m) => entity.as_mut().unwrap().recieve_message(m),
             None => {}

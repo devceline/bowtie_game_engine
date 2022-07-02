@@ -1,12 +1,12 @@
 use std::ptr::NonNull;
 
 use crate::{
+  bowtie::entity::{Component, Entity, Message},
   components::{
     collide::CollisionComponent, event::EventComponent,
     gravity::GravityComponent,
   },
   general::{color::Color, direction::Direction},
-  bowtie::entity::{Component, Entity, Message},
   math::general::absolute_value_f32,
   shapes::rectangle::Rectangle,
   sprites::sprite::Sprite,

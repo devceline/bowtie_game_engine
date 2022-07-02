@@ -1,8 +1,8 @@
 use std::{collections::HashMap, marker::PhantomData};
 
 use crate::{
-  general::direction::Direction,
   bowtie::entity::{Component, Entity, Message},
+  general::direction::Direction,
   math::general::absolute_value_f32,
 };
 
@@ -59,17 +59,17 @@ impl<'d> CollisionComponent<'d> {
     let other_top_position = other_y;
     let other_bottom_position = other_y - other_height;
 
-    let down_collision =
-      bottom_position <= other_top_position && bottom_position >= other_bottom_position;
+    let down_collision = bottom_position <= other_top_position
+      && bottom_position >= other_bottom_position;
 
-    let up_collision =
-      top_position >= other_bottom_position && top_position <= other_top_position;
+    let up_collision = top_position >= other_bottom_position
+      && top_position <= other_top_position;
 
-    let right_collision =
-      right_position >= other_left_position && right_position <= other_right_position;
+    let right_collision = right_position >= other_left_position
+      && right_position <= other_right_position;
 
-    let left_collision =
-      left_position > other_left_position && left_position < other_right_position;
+    let left_collision = left_position > other_left_position
+      && left_position < other_right_position;
 
     if right_collision {
       direction = direction.add_direction(Direction::Right);
@@ -131,7 +131,6 @@ impl<'d> Component<'d> for CollisionComponent<'d> {
     _entities: &Vec<*mut dyn Entity<'d>>,
     entity: *mut dyn Entity<'d>,
   ) -> Option<Message> {
-
     let keys = self
       .colliding_objects
       .keys()

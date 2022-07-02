@@ -1,10 +1,10 @@
 use crate::{
+  bowtie::entity::{Component, Entity},
   general::{
     color::{Color, COLORS},
     direction::Direction,
   },
   gl_utils::gl_texture::{Texture, TextureOptions},
-  bowtie::entity::{Component, Entity},
   shapes::rectangle::Rectangle,
   sprites::sprite::Sprite,
 };

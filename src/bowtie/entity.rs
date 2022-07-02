@@ -3,7 +3,7 @@ use std::collections::HashMap;
 
 /// Entity trait
 /// This is the basis for any object that can be acted upon within the engine
-/// 
+///
 /// Should have mutable position and should store its own components
 /// Should also have a function that recieves messages so the components
 /// have an effect.
@@ -27,14 +27,14 @@ pub trait Entity<'a> {
 }
 
 /// Component Trait
-/// This is the basis for creating a component or system that acts within 
+/// This is the basis for creating a component or system that acts within
 /// the engine
 ///
 /// E.g: A collision component
 pub trait Component<'a> {
   fn get_name(&self) -> &str;
 
-  /// Act function recieves information about current entities and returns a 
+  /// Act function recieves information about current entities and returns a
   /// message with a type and a HashMap of values. This is to say, entities can
   /// interact with this information differently.
   ///

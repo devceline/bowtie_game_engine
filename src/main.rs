@@ -3,11 +3,11 @@ extern crate gl;
 extern crate glfw;
 extern crate png;
 
+mod bowtie;
 mod components;
 mod game_objects;
 mod general;
 mod gl_utils;
-mod bowtie;
 mod math;
 mod rendering;
 mod shapes;
@@ -19,12 +19,12 @@ use components::gravity::GravityComponent;
 use game_objects::floor::Floor;
 use glfw::Context;
 
+use bowtie::bowtie::BowTie;
+use bowtie::entity::Entity;
 use game_objects::playable_character::PlayableCharacter;
 use general::color::COLORS;
 use gl_utils::gl_error_reader;
 use gl_utils::gl_texture::{Texture, TextureOptions};
-use bowtie::entity::Entity;
-use bowtie::bowtie::BowTie;
 use shapes::rectangle::Rectangle;
 use sprites::sprite::Sprite;
 
