@@ -98,8 +98,7 @@ impl ShaderProgram {
   }
 
   fn get_shader_location(&self, shader: &Shader) -> String {
-    println!("{:?}", std::env::current_dir());
-    let mut base_url = String::from("./shaders/");
+    let mut base_url = String::from(concat!(env!("OUT_DIR"), "/shaders/"));
     match shader {
       Shader::VertexShader(_name, _attributes) => {
         base_url.push_str("vertex/");
