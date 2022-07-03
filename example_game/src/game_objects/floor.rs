@@ -1,12 +1,13 @@
-use crate::{
-  bowtie::entity::{Component, Entity},
-  general::{
-    color::{Color, COLORS},
-    direction::Direction,
-  },
-  gl_utils::gl_texture::{Texture, TextureOptions},
-  shapes::rectangle::Rectangle,
-  sprites::sprite::Sprite,
+extern crate bowtie;
+
+use bowtie::{
+  Component, Entity,
+  COLORS,
+  Drawable,
+  Message,
+  Texture, TextureOptions,
+  Rectangle,
+  Sprite,
 };
 
 pub struct Floor<'s> {
@@ -46,7 +47,7 @@ impl<'s> Entity<'s> for Floor<'s> {
     self.sprite.get_height()
   }
 
-  fn get_drawable(&'s self) -> &'s dyn crate::sprites::drawable::Drawable<'s> {
+  fn get_drawable(&'s self) -> &'s dyn Drawable<'s> {
     &self.sprite
   }
 
@@ -62,5 +63,5 @@ impl<'s> Entity<'s> for Floor<'s> {
     self.sprite.get_width()
   }
 
-  fn recieve_message(&mut self, message: crate::bowtie::entity::Message) {}
+  fn recieve_message(&mut self, message: Message) {}
 }

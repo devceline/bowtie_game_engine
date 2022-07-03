@@ -1,32 +1,21 @@
 extern crate futures;
-extern crate gl;
 extern crate glfw;
-extern crate png;
+extern crate bowtie;
+extern crate gl;
 
-mod bowtie;
-mod components;
 mod game_objects;
-mod general;
-mod gl_utils;
-mod math;
-mod rendering;
-mod shapes;
-mod sprites;
 
-use components::collide::CollisionComponent;
-use components::event::EventComponent;
-use components::gravity::GravityComponent;
-use game_objects::floor::Floor;
+use bowtie::{BowTie, Texture, Entity, TextureOptions, Rectangle, Sprite, COLORS, 
+  premade_components::{
+    GravityComponent,
+    CollisionComponent
+  }
+};
+
+
 use glfw::Context;
+use game_objects::{playable_character::PlayableCharacter, floor::Floor};
 
-use bowtie::bowtie::BowTie;
-use bowtie::entity::Entity;
-use game_objects::playable_character::PlayableCharacter;
-use general::color::COLORS;
-use gl_utils::gl_error_reader;
-use gl_utils::gl_texture::{Texture, TextureOptions};
-use shapes::rectangle::Rectangle;
-use sprites::sprite::Sprite;
 
 async fn handle_player_events<'a>(
   event: glfw::WindowEvent,
@@ -61,12 +50,10 @@ fn main() {
     .expect("Failed to create window");
   window_setup(&mut glfw_instance, &mut window);
 
-  gl_error_reader::init_debug_callback();
   let mut bowtie = BowTie::new();
 
   let mut collision_component = CollisionComponent::new();
   let mut gravity_component = GravityComponent::new(0.01);
-  let mut event_component = EventComponent::new();
 
   let mut floor = Floor::new();
 
@@ -79,7 +66,6 @@ fn main() {
 
   playable_character.load_components(&mut collision_component);
   playable_character.load_components(&mut gravity_component);
-  playable_character.load_components(&mut event_component);
   floor.load_components(&mut collision_component);
   bowtie.load_entity(&mut floor);
   bowtie.load_entity(&mut playable_character);
