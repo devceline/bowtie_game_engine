@@ -10,3 +10,4 @@ bowtie = { path = "../engine" }
 glfw = "0.45.0"
 futures = "0.3"
 gl = "0.14.0"
+rand = "0.8.5"

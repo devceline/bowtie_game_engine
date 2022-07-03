@@ -1,14 +1,8 @@
 extern crate bowtie;
 use bowtie::{
-  Component, Entity, Message,
-  Color, Direction,
-  Rectangle, Sprite,
-  Drawable,
   math::general::absolute_value_f32,
-  premade_components::{
-    CollisionComponent,
-    GravityComponent,
-  },
+  premade_components::{CollisionComponent, GravityComponent},
+  Color, Component, Direction, Drawable, Entity, Message, Rectangle, Sprite,
 };
 
 pub struct PlayableCharacter<'s> {
@@ -65,9 +59,7 @@ impl<'e> Entity<'e> for PlayableCharacter<'e> {
     self.components.push(component);
   }
 
-  fn get_components(
-    &mut self,
-  ) -> &Vec<*mut dyn Component<'e>> {
+  fn get_components(&mut self) -> &Vec<*mut dyn Component<'e>> {
     &self.components
   }
 

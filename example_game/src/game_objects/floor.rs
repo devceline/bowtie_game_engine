@@ -1,13 +1,8 @@
 extern crate bowtie;
 
 use bowtie::{
-  Component, Entity,
-  COLORS,
-  Drawable,
-  Message,
-  Texture, TextureOptions,
-  Rectangle,
-  Sprite,
+  Component, Drawable, Entity, Message, Rectangle, Sprite, Texture,
+  TextureOptions, COLORS,
 };
 
 pub struct Floor<'s> {
