@@ -2,6 +2,11 @@
 name = "bowtie"
 version = "0.2.0"
 edition = "2021"
+readme = "../README.md"
+description = "2D Game engine with messaging system"
+license = "MIT"
+homepage = "https://github.com/devceline/bowtie_game_engine"
+repository = "https://github.com/devceline/bowtie_game_engine"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
