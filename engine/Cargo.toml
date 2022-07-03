@@ -1,6 +1,6 @@
 [package]
 name = "bowtie"
-version = "0.2.1"
+version = "0.2.2"
 edition = "2021"
 readme = "../README.md"
 description = "2D Game engine with messaging system"
