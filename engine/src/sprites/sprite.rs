@@ -12,12 +12,12 @@ use super::drawable::Drawable;
 use std::marker::PhantomData;
 
 #[derive(Debug, Clone)]
+/// A sprite manages a texture and a texture to create a drawable.
 pub struct Sprite<'a, TShape>
 where
   TShape: Shape + 'a,
 {
   shape: TShape,
-  direction: Direction,
   pub name: String,
   texture: Texture,
   phantom: PhantomData<&'a TShape>,
@@ -32,7 +32,6 @@ where
     Sprite {
       shape,
       name: texture.image_name.to_owned(),
-      direction: Direction::Stationary,
       texture,
       phantom: PhantomData,
       transformation: Matrix::<f32>::generate_identity(4),
@@ -46,7 +45,6 @@ where
   ) -> Sprite<'a, TShape> {
     Sprite {
       shape,
-      direction: Direction::Stationary,
       name: texture.image_name.to_owned(),
       texture,
       phantom: PhantomData,

@@ -46,6 +46,7 @@ pub trait Component<'a> {
   ) -> Option<Message>;
 }
 
+/// Messages that will be communicated between components and entities
 pub struct Message {
   message_type: String,
   values: HashMap<String, f32>,

@@ -3,6 +3,7 @@ use crate::general::color::Color;
 use super::shape::Shape;
 
 #[derive(Debug, Copy, Clone)]
+/// Rectangle `Shape`
 pub struct Rectangle {
   pub width: f32,
   pub height: f32,

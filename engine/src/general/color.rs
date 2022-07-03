@@ -1,4 +1,6 @@
 #[derive(Debug, Copy, Clone)]
+/// Colors represented in normalized values between 1.0 and -0.0
+/// Eg: Red would be r: 1.0, g:0.0, b: 0.0, a: 1.0
 pub struct Color {
   pub r: f32,
   pub g: f32,
@@ -12,6 +14,7 @@ impl Color {
   }
 }
 
+/// Helper enum with predefined colors that translate to Color structs
 pub enum COLORS {
   Red,
   White,

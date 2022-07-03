@@ -23,6 +23,9 @@ pub struct TextureOptions {
 }
 
 #[derive(Debug, Clone)]
+/// OpenGL texture. Upon creation, it defines a sampler uniform and initializes
+/// a texture buffer, loading it with wit the file's data.
+/// Current supported format(s): png
 pub struct Texture {
   pub texture_id: i32,
   pub image_name: String,
