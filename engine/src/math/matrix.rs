@@ -21,6 +21,7 @@ pub trait ScaleMatrix<T> {
   fn generate_scale_matrix(x: T, y: T, z: T) -> Matrix<T>;
 }
 
+// TODO: Make this better, by storing one vector :>
 #[derive(Debug, Clone)]
 pub struct Matrix<T> {
   matrix: Vec<Vec<T>>,
