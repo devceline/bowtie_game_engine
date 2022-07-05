@@ -39,12 +39,18 @@ impl<'e> Entity<'e> for PlayableCharacter<'e> {
     };
     let amount = absolute_value_f32(y - self.get_y());
 
-    if direction != self.collision_direction {
-      self.sprite.move_sprite(direction, amount);
-      true
-    } else {
-      false
+    let net = direction.subtract_direction(self.collision_direction);
+
+    if net == Direction::Stationary {
+      false;
     }
+
+    self.sprite.move_sprite(
+      net,
+      amount,
+    );
+
+    true
   }
 
   fn get_width(&self) -> f32 {
@@ -72,6 +78,9 @@ impl<'e> Entity<'e> for PlayableCharacter<'e> {
 
     if message_name == CollisionComponent::get_message_name() {
       self.collision_direction = message.get_values()["with"].into();
+      if self.collision_direction != Direction::Stationary {
+        println!("Player collided {:?}", self.collision_direction);
+      }
     }
   }
 }
@@ -118,10 +127,13 @@ impl<'s> PlayableCharacter<'s> {
     speed: f32,
   ) {
     self.handle_direction_change(direction, subtract);
-    self.sprite.move_sprite(
-      self.direction.subtract_direction(self.collision_direction),
-      speed,
+    let net_direction =
+      self.direction.subtract_direction(self.collision_direction);
+    println!(
+      "Player requested to move to {:?}, but subtracting {:?} resulted in {:?}",
+      direction, self.collision_direction, net_direction
     );
+    self.sprite.move_sprite(net_direction, speed);
   }
 
   pub async fn respond_to_event(&mut self, event: &glfw::WindowEvent) {

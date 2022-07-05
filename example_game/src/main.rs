@@ -64,9 +64,16 @@ fn main() {
   let mut random_entities = Vec::<PlayableCharacter>::new();
   random_entities.reserve(2000);
 
+  let mut obstacle = PlayableCharacter::new(Sprite::new(
+    Rectangle::new(0.0, -0.4, 0.1, 0.1, COLORS::White.into()),
+    Texture::new("dirt", TextureOptions::default()),
+  ));
+
   playable_character.load_components(&mut collision_component);
+  obstacle.load_components(&mut collision_component);
   playable_character.load_components(&mut gravity_component);
   floor.load_components(&mut collision_component);
+  bowtie.load_entity(&mut obstacle);
   bowtie.load_entity(&mut floor);
   bowtie.load_entity(&mut playable_character);
 
