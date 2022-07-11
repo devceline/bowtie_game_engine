@@ -54,9 +54,6 @@ fn main() {
   // let mut collision_component = CollisionComponent::new();
   // let mut gravity_component = GravityComponent::new(0.005);
   // let mut event_component = EventComponent::new();
-  let en_texture = Texture::new("witch", TextureOptions::default());
-  en_texture.load_texture();
-
   let mut random_entities = Vec::<StandardEntity>::new();
   random_entities.reserve(2000);
   
@@ -64,8 +61,7 @@ fn main() {
 
   bowtie.load_entity(StandardEntity::new(Sprite::new(
     Rectangle::new(0.0, 0.5, 0.2, 0.3, COLORS::White.into()),
-    Texture::from(&en_texture),
-  ), 2.0));
+    Texture::new("witch", TextureOptions::default())  ), 2.0));
 
   bowtie.prep_for_render();
 

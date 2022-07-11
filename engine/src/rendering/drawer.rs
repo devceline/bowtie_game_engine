@@ -110,8 +110,8 @@ impl<'a> Drawer<'a> {
   /// Actually loads the sprite's textures.
   /// This needs to be done once, but has to be done before the draw call.
   pub fn prep_textures(&self, program: &ShaderProgram) {
-    for sprite in &self.dynamic_sprites {
-      sprite.set_texture_uniform(program);
+    for drawable in &self.drawables {
+      drawable.texture.set_uniform(program);
     }
     unsafe {
       gl::Enable(gl::BLEND);
@@ -122,8 +122,6 @@ impl<'a> Drawer<'a> {
 
   /// Renders the dynamically loaded sprites
   pub fn draw(&mut self, mode: DrawingMode) {
-    let dynamic_sprites = &self.dynamic_sprites;
-
     self.vertices.clear();
     self.elements.clear();
     self.elements_count = 0;
