@@ -19,7 +19,7 @@ where
 {
   shape: TShape,
   pub name: String,
-  texture: Texture,
+  pub texture: Texture,
   phantom: PhantomData<&'a TShape>,
   transformation: Matrix<f32>,
 }

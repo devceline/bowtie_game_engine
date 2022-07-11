@@ -2,13 +2,21 @@ extern crate gl;
 
 use crate::general::color;
 use crate::gl_utils::element_array_buffer::ElementArrayBuffer;
-use crate::gl_utils::gl_texture::Texture;
+use crate::gl_utils::gl_texture::{Texture, LoadableTexture};
 use crate::gl_utils::gl_translation::{DataType, DrawingMode, ToGl, UsageMode};
 use crate::gl_utils::shader_creator::ShaderProgram;
 use crate::gl_utils::vertex_array_buffer::VertexArrayBuffer;
 use crate::shapes::rectangle::Rectangle;
 use crate::sprites::drawable::Drawable;
 use crate::sprites::sprite::Sprite;
+
+#[derive(Clone)]
+pub struct DrawableData {
+  pub vertices: Vec<f32>,
+  pub elements: Vec<i32>,
+  pub corner_count: i32,
+  pub texture: Texture,
+}
 
 pub struct Drawer<'a> {
   vertex_array_buffer: VertexArrayBuffer<f32>,
@@ -17,6 +25,7 @@ pub struct Drawer<'a> {
   elements: Vec<i32>,
   elements_count: i32,
   dynamic_sprites: Vec<&'a dyn Drawable<'a>>,
+  drawables: Vec<DrawableData>
 }
 
 impl<'a> Drawer<'a> {
@@ -34,6 +43,7 @@ impl<'a> Drawer<'a> {
       elements: vec![],
       elements_count: 0,
       dynamic_sprites: vec![],
+      drawables: vec![]
     }
   }
 
@@ -41,56 +51,37 @@ impl<'a> Drawer<'a> {
    * Loads sprite into this drawer
    * It pushes the sprite's vertices and elements to have it be rendered
    */
-  fn load_sprite(
+
+  fn load_drawable(
     elements: &mut Vec<i32>,
     vertices: &mut Vec<f32>,
-    drawable: &'a dyn Drawable<'a>,
+    drawable: &DrawableData,
     elements_count: i32,
-  ) -> () {
-    for i in drawable.get_vertices() {
-      vertices.push(i);
+  ) {
+    for i in &drawable.vertices {
+      vertices.push(i.to_owned());
     }
 
-    for i in drawable.get_elements() {
+    for i in &drawable.elements {
       elements.push(i + elements_count.to_owned());
     }
   }
 
-  /*
-   * Add sprite to drawer to be rendered on the next draw call.
-   * Naturally, the sprite needs to have the same lifetime as the drawer.
-   */
-  pub fn load_sprite_dynamic(&mut self, sprite: &'a dyn Drawable<'a>) {
-    let sprite_instance = sprite;
-    self.dynamic_sprites.push(sprite_instance);
-    Drawer::load_sprite(
+  pub fn load_drawable_dynamic(&mut self, drawable: DrawableData) {
+    self.drawables.push(drawable.to_owned());
+    Drawer::load_drawable(
       &mut self.elements,
       &mut self.vertices,
-      sprite_instance,
+      &self.drawables[self.drawables.len() - 1],
       self.elements_count,
     );
 
     self.vertex_array_buffer.update_data(&self.vertices);
     self.element_array_buffer.update_data(&self.elements);
 
-    sprite_instance.load_texture();
+    drawable.texture.load_texture();
   }
 
-  /*
-   * Removes sprite from drawer to be removed on the next draw call.
-   */
-  pub fn unload_sprite_dynamic(&mut self, sprite: &'a dyn Drawable<'a>) {
-    let to_remove_idx = self
-      .dynamic_sprites
-      .iter()
-      .position(|spr| (*spr as *const dyn Drawable<'a>) == sprite);
-    match to_remove_idx {
-      Some(idx) => {
-        self.dynamic_sprites.remove(idx);
-      }
-      None => {}
-    }
-  }
 
   /*
    * Renders a rectangle as wide and tall as the window to clear it
@@ -137,15 +128,29 @@ impl<'a> Drawer<'a> {
     self.elements.clear();
     self.elements_count = 0;
 
-    for i in 0..dynamic_sprites.len() {
-      Drawer::load_sprite(
+    // for i in 0..dynamic_sprites.len() {
+    //   Drawer::load_sprite(
+    //     &mut self.elements,
+    //     &mut self.vertices,
+    //     dynamic_sprites[i],
+    //     self.elements_count,
+    //   );
+    //   self.elements_count += dynamic_sprites[i].get_corner_count()
+    // }
+
+    for i in 0..self.drawables.len() {
+      Drawer::load_drawable(
         &mut self.elements,
         &mut self.vertices,
-        dynamic_sprites[i],
+        &self.drawables[i],
         self.elements_count,
       );
-      self.elements_count += dynamic_sprites[i].get_corner_count()
+      self.elements_count += self.drawables[i].corner_count
     }
+
+    println!("----------------------------");
+    println!("{:?}", self.vertices);
+    println!("----------------------------");
 
     self.vertex_array_buffer.update_data(&self.vertices);
     self.element_array_buffer.update_data(&self.elements);

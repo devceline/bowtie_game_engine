@@ -1,4 +1,4 @@
-use crate::sprites::drawable::Drawable;
+use crate::{sprites::drawable::Drawable, Sprite, Rectangle, Direction, rendering::drawer::DrawableData};
 use std::collections::HashMap;
 
 /// Entity trait
@@ -8,7 +8,7 @@ use std::collections::HashMap;
 /// Should also have a function that recieves messages so the components
 /// have an effect.
 pub trait Entity<'a> {
-  fn get_drawable(&'a self) -> &'a dyn Drawable<'a>;
+  fn get_drawable(&self) -> DrawableData;
 
   fn get_x(&self) -> f32;
   fn get_y(&self) -> f32;
@@ -24,6 +24,78 @@ pub trait Entity<'a> {
   /// Implementing this will usually involve pattern matching or if statements
   /// to act depending on the type of message.
   fn recieve_message(&mut self, message: Message);
+}
+
+
+#[derive(Clone, Debug)]
+pub struct StandardEntity<'s> {
+  sprite: Sprite<'s, Rectangle>,
+  speed: f32,
+  components: Vec<*mut dyn Component<'s>>,
+  direction: Direction,
+  collision_direction: Direction,
+}
+
+impl<'s> StandardEntity<'s> {
+  pub fn new(sprite: Sprite<'s, Rectangle>, speed: f32) -> StandardEntity<'s> {
+    StandardEntity {
+      sprite,
+      speed,
+      components: vec![],
+      direction: Direction::Stationary,
+      collision_direction: Direction::Stationary
+    }
+  }
+}
+
+impl<'a> Entity<'a> for StandardEntity<'a> {
+  fn get_x(&self) -> f32 {
+    self.sprite.get_x()
+  }
+
+  fn get_y(&self) -> f32 {
+      self.sprite.get_y()
+  }
+
+  fn set_y(&mut self, y: f32) -> bool {
+    self.sprite.set_y(y);
+    true
+  }
+
+  fn set_x(&mut self, x: f32) -> bool {
+    self.sprite.set_x(x);
+    true
+  }
+
+  fn get_width(&self) -> f32 {
+      self.sprite.get_width()
+  }
+
+  fn get_height(&self) -> f32 {
+      self.sprite.get_height()
+  }
+
+  fn get_drawable(&self) -> DrawableData {
+    DrawableData {
+      vertices: self.sprite.get_vertices(),
+      elements: self.sprite.get_elements(),
+      texture: self.sprite.texture.to_owned(),
+      corner_count: self.sprite.get_corner_count()
+    }
+  }
+
+  fn get_components(&mut self) -> &Vec<*mut dyn Component<'a>> {
+      &self.components
+  }
+
+  fn load_components(&mut self, component: *mut dyn Component<'a>) {
+    self.components.push(component);
+  }
+
+  fn recieve_message(&mut self, message: Message) {
+      
+  }
+
 }
 
 /// Component Trait
