@@ -83,6 +83,8 @@ impl Texture {
       // Incrementing texture count to have accurate Texture ID
       TEXTURE_COUNT = TEXTURE_COUNT + 1;
 
+      tex.load_texture();
+
       return tex;
     }
   }

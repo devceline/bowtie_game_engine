@@ -57,11 +57,12 @@ fn main() {
   let mut random_entities = Vec::<StandardEntity>::new();
   random_entities.reserve(2000);
   
-  // playable_character.set_message_reciever(message_reciever);
+  let text = Texture::new("character", TextureOptions::default());
+  
 
   bowtie.load_entity(StandardEntity::new(Sprite::new(
-    Rectangle::new(0.0, 0.5, 0.2, 0.3, COLORS::White.into()),
-    Texture::new("witch", TextureOptions::default())  ), 2.0));
+    Rectangle::new(0.0, 0.5, 0.2, 0.3, COLORS::Red.into()),
+      Texture::new("witch", TextureOptions::default())), 2.0));
 
   bowtie.prep_for_render();
 

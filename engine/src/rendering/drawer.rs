@@ -110,9 +110,6 @@ impl<'a> Drawer<'a> {
   /// Actually loads the sprite's textures.
   /// This needs to be done once, but has to be done before the draw call.
   pub fn prep_textures(&self, program: &ShaderProgram) {
-    for drawable in &self.drawables {
-      drawable.texture.set_uniform(program);
-    }
     unsafe {
       gl::Enable(gl::BLEND);
       gl::BlendEquation(gl::FUNC_ADD);

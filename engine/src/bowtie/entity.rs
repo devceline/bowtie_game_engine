@@ -1,4 +1,4 @@
-use crate::{sprites::drawable::Drawable, Sprite, Rectangle, Direction, rendering::drawer::DrawableData};
+use crate::{sprites::drawable::Drawable, Sprite, Rectangle, Direction, rendering::drawer::DrawableData, gl_utils::{gl_texture::LoadableTexture}};
 use std::collections::HashMap;
 
 /// Entity trait
@@ -38,7 +38,6 @@ pub struct StandardEntity<'s> {
 
 impl<'s> StandardEntity<'s> {
   pub fn new(sprite: Sprite<'s, Rectangle>, speed: f32) -> StandardEntity<'s> {
-    sprite.load_texture();
     StandardEntity {
       sprite,
       speed,
@@ -46,6 +45,10 @@ impl<'s> StandardEntity<'s> {
       direction: Direction::Stationary,
       collision_direction: Direction::Stationary
     }
+  }
+  
+  pub fn load_texture(&self) {
+    self.sprite.texture.load_texture();
   }
 }
 

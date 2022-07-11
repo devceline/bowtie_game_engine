@@ -104,9 +104,6 @@ where
     self.transformation = transformation_matrix;
   }
 
-  pub fn load_texture(&mut self) {
-    self.texture.load_texture();
-  }
 
   pub fn set_x(&mut self, x: f32) {
     self.shape.set_x(x);
