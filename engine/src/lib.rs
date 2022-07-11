@@ -19,6 +19,6 @@ pub use sprites::{sprite::Sprite, drawable::Drawable};
 pub use shapes::{shape::Shape, rectangle::Rectangle};
 
 pub mod premade_components {
-  pub use crate::components::{gravity::GravityComponent, collide::CollisionComponent};
+  pub use crate::components::{gravity::GravityComponent, collide::CollisionComponent, event::EventComponent};
 }
 

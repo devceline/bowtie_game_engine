@@ -7,13 +7,15 @@ extern crate rand;
 mod game_objects;
 
 use bowtie::{
-  premade_components::{CollisionComponent, GravityComponent},
+  premade_components::{CollisionComponent, GravityComponent, EventComponent},
   BowTie, Entity, LoadableTexture, Rectangle, Sprite, Texture, TextureOptions,
-  COLORS,
+  COLORS, Message,
 };
 
-use game_objects::{floor::Floor, playable_character::PlayableCharacter};
+use game_objects::{floor::Floor, playable_character::{PlayableCharacter, MessageReciever}};
 use glfw::Context;
+
+fn message_reciever<'s>(entity: &mut dyn Entity<'s>, message: Message) {}
 
 async fn handle_player_events<'a>(
   event: glfw::WindowEvent,
@@ -50,8 +52,9 @@ fn main() {
 
   let mut bowtie = BowTie::new();
 
-  let mut collision_component = CollisionComponent::new();
-  let mut gravity_component = GravityComponent::new(0.005);
+  // let mut collision_component = CollisionComponent::new();
+  // let mut gravity_component = GravityComponent::new(0.005);
+  // let mut event_component = EventComponent::new();
   let en_texture = Texture::new("character", TextureOptions::default());
   en_texture.load_texture();
   let mut floor = Floor::new();
@@ -66,13 +69,18 @@ fn main() {
 
   let mut obstacle = PlayableCharacter::new(Sprite::new(
     Rectangle::new(0.0, -0.4, 0.1, 0.1, COLORS::White.into()),
-    Texture::new("dirt", TextureOptions::default()),
+    Texture::new("spike", TextureOptions::default()),
   ));
 
-  playable_character.load_components(&mut collision_component);
-  obstacle.load_components(&mut collision_component);
-  playable_character.load_components(&mut gravity_component);
-  floor.load_components(&mut collision_component);
+  
+  playable_character.set_message_reciever(message_reciever);
+
+  // obstacle.load_components(&mut event_component);
+  // playable_character.load_components(&mut collision_component);
+  // obstacle.load_components(&mut collision_component);
+  // playable_character.load_components(&mut gravity_component);
+  // floor.load_components(&mut collision_component);
+  //
   bowtie.load_entity(&mut obstacle);
   bowtie.load_entity(&mut floor);
   bowtie.load_entity(&mut playable_character);
@@ -82,6 +90,7 @@ fn main() {
     Texture::from(&en_texture),
   )));
   let id = random_entities.len() - 1;
+
   bowtie.load_entity(&mut random_entities[id]);
 
   bowtie.prep_for_render();
@@ -90,16 +99,16 @@ fn main() {
     window.swap_buffers();
     glfw_instance.poll_events();
 
-    let collision_direction = collision_component
-      .get_entity_collision_direction(&mut playable_character);
-    bowtie.update_entities();
-    let is_collided =
-      collision_component.get_is_collided(&mut playable_character);
-    if is_collided {
-      playable_character.set_collision_direction(collision_direction);
-    } else {
-      playable_character.set_collision_direction(collision_direction);
-    }
+    // let collision_direction = collision_component
+    //   .get_entity_collision_direction(&mut playable_character);
+    // bowtie.update_entities();
+    // let is_collided =
+    //   collision_component.get_is_collided(&mut playable_character);
+    // if is_collided {
+    //   playable_character.set_collision_direction(collision_direction);
+    // } else {
+    //   playable_character.set_collision_direction(collision_direction);
+    // }
     bowtie.draw_entities();
 
     for (_, event) in glfw::flush_messages(&events) {
@@ -116,8 +125,8 @@ fn main() {
           for _ in 0..20 {
             random_entities.push(PlayableCharacter::new(Sprite::new(
               Rectangle::new(
-                (rand::random::<f32>() % 2.0) - 1.0,
-                (rand::random::<f32>() % 2.0) - 1.0,
+                (rand::random::<f32>() % 1.0) - 0.5,
+                (rand::random::<f32>() % 1.0) - 0.5,
                 0.2,
                 0.3,
                 COLORS::White.into(),
@@ -125,6 +134,7 @@ fn main() {
               Texture::from(&en_texture),
             )));
             let id = random_entities.len() - 1;
+            // random_entities[id].load_components(&mut gravity_component);
             bowtie.load_entity(&mut random_entities[id]);
           }
         }
