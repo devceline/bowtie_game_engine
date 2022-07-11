@@ -132,7 +132,7 @@ impl<'d> BowTie<'d> {
 
   /// Draws the entities with an actual clear screen refresh
   pub fn draw_entities(&mut self) {
-    // self.drawer.clear_screen(COLORS::White.into());
+    self.drawer.clear_screen(COLORS::White.into());
     self.drawer.draw(DrawingMode::Triangles);
   }
 }

@@ -128,16 +128,6 @@ impl<'a> Drawer<'a> {
     self.elements.clear();
     self.elements_count = 0;
 
-    // for i in 0..dynamic_sprites.len() {
-    //   Drawer::load_sprite(
-    //     &mut self.elements,
-    //     &mut self.vertices,
-    //     dynamic_sprites[i],
-    //     self.elements_count,
-    //   );
-    //   self.elements_count += dynamic_sprites[i].get_corner_count()
-    // }
-
     for i in 0..self.drawables.len() {
       Drawer::load_drawable(
         &mut self.elements,
@@ -148,10 +138,6 @@ impl<'a> Drawer<'a> {
       self.elements_count += self.drawables[i].corner_count
     }
 
-    println!("----------------------------");
-    println!("{:?}", self.vertices);
-    println!("----------------------------");
-
     self.vertex_array_buffer.update_data(&self.vertices);
     self.element_array_buffer.update_data(&self.elements);
 
@@ -161,7 +147,7 @@ impl<'a> Drawer<'a> {
         self.elements.len() as i32,
         self.element_array_buffer.data_type.to_gl(),
         0 as *const gl::types::GLvoid,
-        self.dynamic_sprites.len() as i32,
+        self.drawables.len() as i32,
       );
     }
   }

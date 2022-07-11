@@ -117,6 +117,7 @@ impl Texture {
 
 impl LoadableTexture for Texture {
   fn load_texture(&self) {
+    println!("texture id: {:?}, image_name: {:?}", self.texture_id, self.image_name);
     if self.is_from_ref {
       return;
     }

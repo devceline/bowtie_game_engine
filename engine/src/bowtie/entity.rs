@@ -38,6 +38,7 @@ pub struct StandardEntity<'s> {
 
 impl<'s> StandardEntity<'s> {
   pub fn new(sprite: Sprite<'s, Rectangle>, speed: f32) -> StandardEntity<'s> {
+    sprite.load_texture();
     StandardEntity {
       sprite,
       speed,

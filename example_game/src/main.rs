@@ -54,29 +54,16 @@ fn main() {
   // let mut collision_component = CollisionComponent::new();
   // let mut gravity_component = GravityComponent::new(0.005);
   // let mut event_component = EventComponent::new();
-  let en_texture = Texture::new("character", TextureOptions::default());
+  let en_texture = Texture::new("witch", TextureOptions::default());
   en_texture.load_texture();
-  let mut playable_character = StandardEntity::new(Sprite::new(
-    Rectangle::new(0.0, 0.5, 0.2, 0.3, COLORS::White.into()),
-    Texture::new("witch", TextureOptions::default()),
-  ), 2.0);
 
   let mut random_entities = Vec::<StandardEntity>::new();
   random_entities.reserve(2000);
   
   // playable_character.set_message_reciever(message_reciever);
 
-  // obstacle.load_components(&mut event_component);
-  // playable_character.load_components(&mut collision_component);
-  // obstacle.load_components(&mut collision_component);
-  // playable_character.load_components(&mut gravity_component);
-  // floor.load_components(&mut collision_component);
-  //
-  // bowtie.load_entity(&mut obstacle);
-  // bowtie.load_entity(&mut floor);
-  bowtie.load_entity(playable_character);
   bowtie.load_entity(StandardEntity::new(Sprite::new(
-    Rectangle::new(0.0, 0.5, 0.2, 0.3, COLORS::Red.into()),
+    Rectangle::new(0.0, 0.5, 0.2, 0.3, COLORS::White.into()),
     Texture::from(&en_texture),
   ), 2.0));
 
@@ -85,16 +72,6 @@ fn main() {
   while !window.should_close() {
     window.swap_buffers();
     glfw_instance.poll_events();
-    // let collision_direction = collision_component
-    //   .get_entity_collision_direction(&mut playable_character);
-    // bowtie.update_entities();
-    // let is_collided =
-    //   collision_component.get_is_collided(&mut playable_character);
-    // if is_collided {
-    //   playable_character.set_collision_direction(collision_direction);
-    // } else {
-    //   playable_character.set_collision_direction(collision_direction);
-    // }
     bowtie.draw_entities();
 
     for (_, event) in glfw::flush_messages(&events) {
@@ -109,17 +86,17 @@ fn main() {
         glfw::WindowEvent::Key(glfw::Key::O, _, glfw::Action::Press, _) => {
           println!("Handling {} enemies", random_entities.len());
           for _ in 0..20 {
-            random_entities.push(StandardEntity::new(Sprite::new(
-              Rectangle::new(
-                (rand::random::<f32>() % 1.0) - 0.5,
-                (rand::random::<f32>() % 1.0) - 0.5,
-                0.2,
-                0.3,
-                COLORS::White.into(),
-              ),
-              Texture::from(&en_texture),
-            ), 2.0));
-            let id = random_entities.len() - 1;
+            // random_entities.push(StandardEntity::new(Sprite::new(
+            //   Rectangle::new(
+            //     (rand::random::<f32>() % 1.0) - 0.5,
+            //     (rand::random::<f32>() % 1.0) - 0.5,
+            //     0.2,
+            //     0.3,
+            //     COLORS::White.into(),
+            //   ),
+            //   Texture::from(&en_texture),
+            // ), 2.0));
+            // let id = random_entities.len() - 1;
             // random_entities[id].load_components(&mut gravity_component);
             // bowtie.load_entity(random_entities[id]);
           }
