@@ -4,26 +4,23 @@ extern crate gl;
 extern crate glfw;
 extern crate rand;
 
-mod game_objects;
-
 use bowtie::{
-  premade_components::{CollisionComponent, GravityComponent, EventComponent},
-  BowTie, Entity, LoadableTexture, Rectangle, Sprite, Texture, TextureOptions,
-  COLORS, Message,
+  BowTie, Entity, StandardEntity, LoadableTexture, Rectangle, Sprite, Texture, TextureOptions,
+  COLORS, Message, init_debug_callback
 };
 
-use game_objects::{floor::Floor, playable_character::{PlayableCharacter, MessageReciever}};
+// use game_objects::{floor::Floor, playable_character::{PlayableCharacter, MessageReciever}};
 use glfw::Context;
 
 fn message_reciever<'s>(entity: &mut dyn Entity<'s>, message: Message) {}
 
-async fn handle_player_events<'a>(
-  event: glfw::WindowEvent,
-  character: &mut PlayableCharacter<'a>,
-) {
-  // println!("x: {}, y: {}, y+height: {}", character.get_x(), character.get_y(), character.get_y() + character.get_height());
-  futures::join!(character.respond_to_event(&event));
-}
+// async fn handle_player_events<'a>(
+//   event: glfw::WindowEvent,
+//   character: &mut PlayableCharacter<'a>,
+// ) {
+//   // println!("x: {}, y: {}, y+height: {}", character.get_x(), character.get_y(), character.get_y() + character.get_height());
+//   futures::join!(character.respond_to_event(&event));
+// }
 
 fn window_setup(glfw: &mut glfw::Glfw, window: &mut glfw::Window) {
   window.make_current();
@@ -52,28 +49,22 @@ fn main() {
 
   let mut bowtie = BowTie::new();
 
+  init_debug_callback();
+
   // let mut collision_component = CollisionComponent::new();
   // let mut gravity_component = GravityComponent::new(0.005);
   // let mut event_component = EventComponent::new();
   let en_texture = Texture::new("character", TextureOptions::default());
   en_texture.load_texture();
-  let mut floor = Floor::new();
-
-  let mut playable_character = PlayableCharacter::new(Sprite::new(
+  let mut playable_character = StandardEntity::new(Sprite::new(
     Rectangle::new(0.0, 0.5, 0.2, 0.3, COLORS::White.into()),
     Texture::new("witch", TextureOptions::default()),
-  ));
+  ), 2.0);
 
-  let mut random_entities = Vec::<PlayableCharacter>::new();
+  let mut random_entities = Vec::<StandardEntity>::new();
   random_entities.reserve(2000);
-
-  let mut obstacle = PlayableCharacter::new(Sprite::new(
-    Rectangle::new(0.0, -0.4, 0.1, 0.1, COLORS::White.into()),
-    Texture::new("spike", TextureOptions::default()),
-  ));
-
   
-  playable_character.set_message_reciever(message_reciever);
+  // playable_character.set_message_reciever(message_reciever);
 
   // obstacle.load_components(&mut event_component);
   // playable_character.load_components(&mut collision_component);
@@ -81,24 +72,19 @@ fn main() {
   // playable_character.load_components(&mut gravity_component);
   // floor.load_components(&mut collision_component);
   //
-  bowtie.load_entity(&mut obstacle);
-  bowtie.load_entity(&mut floor);
-  bowtie.load_entity(&mut playable_character);
-
-  random_entities.push(PlayableCharacter::new(Sprite::new(
-    Rectangle::new(0.0, 0.5, 0.2, 0.3, COLORS::White.into()),
+  // bowtie.load_entity(&mut obstacle);
+  // bowtie.load_entity(&mut floor);
+  bowtie.load_entity(playable_character);
+  bowtie.load_entity(StandardEntity::new(Sprite::new(
+    Rectangle::new(0.0, 0.5, 0.2, 0.3, COLORS::Red.into()),
     Texture::from(&en_texture),
-  )));
-  let id = random_entities.len() - 1;
-
-  bowtie.load_entity(&mut random_entities[id]);
+  ), 2.0));
 
   bowtie.prep_for_render();
 
   while !window.should_close() {
     window.swap_buffers();
     glfw_instance.poll_events();
-
     // let collision_direction = collision_component
     //   .get_entity_collision_direction(&mut playable_character);
     // bowtie.update_entities();
@@ -112,10 +98,10 @@ fn main() {
     bowtie.draw_entities();
 
     for (_, event) in glfw::flush_messages(&events) {
-      futures::executor::block_on(handle_player_events(
-        event.to_owned(),
-        &mut playable_character,
-      ));
+      // futures::executor::block_on(handle_player_events(
+      //   event.to_owned(),
+      //   &mut playable_character,
+      // ));
       match event {
         glfw::WindowEvent::Key(glfw::Key::Escape, _, _, _) => {
           window.set_should_close(true);
@@ -123,7 +109,7 @@ fn main() {
         glfw::WindowEvent::Key(glfw::Key::O, _, glfw::Action::Press, _) => {
           println!("Handling {} enemies", random_entities.len());
           for _ in 0..20 {
-            random_entities.push(PlayableCharacter::new(Sprite::new(
+            random_entities.push(StandardEntity::new(Sprite::new(
               Rectangle::new(
                 (rand::random::<f32>() % 1.0) - 0.5,
                 (rand::random::<f32>() % 1.0) - 0.5,
@@ -132,10 +118,10 @@ fn main() {
                 COLORS::White.into(),
               ),
               Texture::from(&en_texture),
-            )));
+            ), 2.0));
             let id = random_entities.len() - 1;
             // random_entities[id].load_components(&mut gravity_component);
-            bowtie.load_entity(&mut random_entities[id]);
+            // bowtie.load_entity(random_entities[id]);
           }
         }
         _ => {}
