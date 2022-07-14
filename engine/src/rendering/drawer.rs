@@ -2,7 +2,8 @@ extern crate gl;
 
 use crate::general::color;
 use crate::gl_utils::element_array_buffer::ElementArrayBuffer;
-use crate::gl_utils::gl_texture::{Texture, LoadableTexture};
+use crate::gl_utils::gl_texture::{LoadableTexture, Texture};
+use crate::gl_utils::gl_texture_loader::TextureLoader;
 use crate::gl_utils::gl_translation::{DataType, DrawingMode, ToGl, UsageMode};
 use crate::gl_utils::shader_creator::ShaderProgram;
 use crate::gl_utils::vertex_array_buffer::VertexArrayBuffer;
@@ -23,9 +24,10 @@ pub struct Drawer<'a> {
   element_array_buffer: ElementArrayBuffer<i32>,
   vertices: Vec<f32>,
   elements: Vec<i32>,
+  texture_loader: TextureLoader,
   elements_count: i32,
   dynamic_sprites: Vec<&'a dyn Drawable<'a>>,
-  drawables: Vec<DrawableData>
+  drawables: Vec<DrawableData>,
 }
 
 impl<'a> Drawer<'a> {
@@ -39,11 +41,12 @@ impl<'a> Drawer<'a> {
         DataType::UnsignedInt,
         usage_mode,
       ),
+      texture_loader: TextureLoader::new(),
       vertices: vec![],
       elements: vec![],
       elements_count: 0,
       dynamic_sprites: vec![],
-      drawables: vec![]
+      drawables: vec![],
     }
   }
 
@@ -67,8 +70,9 @@ impl<'a> Drawer<'a> {
     }
   }
 
-  pub fn load_drawable_dynamic(&mut self, drawable: DrawableData) {
+  pub fn load_drawable_dynamic(&mut self, drawable: DrawableData, program: &ShaderProgram) {
     self.drawables.push(drawable.to_owned());
+
     Drawer::load_drawable(
       &mut self.elements,
       &mut self.vertices,
@@ -79,9 +83,8 @@ impl<'a> Drawer<'a> {
     self.vertex_array_buffer.update_data(&self.vertices);
     self.element_array_buffer.update_data(&self.elements);
 
-    drawable.texture.load_texture();
+    self.texture_loader.load_texture(drawable.texture, program);
   }
-
 
   /*
    * Renders a rectangle as wide and tall as the window to clear it
@@ -109,7 +112,15 @@ impl<'a> Drawer<'a> {
 
   /// Actually loads the sprite's textures.
   /// This needs to be done once, but has to be done before the draw call.
-  pub fn prep_textures(&self, program: &ShaderProgram) {
+  pub fn prep_textures(&mut self, program: &ShaderProgram) {
+    let textures = self
+      .drawables
+      .iter()
+      .map(|drawable| drawable.texture.to_owned())
+      .collect::<Vec<Texture>>();
+
+    self.texture_loader.load_textures(textures, program);
+
     unsafe {
       gl::Enable(gl::BLEND);
       gl::BlendEquation(gl::FUNC_ADD);

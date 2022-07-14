@@ -49,20 +49,24 @@ fn main() {
 
   let mut bowtie = BowTie::new();
 
-  init_debug_callback();
+  // init_debug_callback();
 
   // let mut collision_component = CollisionComponent::new();
   // let mut gravity_component = GravityComponent::new(0.005);
   // let mut event_component = EventComponent::new();
   let mut random_entities = Vec::<StandardEntity>::new();
   random_entities.reserve(2000);
-  
-  let text = Texture::new("character", TextureOptions::default());
-  
 
+  // let en_texture = Texture::new("character", TextureOptions::default());
+
+  //bowtie.load_entity(StandardEntity::new(Sprite::new(
+  //  Rectangle::new(0.0, -0.5, 0.2, 0.3, COLORS::Red.into()),
+  //    Texture::from(&en_texture)), 2.0));
+  
   bowtie.load_entity(StandardEntity::new(Sprite::new(
     Rectangle::new(0.0, 0.5, 0.2, 0.3, COLORS::Red.into()),
       Texture::new("witch", TextureOptions::default())), 2.0));
+
 
   bowtie.prep_for_render();
 
@@ -81,21 +85,23 @@ fn main() {
           window.set_should_close(true);
         }
         glfw::WindowEvent::Key(glfw::Key::O, _, glfw::Action::Press, _) => {
-          println!("Handling {} enemies", random_entities.len());
           for _ in 0..20 {
-            // random_entities.push(StandardEntity::new(Sprite::new(
-            //   Rectangle::new(
-            //     (rand::random::<f32>() % 1.0) - 0.5,
-            //     (rand::random::<f32>() % 1.0) - 0.5,
-            //     0.2,
-            //     0.3,
-            //     COLORS::White.into(),
-            //   ),
-            //   Texture::from(&en_texture),
-            // ), 2.0));
+            // random_entities.push();
             // let id = random_entities.len() - 1;
             // random_entities[id].load_components(&mut gravity_component);
             // bowtie.load_entity(random_entities[id]);
+            bowtie.load_entity(
+              StandardEntity::new(Sprite::new(
+              Rectangle::new(
+                (rand::random::<f32>() % 1.0) - 0.5,
+                (rand::random::<f32>() % 1.0) - 0.5,
+                0.2,
+                0.3,
+                COLORS::White.into(),
+              ),
+              Texture::none(),
+            ), 2.0)
+            )
           }
         }
         _ => {}

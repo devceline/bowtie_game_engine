@@ -198,7 +198,7 @@ where
   }
 
   fn load_texture(&'a self) -> () {
-    self.texture.load_texture();
+    // self.texture.load_texture();
   }
 
   fn get_vertices(&self) -> Vec<f32> {

@@ -2,6 +2,7 @@ use crate::{
   general::color::COLORS,
   gl_utils::{
     gl_translation::{DataType, DrawingMode, UsageMode},
+    gl_texture::{Texture, LoadableTexture},
     shader_creator::{
       Shader, ShaderProgram, VertexShaderAttribute, VertexShaderAttributeType,
     },
@@ -98,9 +99,7 @@ impl<'d> BowTie<'d> {
   pub fn load_entity(&mut self, entity: StandardEntity<'d>) {
     self.entities.push(entity.to_owned());
     let drawable = entity.get_drawable();
-    let id = entity.get_drawable().texture.texture_id;
-    println!("Loading entity with tex id {id}");
-    self.drawer.load_drawable_dynamic(drawable);
+    self.drawer.load_drawable_dynamic(drawable.to_owned(), &self.shading_program);
   }
 
   pub fn unload_entity(&'d mut self, entity: StandardEntity<'d>) {

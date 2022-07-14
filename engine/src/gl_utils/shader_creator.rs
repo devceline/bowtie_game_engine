@@ -87,10 +87,11 @@ impl ShaderProgram {
   pub fn set_uniform<T>(&self, uniform: &dyn SettableUniform<T>) {
     let uniform_name = get_c_string(uniform.get_name().to_owned());
 
-    println!("Setting {:?}", uniform_name);
 
     let uniform_location =
       unsafe { gl::GetUniformLocation(self.program_id, uniform_name.as_ptr()) };
+
+    println!("Setting {:?}", uniform_name);
 
     if uniform_location < 0 {
       panic!("Uniform {:?} was not found", uniform_name);

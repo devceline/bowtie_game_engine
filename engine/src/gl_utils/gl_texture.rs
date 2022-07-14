@@ -1,6 +1,7 @@
 extern crate gl;
 extern crate png;
 
+use std::collections::HashMap;
 use std::fs::File;
 
 use super::shader_creator::ShaderProgram;
@@ -12,7 +13,7 @@ use super::gl_translation::{TextureFilter, TextureWrap, ToGl};
 static mut TEXTURE_COUNT: u32 = 0;
 
 pub trait LoadableTexture {
-  fn load_texture(&self);
+  fn load_texture(&self, program: &ShaderProgram);
 }
 
 #[derive(Debug, Copy, Clone)]
@@ -83,8 +84,6 @@ impl Texture {
       // Incrementing texture count to have accurate Texture ID
       TEXTURE_COUNT = TEXTURE_COUNT + 1;
 
-      tex.load_texture();
-
       return tex;
     }
   }
@@ -118,11 +117,7 @@ impl Texture {
 }
 
 impl LoadableTexture for Texture {
-  fn load_texture(&self) {
-    println!("texture id: {:?}, image_name: {:?}", self.texture_id, self.image_name);
-    if self.is_from_ref {
-      return;
-    }
+  fn load_texture(&self, program: &ShaderProgram) {
     unsafe {
       // BindTexture requires a specific texture to be activated first
       gl::ActiveTexture(gl::TEXTURE0 + (self.texture_id as u32));
@@ -136,6 +131,7 @@ impl LoadableTexture for Texture {
       let (info, mut reader) = decoder.read_info().unwrap();
       let mut buf = vec![0; info.buffer_size()];
       reader.next_frame(&mut buf).unwrap();
+      println!("Loading texture {}", self.texture_id);
 
       // Loading image into gl
       gl::TexImage2D(
@@ -152,6 +148,8 @@ impl LoadableTexture for Texture {
 
       // Using mipmaps for performance
       gl::GenerateMipmap(gl::TEXTURE_2D);
+
+      self.set_uniform(program);
 
       // Wrap
       gl::TexParameteri(
@@ -177,7 +175,8 @@ impl LoadableTexture for Texture {
         self.options.min_filter.to_gl() as i32,
       );
     };
-    // self.is_loaded = true;
+
+
   }
 }
 
