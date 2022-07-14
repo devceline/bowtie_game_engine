@@ -112,12 +112,16 @@ impl Texture {
       format!("tex{}_sampler", self.texture_id).as_str(),
       self.texture_id,
     );
+    println!("Setting {:?} {:?}", uniform.get_name(), uniform.value);
     program.set_uniform(&uniform);
   }
 }
 
 impl LoadableTexture for Texture {
   fn load_texture(&self, program: &ShaderProgram) {
+    if self.texture_id < 0 {
+      return;
+    }
     unsafe {
       // BindTexture requires a specific texture to be activated first
       gl::ActiveTexture(gl::TEXTURE0 + (self.texture_id as u32));
@@ -131,7 +135,6 @@ impl LoadableTexture for Texture {
       let (info, mut reader) = decoder.read_info().unwrap();
       let mut buf = vec![0; info.buffer_size()];
       reader.next_frame(&mut buf).unwrap();
-      println!("Loading texture {}", self.texture_id);
 
       // Loading image into gl
       gl::TexImage2D(
@@ -183,6 +186,6 @@ impl LoadableTexture for Texture {
 impl Drop for Texture {
   fn drop(&mut self) {
     let id_u32 = self.id as u32;
-    unsafe { gl::DeleteTextures(1, &id_u32) };
+    // unsafe { gl::DeleteTextures(1, &id_u32) };
   }
 }

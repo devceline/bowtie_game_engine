@@ -47,9 +47,6 @@ impl<'s> StandardEntity<'s> {
     }
   }
   
-  pub fn load_texture(&self) {
-    // self.sprite.texture.load_texture();
-  }
 }
 
 impl<'a> Entity<'a> for StandardEntity<'a> {

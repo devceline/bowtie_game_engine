@@ -197,10 +197,6 @@ where
     return vec![0, 1, 2, 2, 3, 0];
   }
 
-  fn load_texture(&'a self) -> () {
-    // self.texture.load_texture();
-  }
-
   fn get_vertices(&self) -> Vec<f32> {
     let mut vertices = Vec::<f32>::new();
 

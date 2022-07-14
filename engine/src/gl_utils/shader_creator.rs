@@ -91,8 +91,6 @@ impl ShaderProgram {
     let uniform_location =
       unsafe { gl::GetUniformLocation(self.program_id, uniform_name.as_ptr()) };
 
-    println!("Setting {:?}", uniform_name);
-
     if uniform_location < 0 {
       panic!("Uniform {:?} was not found", uniform_name);
     }
