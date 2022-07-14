@@ -19,7 +19,7 @@ where
 {
   shape: TShape,
   pub name: String,
-  texture: Texture,
+  pub texture: Texture,
   phantom: PhantomData<&'a TShape>,
   transformation: Matrix<f32>,
 }
@@ -104,9 +104,6 @@ where
     self.transformation = transformation_matrix;
   }
 
-  pub fn load_texture(&mut self) {
-    self.texture.load_texture();
-  }
 
   pub fn set_x(&mut self, x: f32) {
     self.shape.set_x(x);
@@ -201,7 +198,7 @@ where
   }
 
   fn load_texture(&'a self) -> () {
-    self.texture.load_texture();
+    // self.texture.load_texture();
   }
 
   fn get_vertices(&self) -> Vec<f32> {

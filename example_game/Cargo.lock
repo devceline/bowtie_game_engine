@@ -27,6 +27,7 @@ dependencies = [
  "futures",
  "gl",
  "png",
+ "rand",
 ]
 
 [[package]]

@@ -5,7 +5,7 @@ uniform sampler2D tex1_sampler;
 uniform sampler2D tex2_sampler;
 uniform sampler2D tex3_sampler;
 uniform sampler2D tex4_sampler;
-uniform sampler2D tex5_sampler;
+uniform sampler2D tex6_sampler;
 
 in vec4 Color;
 in vec2 tex_cords_out;
@@ -35,7 +35,7 @@ void main()
 			base_texture = texture(tex4_sampler, tex_cords_out);
 			break;
 		case 5: 
-			base_texture = texture(tex5_sampler, tex_cords_out);
+			base_texture = texture(tex6_sampler, tex_cords_out);
 			break;
 	}
 

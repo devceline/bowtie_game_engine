@@ -1,9 +1,15 @@
 extern crate bowtie;
+use std::ptr::NonNull;
+
 use bowtie::{
   math::general::absolute_value_f32,
   premade_components::{CollisionComponent, GravityComponent},
   Color, Component, Direction, Drawable, Entity, Message, Rectangle, Sprite,
 };
+
+pub type MessageReciever<'s> = fn(&mut dyn Entity<'s>, Message) -> ();
+
+fn dummy_reciever<'s>(entity: &mut dyn Entity<'s>, message: Message) {}
 
 pub struct PlayableCharacter<'s> {
   sprite: Sprite<'s, Rectangle>,
@@ -11,6 +17,7 @@ pub struct PlayableCharacter<'s> {
   components: Vec<*mut dyn Component<'s>>,
   direction: Direction,
   collision_direction: Direction,
+  message_reciever: MessageReciever<'s>
 }
 
 impl<'e> Entity<'e> for PlayableCharacter<'e> {
@@ -45,10 +52,7 @@ impl<'e> Entity<'e> for PlayableCharacter<'e> {
       false;
     }
 
-    self.sprite.move_sprite(
-      net,
-      amount,
-    );
+    self.sprite.move_sprite(net, amount);
 
     true
   }
@@ -78,10 +82,8 @@ impl<'e> Entity<'e> for PlayableCharacter<'e> {
 
     if message_name == CollisionComponent::get_message_name() {
       self.collision_direction = message.get_values()["with"].into();
-      if self.collision_direction != Direction::Stationary {
-        println!("Player collided {:?}", self.collision_direction);
-      }
     }
+
   }
 }
 
@@ -93,11 +95,16 @@ impl<'s> PlayableCharacter<'s> {
       direction: Direction::Stationary,
       collision_direction: Direction::Stationary,
       speed: 0.03,
+      message_reciever: dummy_reciever
     }
   }
 
   pub fn set_color_overlay(&mut self, color: Color) {
     self.sprite.set_color_overlay(color);
+  }
+
+  pub fn set_message_reciever<'f>(&mut self, reciever: MessageReciever<'s>) {
+    self.message_reciever = reciever;
   }
 
   pub fn set_collision_direction(&mut self, direction: Direction) {
@@ -120,6 +127,9 @@ impl<'s> PlayableCharacter<'s> {
     }
   }
 
+  /// Moves the character by adding or subtracting the target direction
+  /// To the current direction, and then subtracting the collision_direction
+  /// To move a final net direction.
   pub fn move_character(
     &mut self,
     direction: Direction,
@@ -129,10 +139,6 @@ impl<'s> PlayableCharacter<'s> {
     self.handle_direction_change(direction, subtract);
     let net_direction =
       self.direction.subtract_direction(self.collision_direction);
-    println!(
-      "Player requested to move to {:?}, but subtracting {:?} resulted in {:?}",
-      direction, self.collision_direction, net_direction
-    );
     self.sprite.move_sprite(net_direction, speed);
   }
 
