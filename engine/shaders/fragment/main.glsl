@@ -39,6 +39,6 @@ void main()
 			break;
 	}
 
-	outColor = base_texture * vec4(Color);
+	outColor = base_texture * Color;
 
 }

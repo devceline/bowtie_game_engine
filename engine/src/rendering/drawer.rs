@@ -10,6 +10,7 @@ use crate::gl_utils::vertex_array_buffer::VertexArrayBuffer;
 use crate::shapes::rectangle::Rectangle;
 use crate::sprites::drawable::Drawable;
 use crate::sprites::sprite::Sprite;
+use crate::{Entity, StandardEntity};
 
 #[derive(Clone)]
 pub struct DrawableData {
@@ -26,8 +27,8 @@ pub struct Drawer<'a> {
   elements: Vec<i32>,
   texture_loader: TextureLoader,
   elements_count: i32,
-  dynamic_sprites: Vec<&'a dyn Drawable<'a>>,
   drawables: Vec<DrawableData>,
+  entities: *const Vec<StandardEntity<'a>>,
 }
 
 impl<'a> Drawer<'a> {
@@ -45,8 +46,8 @@ impl<'a> Drawer<'a> {
       vertices: vec![],
       elements: vec![],
       elements_count: 0,
-      dynamic_sprites: vec![],
       drawables: vec![],
+      entities: std::ptr::null(),
     }
   }
 
@@ -70,7 +71,11 @@ impl<'a> Drawer<'a> {
     }
   }
 
-  pub fn load_drawable_dynamic(&mut self, drawable: DrawableData, program: &ShaderProgram) {
+  pub fn load_drawable_dynamic(
+    &mut self,
+    drawable: DrawableData,
+    program: &ShaderProgram,
+  ) {
     self.drawables.push(drawable.to_owned());
 
     Drawer::load_drawable(
@@ -82,8 +87,6 @@ impl<'a> Drawer<'a> {
 
     self.vertex_array_buffer.update_data(&self.vertices);
     self.element_array_buffer.update_data(&self.elements);
-
-    self.texture_loader.load_texture(drawable.texture, program);
   }
 
   /*
@@ -110,13 +113,17 @@ impl<'a> Drawer<'a> {
     }
   }
 
+  pub fn prep_data(&mut self, program: &ShaderProgram) {
+    self.load_all(program);
+  }
+
   /// Actually loads the sprite's textures.
   /// This needs to be done once, but has to be done before the draw call.
   pub fn prep_textures(&mut self, program: &ShaderProgram) {
-    let textures = self
-      .drawables
+    let entities = unsafe { self.entities.as_ref().unwrap() };
+    let textures = entities
       .iter()
-      .map(|drawable| drawable.texture.to_owned())
+      .map(|entitiy| entitiy.get_drawable().texture.to_owned())
       .collect::<Vec<Texture>>();
 
     self.texture_loader.load_textures(textures, program);
@@ -128,32 +135,54 @@ impl<'a> Drawer<'a> {
     }
   }
 
-  /// Renders the dynamically loaded sprites
-  pub fn draw(&mut self, mode: DrawingMode) {
+  pub fn set_entities_array(
+    &mut self,
+    entities: *const Vec<StandardEntity<'a>>,
+  ) {
+    self.entities = entities;
+  }
+
+  pub fn load_all(&mut self, program: &ShaderProgram) {
+    let size = self.vertices.len();
     self.vertices.clear();
     self.elements.clear();
     self.elements_count = 0;
 
-    for i in 0..self.drawables.len() {
+    self.vertices.reserve(size);
+
+    let entities = unsafe { self.entities.as_ref().unwrap() };
+    let len = entities.len();
+
+    for i in 0..len {
+      let entity = &entities[i];
+
+      let drawable = entity.get_drawable();
+      self
+        .texture_loader
+        .load_texture(drawable.to_owned().texture, program);
       Drawer::load_drawable(
         &mut self.elements,
         &mut self.vertices,
-        &self.drawables[i],
+        &drawable,
         self.elements_count,
       );
-      self.elements_count += self.drawables[i].corner_count
+      self.elements_count += drawable.corner_count
     }
 
     self.vertex_array_buffer.update_data(&self.vertices);
     self.element_array_buffer.update_data(&self.elements);
+  }
+
+  /// Renders the dynamically loaded sprites
+  pub fn draw(&mut self, mode: DrawingMode, program: &ShaderProgram) {
+    self.load_all(program);
 
     unsafe {
-      gl::DrawElementsInstanced(
+      gl::DrawElements(
         mode.to_gl(),
         self.elements.len() as i32,
         self.element_array_buffer.data_type.to_gl(),
         0 as *const gl::types::GLvoid,
-        self.drawables.len() as i32,
       );
     }
   }

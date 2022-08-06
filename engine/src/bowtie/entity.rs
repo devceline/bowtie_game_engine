@@ -1,5 +1,11 @@
-use crate::{sprites::drawable::Drawable, Sprite, Rectangle, Direction, rendering::drawer::DrawableData, gl_utils::{gl_texture::LoadableTexture}};
+use crate::{
+  general::direction, gl_utils::gl_texture::LoadableTexture,
+  rendering::drawer::DrawableData, sprites::drawable::Drawable, Direction,
+  Rectangle, Sprite,
+};
 use std::collections::HashMap;
+
+use super::component::StandardComponent;
 
 /// Entity trait
 /// This is the basis for any object that can be acted upon within the engine
@@ -18,20 +24,19 @@ pub trait Entity<'a> {
   fn get_height(&self) -> f32;
   fn get_width(&self) -> f32;
 
-  fn get_components(&mut self) -> &Vec<*mut dyn Component<'a>>;
-  fn load_components(&mut self, component: *mut dyn Component<'a>);
+  fn get_components(&self) -> &Vec<StandardComponent<'a>>;
+  fn load_components(&mut self, component: StandardComponent<'a>);
 
   /// Implementing this will usually involve pattern matching or if statements
   /// to act depending on the type of message.
   fn recieve_message(&mut self, message: Message);
 }
 
-
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct StandardEntity<'s> {
   sprite: Sprite<'s, Rectangle>,
   speed: f32,
-  components: Vec<*mut dyn Component<'s>>,
+  components: Vec<StandardComponent<'s>>,
   direction: Direction,
   collision_direction: Direction,
 }
@@ -43,10 +48,49 @@ impl<'s> StandardEntity<'s> {
       speed,
       components: vec![],
       direction: Direction::Stationary,
-      collision_direction: Direction::Stationary
+      collision_direction: Direction::Stationary,
     }
   }
-  
+
+  pub fn move_in_direction(&mut self, direction: Direction, strength: f32) {
+    let (x, y) =
+      (direction.subtract_direction(self.collision_direction)).as_vector();
+
+    let x_strength = x * strength;
+    let y_strength = y * strength;
+
+    self.set_x(self.get_x() + x_strength);
+    self.set_y(self.get_y() + y_strength);
+  }
+
+  pub fn set_collision_direction(&mut self, direction: Direction) {
+    self.collision_direction = direction;
+  }
+
+  pub fn get_component(&self, name: &str) -> Option<&StandardComponent<'s>> {
+    self
+      .components
+      .iter()
+      .find(|component| component.get_name() == name)
+  }
+
+  // TODO: Figure out a way to make this safe
+  pub fn act_on_components(&mut self) {
+    let mut components: Vec<*const StandardComponent> = vec![];
+    let entity_ref: *mut StandardEntity<'s> = self;
+    unsafe {
+      let len = self.components.len();
+      for i in 0..len {
+        let comp_ptr: *const StandardComponent = &self.components[i];
+        components.push(comp_ptr);
+      }
+
+      for component in components {
+        let comp = component.as_ref().unwrap();
+        comp.act(entity_ref.as_mut().unwrap());
+      }
+    }
+  }
 }
 
 impl<'a> Entity<'a> for StandardEntity<'a> {
@@ -55,7 +99,7 @@ impl<'a> Entity<'a> for StandardEntity<'a> {
   }
 
   fn get_y(&self) -> f32 {
-      self.sprite.get_y()
+    self.sprite.get_y()
   }
 
   fn set_y(&mut self, y: f32) -> bool {
@@ -69,11 +113,11 @@ impl<'a> Entity<'a> for StandardEntity<'a> {
   }
 
   fn get_width(&self) -> f32 {
-      self.sprite.get_width()
+    self.sprite.get_width()
   }
 
   fn get_height(&self) -> f32 {
-      self.sprite.get_height()
+    self.sprite.get_height()
   }
 
   fn get_drawable(&self) -> DrawableData {
@@ -81,22 +125,19 @@ impl<'a> Entity<'a> for StandardEntity<'a> {
       vertices: self.sprite.get_vertices(),
       elements: self.sprite.get_elements(),
       texture: self.sprite.texture.to_owned(),
-      corner_count: self.sprite.get_corner_count()
+      corner_count: self.sprite.get_corner_count(),
     }
   }
 
-  fn get_components(&mut self) -> &Vec<*mut dyn Component<'a>> {
-      &self.components
+  fn get_components(&self) -> &Vec<StandardComponent<'a>> {
+    &self.components
   }
 
-  fn load_components(&mut self, component: *mut dyn Component<'a>) {
+  fn load_components(&mut self, component: StandardComponent<'a>) {
     self.components.push(component);
   }
 
-  fn recieve_message(&mut self, message: Message) {
-      
-  }
-
+  fn recieve_message(&mut self, message: Message) {}
 }
 
 /// Component Trait

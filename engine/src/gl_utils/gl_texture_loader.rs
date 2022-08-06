@@ -39,3 +39,12 @@ impl TextureLoader {
     }
   }
 }
+
+impl Drop for TextureLoader {
+  fn drop(&mut self) {
+    println!("Dropping loader");
+    for texture in self.loaded_textures.keys() {
+      //unsafe { gl::DeleteTextures(1, texture) };
+    }
+  }
+}

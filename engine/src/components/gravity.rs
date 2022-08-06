@@ -1,16 +1,24 @@
-use std::collections::HashMap;
+use std::{
+  collections::HashMap,
+  marker::PhantomData,
+  sync::{Arc, Mutex},
+};
 
-use crate::bowtie::entity::{Component, Entity, Message};
+use crate::{
+  bowtie::entity::{Component, Entity, Message, StandardEntity},
+  general::value::Value,
+  Direction, StandardComponent,
+};
 
 /// Gravity Component
 ///
 /// Sends a message about y position updates in `f32`
+#[derive(Clone)]
 pub struct GravityComponent<'s> {
   speed: f32,
   acceleration: f32,
+  _marker: PhantomData<&'s f32>,
   terminal_velocity: f32,
-  // Although this is not scientifcally accurate, I CBA implement weight.
-  falling_objects: HashMap<*mut dyn Entity<'s>, (f32, f32)>,
 }
 
 impl<'s> GravityComponent<'s> {
@@ -19,48 +27,62 @@ impl<'s> GravityComponent<'s> {
       speed: speed / 100.0,
       acceleration: speed * 0.2,
       terminal_velocity: speed * 1000.0,
-      falling_objects: HashMap::new(),
+      _marker: PhantomData,
     }
   }
 
-  pub fn get_message_name() -> String {
-    "gravity_pull".to_string()
-  }
-}
-
-impl<'s> Component<'s> for GravityComponent<'s> {
-  fn get_name(&self) -> &str {
-    "gravity"
+  pub fn get_name() -> String {
+    String::from("gravity")
   }
 
-  unsafe fn act(
-    &mut self,
-    _entities: &Vec<*mut dyn Entity<'s>>,
-    entity: *mut dyn Entity<'s>,
-  ) -> Option<Message> {
-    let entity_ref = entity.as_ref().unwrap();
+  pub fn component(&'s mut self) -> StandardComponent<'s> {
+    StandardComponent::new(
+      Arc::new(|entity, store| {
+        let mut locked_store = store.lock().unwrap();
 
-    let (speed, y_pos) = self
-      .falling_objects
-      .entry(entity)
-      .or_insert((self.speed, entity_ref.get_y()));
+        let falling_objects = locked_store
+          .entry(String::from("falling_objects"))
+          .or_insert(Value::Object(HashMap::new()));
 
-    if *speed < self.terminal_velocity {
-      *speed += self.acceleration;
-    }
+        match falling_objects {
+          Value::Object(objects) => {
+            let entity_ptr: *mut StandardEntity<'s> = entity;
+            let entity_ptr_str = format!("{:?}", entity_ptr);
 
-    let entity_y = entity_ref.get_y();
+            let object_info = objects
+              .entry(entity_ptr_str)
+              .or_insert(Value::Vec2f32((self.speed.to_owned(), entity.get_y().to_owned())));
 
-    // If they have stopped falling, reset their speed.
-    if entity_y == *y_pos {
-      *speed = self.speed;
-    } else {
-      *y_pos = entity_y;
-    }
+            match object_info {
+              Value::Vec2f32((speed, y_pos)) => {
+                if *speed < self.terminal_velocity {
+                  *speed += self.acceleration;
+                }
 
-    Some(Message::new(
-      GravityComponent::get_message_name(),
-      HashMap::from([(String::from("speed"), *speed)]),
-    ))
+                let entity_y = entity.get_y();
+
+                // If they have stopped falling, reset their speed.
+                if entity_y == *y_pos {
+                  *speed = self.speed;
+                } else {
+                  *y_pos = entity_y;
+                }
+
+                entity.move_in_direction(Direction::Down, *speed);
+              }
+              _ => {}
+            }
+
+          }
+          _ => {
+            panic!("Falling objects should be hashmap")
+          }
+        }
+      }),
+      GravityComponent::get_name().as_str(),
+      HashMap::from([
+        (String::from("falling_objects"), Value::Object(HashMap::new()))
+      ]),
+    )
   }
 }

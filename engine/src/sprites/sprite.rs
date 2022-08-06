@@ -104,7 +104,6 @@ where
     self.transformation = transformation_matrix;
   }
 
-
   pub fn set_x(&mut self, x: f32) {
     self.shape.set_x(x);
   }

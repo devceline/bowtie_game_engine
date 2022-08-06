@@ -4,23 +4,21 @@ extern crate gl;
 extern crate glfw;
 extern crate rand;
 
+mod components;
+
+use std::{collections::HashMap, sync::Arc};
+
+use components::rand_move::RandMove;
+use rand::Rng;
+
 use bowtie::{
-  BowTie, Entity, StandardEntity, LoadableTexture, Rectangle, Sprite, Texture, TextureOptions,
-  COLORS, Message, init_debug_callback
+  init_debug_callback, math,
+  premade_components::{CollisionComponent, GravityComponent, KeyboardMoveComponent},
+  BowTie, Direction, Entity, Message, Rectangle, Sprite, StandardComponent,
+  StandardEntity, Texture, TextureOptions, COLORS,
 };
 
-// use game_objects::{floor::Floor, playable_character::{PlayableCharacter, MessageReciever}};
 use glfw::Context;
-
-fn message_reciever<'s>(entity: &mut dyn Entity<'s>, message: Message) {}
-
-// async fn handle_player_events<'a>(
-//   event: glfw::WindowEvent,
-//   character: &mut PlayableCharacter<'a>,
-// ) {
-//   // println!("x: {}, y: {}, y+height: {}", character.get_x(), character.get_y(), character.get_y() + character.get_height());
-//   futures::join!(character.respond_to_event(&event));
-// }
 
 fn window_setup(glfw: &mut glfw::Glfw, window: &mut glfw::Window) {
   window.make_current();
@@ -35,6 +33,10 @@ fn window_setup(glfw: &mut glfw::Glfw, window: &mut glfw::Window) {
   ));
   glfw.window_hint(glfw::WindowHint::OpenGlForwardCompat(true));
 
+  glfw.set_swap_interval(glfw::SwapInterval::Sync(1));
+
+  init_debug_callback();
+
   window.make_current();
   window.set_key_polling(true);
   window.set_sticky_keys(true);
@@ -45,57 +47,64 @@ fn main() {
   let (mut window, events) = glfw_instance
     .create_window(1000, 800, "rust game engine", glfw::WindowMode::Windowed)
     .expect("Failed to create window");
+
   window_setup(&mut glfw_instance, &mut window);
+
+  let mut collision = CollisionComponent::new();
+  let rand_move1 = RandMove::new();
+  let mut gravity = GravityComponent::new(0.002);
+  let keyboard_move = KeyboardMoveComponent::new(0.02, 0.0, 0.4);
+
+  let collision_comp = collision.component();
+  let rand_comp = rand_move1.component();
+  let gravity_comp = gravity.component();
+  let keyboard_move_comp = keyboard_move.component();
 
   let mut bowtie = BowTie::new();
 
-  // init_debug_callback();
+  let en_texture = Texture::new("witch", TextureOptions::default());
 
-  // let mut collision_component = CollisionComponent::new();
-  // let mut gravity_component = GravityComponent::new(0.005);
-  // let mut event_component = EventComponent::new();
-  let mut random_entities = Vec::<StandardEntity>::new();
-  random_entities.reserve(2000);
-
-   let en_texture = Texture::new("character", TextureOptions::default());
-
-   bowtie.load_entity(StandardEntity::new(Sprite::new(
-     Rectangle::new(0.0, -0.5, 0.2, 0.3, COLORS::Red.into()),
-       Texture::from(&en_texture)), 2.0));
-
-  bowtie.load_entity(StandardEntity::new(Sprite::new(
-    Rectangle::new(0.0, 0.0, 0.2, 0.3, COLORS::Red.into()),
-      Texture::new("floor", TextureOptions::default())), 2.0));
-  
-  bowtie.load_entity(StandardEntity::new(Sprite::new(
-    Rectangle::new(0.0, 0.5, 0.2, 0.3, COLORS::Red.into()),
-      Texture::new("witch", TextureOptions::default())), 2.0));
-
+  let playable_character = bowtie.load_entity(StandardEntity::new(Sprite::new(Rectangle::new(0.0, 0.0, 0.2, 0.3, COLORS::White.into()), Texture::from(&en_texture)), 0.0));
+  playable_character.load_components(collision_comp.to_owned());
+  playable_character.load_components(keyboard_move_comp.to_owned());
 
   bowtie.prep_for_render();
+
+  //TODO: Make hollow rectangle
+  let line_thickness = 0.01;
+  let line_vectors = [
+    // (-1.0, 1.0, 2.0, line_thickness),
+    // (-1.0, 1.0, line_thickness, 2.0),
+    (0.7 - line_thickness, 1.0, line_thickness * 10.0, 2.0),
+    // (-1.0, -1.0 + line_thickness, 2.0, line_thickness)
+  ];
+  for line in line_vectors {
+    let (x, y, w, h) = line;
+    let created_line = bowtie.load_entity(StandardEntity::new(
+      Sprite::new(
+        Rectangle::new(x, y, w, h, COLORS::Red.into()),
+        Texture::none(),
+      ),
+      0.0,
+    ));
+    created_line.load_components(collision_comp.to_owned());
+  }
 
   while !window.should_close() {
     window.swap_buffers();
     glfw_instance.poll_events();
+    bowtie.update_entities();
     bowtie.draw_entities();
 
     for (_, event) in glfw::flush_messages(&events) {
-      // futures::executor::block_on(handle_player_events(
-      //   event.to_owned(),
-      //   &mut playable_character,
-      // ));
+      keyboard_move.listen_for_event(&event);
       match event {
         glfw::WindowEvent::Key(glfw::Key::Escape, _, _, _) => {
           window.set_should_close(true);
         }
-        glfw::WindowEvent::Key(glfw::Key::O, _, glfw::Action::Press, _) => {
-          for _ in 0..20 {
-            // random_entities.push();
-            // let id = random_entities.len() - 1;
-            // random_entities[id].load_components(&mut gravity_component);
-            // bowtie.load_entity(random_entities[id]);
-            bowtie.load_entity(
-              StandardEntity::new(Sprite::new(
+        glfw::WindowEvent::Key(glfw::Key::P, _, glfw::Action::Press, _) => {
+          bowtie.load_entity(StandardEntity::new(
+            Sprite::new(
               Rectangle::new(
                 (rand::random::<f32>() % 1.0) - 0.5,
                 (rand::random::<f32>() % 1.0) - 0.5,
@@ -103,10 +112,31 @@ fn main() {
                 0.3,
                 COLORS::White.into(),
               ),
-              Texture::none(),
-            ), 2.0)
-            )
+              Texture::from(&en_texture),
+            ),
+            2.0,
+          ));
+        }
+        glfw::WindowEvent::Key(glfw::Key::O, _, glfw::Action::Press, _) => {
+          for _ in 0..100 {
+            let mut rand_entity = StandardEntity::new(
+              Sprite::new(
+                Rectangle::new(
+                  rand::thread_rng().gen_range(-1.0..1.0) - 0.1,
+                  rand::thread_rng().gen_range(-1.0..1.0) + 0.3,
+                  0.2,
+                  0.3,
+                  COLORS::Red.into(),
+                ),
+                Texture::from(&en_texture),
+              ),
+              2.0,
+            );
+            //rand_entity.load_components(rand_move1.component());
+            rand_entity.load_components(gravity_comp.to_owned());
+            bowtie.load_entity(rand_entity);
           }
+          println!("Handling {} entities", bowtie.get_entity_count());
         }
         _ => {}
       }

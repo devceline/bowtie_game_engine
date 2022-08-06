@@ -112,7 +112,6 @@ impl Texture {
       format!("tex{}_sampler", self.texture_id).as_str(),
       self.texture_id,
     );
-    println!("Setting {:?} {:?}", uniform.get_name(), uniform.value);
     program.set_uniform(&uniform);
   }
 }
@@ -178,14 +177,5 @@ impl LoadableTexture for Texture {
         self.options.min_filter.to_gl() as i32,
       );
     };
-
-
-  }
-}
-
-impl Drop for Texture {
-  fn drop(&mut self) {
-    let id_u32 = self.id as u32;
-    // unsafe { gl::DeleteTextures(1, &id_u32) };
   }
 }

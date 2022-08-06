@@ -26,6 +26,7 @@ version = "0.2.2"
 dependencies = [
  "futures",
  "gl",
+ "glfw",
  "png",
  "rand",
 ]
