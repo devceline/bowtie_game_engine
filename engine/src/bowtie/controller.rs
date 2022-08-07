@@ -1,22 +1,24 @@
 use crate::{
   general::color::COLORS,
   gl_utils::{
+    gl_texture::{LoadableTexture, Texture},
     gl_translation::{DataType, DrawingMode, UsageMode},
     shader_creator::{
       Shader, ShaderProgram, VertexShaderAttribute, VertexShaderAttributeType,
     },
     vertex_array_object_handler::VertexArrayObject,
   },
-  rendering::drawer::Drawer,
+  rendering::drawer::{DrawableData, Drawer},
+  Rectangle, Sprite,
 };
 
-use super::entity::Entity;
+use super::entity::{Entity, StandardEntity};
 
 /// Public interface for the game engine's capabilities
 /// Will be responsible for rendering, handling physics systems
 /// And controlling the game's state through entitiy data
 pub struct BowTie<'d> {
-  entities: Vec<*mut dyn Entity<'d>>,
+  entities: Vec<StandardEntity<'d>>,
   drawer: Drawer<'d>,
   shading_program: ShaderProgram,
   _vao: VertexArrayObject,
@@ -85,61 +87,53 @@ fn get_program() -> ShaderProgram {
 impl<'d> BowTie<'d> {
   pub fn new() -> BowTie<'d> {
     let _vao = VertexArrayObject::new();
-    BowTie {
+    let mut bowtie = BowTie {
       entities: vec![],
       drawer: Drawer::new(UsageMode::StaticDraw),
       shading_program: get_program(),
       _vao,
-    }
+    };
+    bowtie.drawer.set_entities_array(&bowtie.entities);
+    bowtie
   }
 
   /// Loads the entity into the drawer and the game's state
   /// To handle rendering and physics
-  pub fn load_entity<'g>(&'g mut self, entity: *mut dyn Entity<'d>) {
+  pub fn load_entity(
+    &mut self,
+    entity: StandardEntity<'d>,
+  ) -> &mut StandardEntity<'d> {
     self.entities.push(entity);
-    unsafe {
-      let drawable = (*self.entities[self.entities.len() - 1]).get_drawable();
-      self.drawer.load_sprite_dynamic(drawable);
-    }
+    let entity_id = self.entities.len() - 1;
+    &mut self.entities[entity_id]
   }
 
-  pub fn unload_entity<'g>(&'g mut self, entity: *mut dyn Entity<'d>) {
-    let pos_option = self.entities.iter().position(|entity_ref| entity_ref.to_owned() == entity.to_owned());
+  pub fn unload_entity(&mut self, entity: StandardEntity<'d>) {}
 
-    match pos_option {
-      Some(pos) => {
-        unsafe {
-          let drawable = (*self.entities[pos]).get_drawable();
-          self.drawer.unload_sprite_dynamic(drawable);
-        }
-        self.entities.remove(pos);
-      }
-      None => {}
-    }
-
+  pub fn get_entity_count(&self) -> usize {
+    self.entities.len()
   }
 
   /// Updates the entities with the existing systems
   pub fn update_entities(&mut self) {
-    for entity in self.entities.to_owned() {
-      unsafe {
-        for comp in entity.as_mut().unwrap().get_components() {
-          let mut entities_copy = self.entities.to_owned();
-          let entity_clown = entity.to_owned();
-          let message =
-            comp.as_mut().unwrap().act(&mut entities_copy, entity_clown);
-          match message {
-            Some(m) => entity.as_mut().unwrap().recieve_message(m),
-            None => {}
-          }
-        }
-      }
+    for entity in self.entities.iter_mut() {
+      entity.act_on_components();
     }
   }
 
   /// Prepares the god object to draw stuff.
   /// Has to be called before the main draw call
-  pub fn prep_for_render(&self) {
+  pub fn prep_for_render(&mut self) {
+    if self.entities.len() < 1 {
+      self.load_entity(StandardEntity::new(
+        Sprite::new(
+          Rectangle::new(0.0, 0.0, 0.0, 0.0, COLORS::White.into()),
+          Texture::none(),
+        ),
+        0.0,
+      ));
+    }
+    self.drawer.prep_data(&self.shading_program);
     self.shading_program.use_program();
     self.drawer.prep_textures(&self.shading_program);
   }
@@ -147,6 +141,8 @@ impl<'d> BowTie<'d> {
   /// Draws the entities with an actual clear screen refresh
   pub fn draw_entities(&mut self) {
     self.drawer.clear_screen(COLORS::White.into());
-    self.drawer.draw(DrawingMode::Triangles);
+    self
+      .drawer
+      .draw(DrawingMode::Triangles, &self.shading_program);
   }
 }

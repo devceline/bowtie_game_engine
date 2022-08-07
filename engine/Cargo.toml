@@ -10,5 +10,7 @@ repository = "https://github.com/devceline/bowtie_game_engine"
 
 [dependencies]
 gl = "0.14.0"
+glfw = "0.45.0"
 png = "0.14.0"
 futures = "0.3"
+rand = "0.8.5"

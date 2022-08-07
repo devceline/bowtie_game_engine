@@ -173,7 +173,7 @@ impl ShaderProgram {
               if loc >= 0 {
                 loc as u32
               } else {
-                panic!("Location not found");
+                panic!("Location for {:?} not found", attrib_name);
               }
             };
 

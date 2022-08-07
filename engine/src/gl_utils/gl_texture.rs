@@ -1,6 +1,7 @@
 extern crate gl;
 extern crate png;
 
+use std::collections::HashMap;
 use std::fs::File;
 
 use super::shader_creator::ShaderProgram;
@@ -12,7 +13,7 @@ use super::gl_translation::{TextureFilter, TextureWrap, ToGl};
 static mut TEXTURE_COUNT: u32 = 0;
 
 pub trait LoadableTexture {
-  fn load_texture(&self);
+  fn load_texture(&self, program: &ShaderProgram);
 }
 
 #[derive(Debug, Copy, Clone)]
@@ -116,8 +117,8 @@ impl Texture {
 }
 
 impl LoadableTexture for Texture {
-  fn load_texture(&self) {
-    if self.is_from_ref {
+  fn load_texture(&self, program: &ShaderProgram) {
+    if self.texture_id < 0 {
       return;
     }
     unsafe {
@@ -150,6 +151,8 @@ impl LoadableTexture for Texture {
       // Using mipmaps for performance
       gl::GenerateMipmap(gl::TEXTURE_2D);
 
+      self.set_uniform(program);
+
       // Wrap
       gl::TexParameteri(
         gl::TEXTURE_2D,
@@ -174,13 +177,5 @@ impl LoadableTexture for Texture {
         self.options.min_filter.to_gl() as i32,
       );
     };
-    // self.is_loaded = true;
-  }
-}
-
-impl Drop for Texture {
-  fn drop(&mut self) {
-    let id_u32 = self.id as u32;
-    unsafe { gl::DeleteTextures(1, &id_u32) };
   }
 }
