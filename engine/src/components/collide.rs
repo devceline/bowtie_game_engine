@@ -46,11 +46,12 @@ impl<'d> CollisionComponent<'d> {
   ) -> Direction {
     let mut direction = Direction::Stationary;
 
-    let x_range = absolute_value_f32(x - other_x);
-    let y_range = absolute_value_f32(y - other_y);
+    let in_x_range = x < other_x + other_width && x + width > other_x;
 
-    let in_x_range = x_range <= width || x_range <= other_width;
-    let in_y_range = y_range <= height;
+    let bottom = y - height;
+    let other_bottom = other_y - other_height;
+    
+    let in_y_range =  bottom < other_y && other_bottom < y;
 
     if !(in_x_range && in_y_range) {
       return direction;
@@ -143,6 +144,7 @@ impl<'d> CollisionComponent<'d> {
     let height = entity_unwrapped.get_height();
     let width = entity_unwrapped.get_width();
 
+    println!("For {:?}", entity.as_ref().unwrap().get_drawable().texture.image_name);
     let collision_direction = CollisionComponent::get_collision_direction(
       x,
       y,

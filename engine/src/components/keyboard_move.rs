@@ -65,7 +65,7 @@ impl<'s> KeyboardMoveComponent<'s> {
               Value::Number(num) => {
                 // println!("{:?}", num);
                 let collision_direction = Direction::from(num.clone());
-                println!("Subtracting {:?} from {:?}", direction, collision_direction);
+                println!("Subtracting {:?} from {:?} resulted in {:?}", collision_direction, direction, direction.subtract_direction(collision_direction));
                 direction = direction.subtract_direction(collision_direction);
               }
               _ => {}

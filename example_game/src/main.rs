@@ -64,19 +64,24 @@ fn main() {
 
   let en_texture = Texture::new("witch", TextureOptions::default());
 
-  let playable_character = bowtie.load_entity(StandardEntity::new(Sprite::new(Rectangle::new(0.0, 0.0, 0.2, 0.3, COLORS::White.into()), Texture::from(&en_texture)), 0.0));
+  let mut playable_character = StandardEntity::new(Sprite::new(Rectangle::new(0.0, 0.0, 0.2, 0.3, COLORS::White.into()), Texture::from(&en_texture)), 0.0);
   playable_character.load_components(collision_comp.to_owned());
   playable_character.load_components(keyboard_move_comp.to_owned());
+
+  let mut playable_character2 = StandardEntity::new(Sprite::new(Rectangle::new(0.5, 0.0, 0.2, 0.3, COLORS::White.into()), Texture::from(&en_texture)), 0.0);
+  playable_character2.load_components(collision_comp.to_owned());
+
+  bowtie.load_entity(playable_character);
 
   bowtie.prep_for_render();
 
   //TODO: Make hollow rectangle
   let line_thickness = 0.01;
   let line_vectors = [
-    // (-1.0, 1.0, 2.0, line_thickness),
-    // (-1.0, 1.0, line_thickness, 2.0),
-    (0.7 - line_thickness, 1.0, line_thickness * 10.0, 2.0),
-    // (-1.0, -1.0 + line_thickness, 2.0, line_thickness)
+    (-1.0, 1.0, 2.0, line_thickness),
+    (-1.0, 1.0, line_thickness, 2.0),
+    (1.0 - line_thickness, 1.0, line_thickness, 2.0),
+    (-1.0, -1.0 + line_thickness, 2.0, line_thickness)
   ];
   for line in line_vectors {
     let (x, y, w, h) = line;
