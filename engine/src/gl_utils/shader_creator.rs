@@ -76,7 +76,10 @@ pub struct ShaderProgram {
 
 impl ShaderProgram {
   pub fn shell() -> ShaderProgram {
-    ShaderProgram { program_id: 0, shader_map: HashMap::new() }
+    ShaderProgram {
+      program_id: 0,
+      shader_map: HashMap::new(),
+    }
   }
   pub fn new() -> ShaderProgram {
     unsafe {

@@ -12,12 +12,14 @@ mod window;
 pub mod math;
 
 pub use bowtie::{
-  component::StandardComponent,
+  component::{ComponentStore, StandardComponent},
   controller::BowTie,
   entity::{Component, Entity, Message, StandardEntity},
 };
 
-pub use general::{color::Color, color::COLORS, direction::Direction};
+pub use general::{
+  color::Color, color::COLORS, direction::Direction, value::Value,
+};
 
 pub use gl_utils::{
   gl_error_reader::init_debug_callback,
@@ -36,4 +38,4 @@ pub mod premade_components {
   };
 }
 
-pub use window::window::{WindowMode, WindowConfig};
+pub use window::window::{WindowConfig, WindowMode};

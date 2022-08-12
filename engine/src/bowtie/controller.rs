@@ -1,20 +1,22 @@
-extern crate glfw;
 extern crate gl;
+extern crate glfw;
 
 use glfw::{Context, FlushedMessages};
 
 use crate::{
   general::color::COLORS,
   gl_utils::{
-    gl_texture::{Texture},
+    gl_texture::Texture,
     gl_translation::{DataType, DrawingMode, UsageMode},
     shader_creator::{
       Shader, ShaderProgram, VertexShaderAttribute, VertexShaderAttributeType,
     },
     vertex_array_object_handler::VertexArrayObject,
   },
+  init_debug_callback,
   rendering::drawer::Drawer,
-  Rectangle, Sprite, window::window::WindowConfig, init_debug_callback,
+  window::window::WindowConfig,
+  Rectangle, Sprite,
 };
 
 use super::entity::StandardEntity;
@@ -28,7 +30,7 @@ pub struct BowTie<'d> {
   shading_program: ShaderProgram,
   glfw_instance: glfw::Glfw,
   window: Option<glfw::Window>,
-  events: Option<std::sync::mpsc::Receiver<(f64, glfw::WindowEvent)>>
+  events: Option<std::sync::mpsc::Receiver<(f64, glfw::WindowEvent)>>,
 }
 
 /// Initiates a shader program with pre-defined vertex attributes
@@ -99,7 +101,7 @@ impl<'d> BowTie<'d> {
       shading_program: ShaderProgram::shell(),
       glfw_instance: glfw::init(glfw::FAIL_ON_ERRORS).unwrap(),
       window: None,
-      events: None
+      events: None,
     };
     bowtie.drawer.set_entities_array(&bowtie.entities);
     bowtie
@@ -155,7 +157,8 @@ impl<'d> BowTie<'d> {
   }
 
   pub fn create_window(&mut self, window_config: WindowConfig) {
-    let (mut window, events) = self.glfw_instance
+    let (mut window, events) = self
+      .glfw_instance
       .create_window(
         window_config.width.into(),
         window_config.height.into(),
@@ -169,14 +172,24 @@ impl<'d> BowTie<'d> {
     gl::load_with(|s| self.glfw_instance.get_proc_address_raw(s));
 
     // OpenGL 3.2
-    self.glfw_instance.window_hint(glfw::WindowHint::ContextVersionMajor(3));
-    self.glfw_instance.window_hint(glfw::WindowHint::ContextVersionMinor(2));
-    self.glfw_instance.window_hint(glfw::WindowHint::OpenGlProfile(
-      glfw::OpenGlProfileHint::Core,
-    ));
-    self.glfw_instance.window_hint(glfw::WindowHint::OpenGlForwardCompat(true));
+    self
+      .glfw_instance
+      .window_hint(glfw::WindowHint::ContextVersionMajor(3));
+    self
+      .glfw_instance
+      .window_hint(glfw::WindowHint::ContextVersionMinor(2));
+    self
+      .glfw_instance
+      .window_hint(glfw::WindowHint::OpenGlProfile(
+        glfw::OpenGlProfileHint::Core,
+      ));
+    self
+      .glfw_instance
+      .window_hint(glfw::WindowHint::OpenGlForwardCompat(true));
 
-    self.glfw_instance.set_swap_interval(glfw::SwapInterval::Sync(1));
+    self
+      .glfw_instance
+      .set_swap_interval(glfw::SwapInterval::Sync(1));
 
     init_debug_callback();
 

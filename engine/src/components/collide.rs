@@ -84,14 +84,14 @@ impl<'d> CollisionComponent<'d> {
     if right_collision {
       direction = direction.add_direction(Direction::Right);
     }
-    if left_collision {
+    else if left_collision {
       direction = direction.add_direction(Direction::Left);
     }
 
     if down_collision {
       direction = direction.add_direction(Direction::Down);
     }
-    if up_collision {
+    else if up_collision {
       direction = direction.add_direction(Direction::Up);
     }
 

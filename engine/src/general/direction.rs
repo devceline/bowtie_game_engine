@@ -188,4 +188,25 @@ impl Direction {
       Direction::Stationary => (0.0, 0.0),
     }
   }
+
+  pub fn from_vector(vector: (f32, f32)) -> Direction {
+    let mut new_direction = Direction::Stationary;
+    let (x, y) = vector;
+
+    if x < 0.0 {
+      new_direction = new_direction.add_direction(Direction::Left);
+    }
+    else if x > 0.0 {
+      new_direction = new_direction.add_direction(Direction::Right);
+    }
+
+    if y < 0.0 {
+      new_direction = new_direction.add_direction(Direction::Down);
+    }
+    else if y > 0.0 {
+      new_direction = new_direction.add_direction(Direction::Up);
+    }
+
+    new_direction
+  }
 }
