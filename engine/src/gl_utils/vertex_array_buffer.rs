@@ -10,6 +10,14 @@ pub struct VertexArrayBuffer<T> {
 }
 
 impl<T> VertexArrayBuffer<T> {
+  pub fn shell() -> VertexArrayBuffer<T> {
+    VertexArrayBuffer {
+      id: 0,
+      data_type: DataType::Float32,
+      vertices: vec![],
+      usage_mode: UsageMode::StaticDraw,
+    }
+  }
   /**
    * Generates a gl vertex array buffer, binds and loads data from elements.
    * Then, a VertexArrayBuffer with the buffer id is returned.

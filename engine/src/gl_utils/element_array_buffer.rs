@@ -10,6 +10,14 @@ pub struct ElementArrayBuffer<T> {
 }
 
 impl<T> ElementArrayBuffer<T> {
+  pub fn shell() -> ElementArrayBuffer<T> {
+    ElementArrayBuffer {
+      data_type: DataType::Float32,
+      elements: vec![],
+      usage_mode: UsageMode::StaticDraw,
+      id: 0,
+    }
+  }
   /**
    * Generates a gl element buffer, binds and loads data from elements.
    * Then, an ElementArrayBuffer with the buffer id is returned.

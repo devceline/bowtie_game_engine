@@ -1,12 +1,8 @@
 extern crate bowtie;
 extern crate futures;
-extern crate gl;
-extern crate glfw;
 extern crate rand;
 
 mod components;
-
-use std::{collections::HashMap, sync::Arc};
 
 use components::rand_move::RandMove;
 use rand::Rng;
@@ -15,40 +11,11 @@ use bowtie::{
   init_debug_callback, math,
   premade_components::{CollisionComponent, GravityComponent, KeyboardMoveComponent},
   BowTie, Direction, Entity, Message, Rectangle, Sprite, StandardComponent,
-  StandardEntity, Texture, TextureOptions, COLORS,
+  StandardEntity, Texture, TextureOptions, COLORS, WindowMode, WindowConfig, glfw
 };
 
-use glfw::Context;
-
-fn window_setup(glfw: &mut glfw::Glfw, window: &mut glfw::Window) {
-  window.make_current();
-
-  gl::load_with(|s| glfw.get_proc_address_raw(s));
-
-  // OpenGL 3.2
-  glfw.window_hint(glfw::WindowHint::ContextVersionMajor(3));
-  glfw.window_hint(glfw::WindowHint::ContextVersionMinor(2));
-  glfw.window_hint(glfw::WindowHint::OpenGlProfile(
-    glfw::OpenGlProfileHint::Core,
-  ));
-  glfw.window_hint(glfw::WindowHint::OpenGlForwardCompat(true));
-
-  glfw.set_swap_interval(glfw::SwapInterval::Sync(1));
-
-  init_debug_callback();
-
-  window.make_current();
-  window.set_key_polling(true);
-  window.set_sticky_keys(true);
-}
 
 fn main() {
-  let mut glfw_instance = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
-  let (mut window, events) = glfw_instance
-    .create_window(1000, 800, "rust game engine", glfw::WindowMode::Windowed)
-    .expect("Failed to create window");
-
-  window_setup(&mut glfw_instance, &mut window);
 
   let mut collision = CollisionComponent::new();
   let rand_move1 = RandMove::new();
@@ -61,6 +28,7 @@ fn main() {
   let keyboard_move_comp = keyboard_move.component();
 
   let mut bowtie = BowTie::new();
+  bowtie.create_window(WindowConfig { width: 1000, height: 800, name: String::from("rust game engine"), mode: WindowMode::Windowed });
 
   let en_texture = Texture::new("witch", TextureOptions::default());
 
@@ -95,17 +63,15 @@ fn main() {
     created_line.load_components(collision_comp.to_owned());
   }
 
-  while !window.should_close() {
-    window.swap_buffers();
-    glfw_instance.poll_events();
-    bowtie.update_entities();
-    bowtie.draw_entities();
+  while !bowtie.should_close() {
+    bowtie.tick();
+    let events = bowtie.flush_events();
 
-    for (_, event) in glfw::flush_messages(&events) {
+    for event in events {
       keyboard_move.listen_for_event(&event);
       match event {
         glfw::WindowEvent::Key(glfw::Key::Escape, _, _, _) => {
-          window.set_should_close(true);
+          bowtie.set_should_close(true);
         }
         glfw::WindowEvent::Key(glfw::Key::P, _, glfw::Action::Press, _) => {
           bowtie.load_entity(StandardEntity::new(
@@ -148,5 +114,5 @@ fn main() {
     }
   }
 
-  window.close();
 }
+

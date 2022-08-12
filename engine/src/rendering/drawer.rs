@@ -32,6 +32,18 @@ pub struct Drawer<'a> {
 }
 
 impl<'a> Drawer<'a> {
+  pub fn shell() -> Drawer<'a> {
+    Drawer {
+      vertex_array_buffer: VertexArrayBuffer::shell(),
+      element_array_buffer: ElementArrayBuffer::shell(),
+      texture_loader: TextureLoader::new(),
+      vertices: vec![],
+      elements: vec![],
+      elements_count: 0,
+      drawables: vec![],
+      entities: std::ptr::null(),
+    }
+  }
   pub fn new(usage_mode: UsageMode) -> Drawer<'a> {
     Drawer {
       vertex_array_buffer: VertexArrayBuffer::<f32>::new(

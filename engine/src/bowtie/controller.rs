@@ -1,18 +1,25 @@
+extern crate gl;
+extern crate glfw;
+
+use glfw::{Context, FlushedMessages};
+
 use crate::{
   general::color::COLORS,
   gl_utils::{
-    gl_texture::{LoadableTexture, Texture},
+    gl_texture::Texture,
     gl_translation::{DataType, DrawingMode, UsageMode},
     shader_creator::{
       Shader, ShaderProgram, VertexShaderAttribute, VertexShaderAttributeType,
     },
     vertex_array_object_handler::VertexArrayObject,
   },
-  rendering::drawer::{DrawableData, Drawer},
+  init_debug_callback,
+  rendering::drawer::Drawer,
+  window::window::WindowConfig,
   Rectangle, Sprite,
 };
 
-use super::entity::{Entity, StandardEntity};
+use super::entity::StandardEntity;
 
 /// Public interface for the game engine's capabilities
 /// Will be responsible for rendering, handling physics systems
@@ -21,7 +28,9 @@ pub struct BowTie<'d> {
   entities: Vec<StandardEntity<'d>>,
   drawer: Drawer<'d>,
   shading_program: ShaderProgram,
-  _vao: VertexArrayObject,
+  glfw_instance: glfw::Glfw,
+  window: Option<glfw::Window>,
+  events: Option<std::sync::mpsc::Receiver<(f64, glfw::WindowEvent)>>,
 }
 
 /// Initiates a shader program with pre-defined vertex attributes
@@ -86,12 +95,13 @@ fn get_program() -> ShaderProgram {
 
 impl<'d> BowTie<'d> {
   pub fn new() -> BowTie<'d> {
-    let _vao = VertexArrayObject::new();
     let mut bowtie = BowTie {
       entities: vec![],
-      drawer: Drawer::new(UsageMode::StaticDraw),
-      shading_program: get_program(),
-      _vao,
+      drawer: Drawer::shell(),
+      shading_program: ShaderProgram::shell(),
+      glfw_instance: glfw::init(glfw::FAIL_ON_ERRORS).unwrap(),
+      window: None,
+      events: None,
     };
     bowtie.drawer.set_entities_array(&bowtie.entities);
     bowtie
@@ -144,5 +154,78 @@ impl<'d> BowTie<'d> {
     self
       .drawer
       .draw(DrawingMode::Triangles, &self.shading_program);
+  }
+
+  pub fn create_window(&mut self, window_config: WindowConfig) {
+    let (mut window, events) = self
+      .glfw_instance
+      .create_window(
+        window_config.width.into(),
+        window_config.height.into(),
+        window_config.name.as_str(),
+        window_config.mode.to_glfw(),
+      )
+      .expect("Failed to create window");
+
+    window.make_current();
+
+    gl::load_with(|s| self.glfw_instance.get_proc_address_raw(s));
+
+    // OpenGL 3.2
+    self
+      .glfw_instance
+      .window_hint(glfw::WindowHint::ContextVersionMajor(3));
+    self
+      .glfw_instance
+      .window_hint(glfw::WindowHint::ContextVersionMinor(2));
+    self
+      .glfw_instance
+      .window_hint(glfw::WindowHint::OpenGlProfile(
+        glfw::OpenGlProfileHint::Core,
+      ));
+    self
+      .glfw_instance
+      .window_hint(glfw::WindowHint::OpenGlForwardCompat(true));
+
+    self
+      .glfw_instance
+      .set_swap_interval(glfw::SwapInterval::Sync(1));
+
+    init_debug_callback();
+
+    window.make_current();
+    window.set_key_polling(true);
+    window.set_sticky_keys(true);
+
+    self.shading_program = get_program();
+    self.drawer = Drawer::new(UsageMode::StaticDraw);
+    self.drawer.set_entities_array(&self.entities);
+
+    self.window = Option::Some(window);
+    self.events = Option::Some(events);
+  }
+
+  pub fn flush_events(&self) -> Vec<glfw::WindowEvent> {
+    let events = glfw::flush_messages(self.events.as_ref().unwrap());
+    let mut window_events: Vec<glfw::WindowEvent> = vec![];
+    for (_, event) in events {
+      window_events.push(event);
+    }
+    window_events
+  }
+
+  pub fn tick(&mut self) {
+    self.window.as_mut().unwrap().swap_buffers();
+    self.glfw_instance.poll_events();
+    self.update_entities();
+    self.draw_entities();
+  }
+
+  pub fn should_close(&self) -> bool {
+    self.window.as_ref().unwrap().should_close()
+  }
+
+  pub fn set_should_close(&mut self, should: bool) {
+    self.window.as_mut().unwrap().set_should_close(should)
   }
 }

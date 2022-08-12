@@ -5,8 +5,8 @@ use std::{
 };
 
 use crate::{
-  premade_components::CollisionComponent, Direction, StandardComponent,
-  StandardEntity, general::value::Value,
+  general::value::Value, premade_components::CollisionComponent, Direction,
+  StandardComponent, StandardEntity,
 };
 
 #[derive(Clone)]
@@ -19,7 +19,6 @@ pub struct KeyboardMoveComponent<'s> {
 }
 
 impl<'s> KeyboardMoveComponent<'s> {
-
   pub fn new(
     speed: f32,
     acceleration: f32,
@@ -50,7 +49,7 @@ impl<'s> KeyboardMoveComponent<'s> {
     let speed_clone = speed.clone();
 
     if direction == Direction::Stationary {
-      return
+      return;
     }
 
     match entity.get_component(CollisionComponent::get_name().as_str()) {
@@ -58,20 +57,17 @@ impl<'s> KeyboardMoveComponent<'s> {
         let collision_store = comp.get_store().lock().unwrap();
         let entity_ptr: *const StandardEntity<'s> = entity;
         let entity_id = format!("{:?}", entity_ptr);
-        match collision_store.get(&entity_id)  {
+        match collision_store.get(&entity_id) {
           None => {}
           Some(dir_num) => {
             match dir_num {
               Value::Number(num) => {
-                // println!("{:?}", num);
                 let collision_direction = Direction::from(num.clone());
-                println!("Subtracting {:?} from {:?} resulted in {:?}", collision_direction, direction, direction.subtract_direction(collision_direction));
                 direction = direction.subtract_direction(collision_direction);
               }
               _ => {}
             }
           }
-
         }
       }
       None => {}
@@ -129,8 +125,6 @@ impl<'s> KeyboardMoveComponent<'s> {
       }
       _ => {}
     }
-
-    println!("Setting new direction to {:?}", direction);
   }
 
   pub fn component(&'s self) -> StandardComponent<'s> {

@@ -49,9 +49,9 @@ impl<'s> GravityComponent<'s> {
             let entity_ptr: *mut StandardEntity<'s> = entity;
             let entity_ptr_str = format!("{:?}", entity_ptr);
 
-            let object_info = objects
-              .entry(entity_ptr_str)
-              .or_insert(Value::Vec2f32((self.speed.to_owned(), entity.get_y().to_owned())));
+            let object_info = objects.entry(entity_ptr_str).or_insert(
+              Value::Vec2f32((self.speed.to_owned(), entity.get_y().to_owned())),
+            );
 
             match object_info {
               Value::Vec2f32((speed, y_pos)) => {
@@ -72,7 +72,6 @@ impl<'s> GravityComponent<'s> {
               }
               _ => {}
             }
-
           }
           _ => {
             panic!("Falling objects should be hashmap")
@@ -80,9 +79,10 @@ impl<'s> GravityComponent<'s> {
         }
       }),
       GravityComponent::get_name().as_str(),
-      HashMap::from([
-        (String::from("falling_objects"), Value::Object(HashMap::new()))
-      ]),
+      HashMap::from([(
+        String::from("falling_objects"),
+        Value::Object(HashMap::new()),
+      )]),
     )
   }
 }
