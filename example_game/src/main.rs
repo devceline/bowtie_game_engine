@@ -1,7 +1,5 @@
 extern crate bowtie;
 extern crate futures;
-extern crate gl;
-extern crate glfw;
 extern crate rand;
 
 mod components;
@@ -13,7 +11,7 @@ use bowtie::{
   init_debug_callback, math,
   premade_components::{CollisionComponent, GravityComponent, KeyboardMoveComponent},
   BowTie, Direction, Entity, Message, Rectangle, Sprite, StandardComponent,
-  StandardEntity, Texture, TextureOptions, COLORS, WindowMode, WindowConfig,
+  StandardEntity, Texture, TextureOptions, COLORS, WindowMode, WindowConfig, glfw
 };
 
 
@@ -117,3 +115,4 @@ fn main() {
   }
 
 }
+

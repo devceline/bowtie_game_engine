@@ -80,8 +80,6 @@ version = "0.1.0"
 dependencies = [
  "bowtie",
  "futures",
- "gl",
- "glfw",
  "rand",
 ]
 

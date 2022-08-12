@@ -1,3 +1,5 @@
+pub extern crate glfw;
+
 mod bowtie;
 mod components;
 mod general;
