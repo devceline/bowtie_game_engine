@@ -50,8 +50,8 @@ impl<'d> CollisionComponent<'d> {
 
     let bottom = y - height;
     let other_bottom = other_y - other_height;
-    
-    let in_y_range =  bottom < other_y && other_bottom < y;
+
+    let in_y_range = bottom < other_y && other_bottom < y;
 
     if !(in_x_range && in_y_range) {
       return direction;
@@ -144,7 +144,6 @@ impl<'d> CollisionComponent<'d> {
     let height = entity_unwrapped.get_height();
     let width = entity_unwrapped.get_width();
 
-    println!("For {:?}", entity.as_ref().unwrap().get_drawable().texture.image_name);
     let collision_direction = CollisionComponent::get_collision_direction(
       x,
       y,
@@ -203,7 +202,6 @@ impl<'d> CollisionComponent<'d> {
     }
 
     CollisionComponent::get_entity_collision_direction(&objects, entity)
-
   }
 
   pub fn get_name() -> String {
@@ -213,19 +211,20 @@ impl<'d> CollisionComponent<'d> {
   pub fn component(&'d mut self) -> StandardComponent<'d> {
     StandardComponent::new(
       Arc::new(|entity, store| unsafe {
-        let new_collision_direction = CollisionComponent::get_final_collission_direction(
-          &self.colliding_objects,
-          entity,
-        );
+        let new_collision_direction =
+          CollisionComponent::get_final_collission_direction(
+            &self.colliding_objects,
+            entity,
+          );
         let entity_ptr: *const StandardEntity<'d> = entity;
 
         let direction_value = Value::Number(new_collision_direction.into());
 
         let mut locked_store = store.lock().unwrap();
-        let dir = locked_store.entry(format!("{:?}", entity_ptr)).or_insert(direction_value.to_owned());
+        let dir = locked_store
+          .entry(format!("{:?}", entity_ptr))
+          .or_insert(direction_value.to_owned());
         *dir = direction_value.to_owned();
-
-        // println!("Setting collision direction to {:?}", new_collision_direction);
 
         entity.set_collision_direction(new_collision_direction);
       }),

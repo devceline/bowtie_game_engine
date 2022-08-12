@@ -55,7 +55,6 @@ pub fn get_cos(theta: f32) -> f32 {
     if i % 2 == 0 {
       continue;
     }
-    println!("x^{}!", i + 1);
     let res = radian.powi(1 + i) / factorial(1 + i) as f32;
     cos = if sub { cos - res } else { cos + res };
     sub = !sub;

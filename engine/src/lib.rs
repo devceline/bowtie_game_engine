@@ -5,6 +5,7 @@ mod gl_utils;
 mod rendering;
 mod shapes;
 mod sprites;
+mod window;
 
 pub mod math;
 
@@ -32,3 +33,5 @@ pub mod premade_components {
     gravity::GravityComponent, keyboard_move::KeyboardMoveComponent,
   };
 }
+
+pub use window::window::{WindowMode, WindowConfig};
