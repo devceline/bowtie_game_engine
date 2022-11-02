@@ -32,36 +32,16 @@ fn main() {
 
   let en_texture = Texture::new("witch", TextureOptions::default());
 
-  let mut playable_character = StandardEntity::new(Sprite::new(Rectangle::new(0.0, 0.0, 0.2, 0.3, COLORS::White.into()), Texture::from(&en_texture)), 0.0);
+  let mut playable_character = StandardEntity::new(Sprite::new(Rectangle::new(0.0, 0.0, 0.2, 0.3, COLORS::White.into()), Texture::from(&en_texture)));
   playable_character.load_components(collision_comp.to_owned());
   playable_character.load_components(keyboard_move_comp.to_owned());
 
-  let mut playable_character2 = StandardEntity::new(Sprite::new(Rectangle::new(0.5, 0.0, 0.2, 0.3, COLORS::White.into()), Texture::from(&en_texture)), 0.0);
+  let mut playable_character2 = StandardEntity::new(Sprite::new(Rectangle::new(0.5, 0.0, 0.2, 0.3, COLORS::White.into()), Texture::from(&en_texture)));
   playable_character2.load_components(collision_comp.to_owned());
 
   bowtie.load_entity(playable_character);
 
   bowtie.prep_for_render();
-
-  //TODO: Make hollow rectangle
-  let line_thickness = 0.01;
-  let line_vectors = [
-    (-1.0, 1.0, 2.0, line_thickness),
-    (-1.0, 1.0, line_thickness, 2.0),
-    (1.0 - line_thickness, 1.0, line_thickness, 2.0),
-    (-1.0, -1.0 + line_thickness, 2.0, line_thickness)
-  ];
-  for line in line_vectors {
-    let (x, y, w, h) = line;
-    let created_line = bowtie.load_entity(StandardEntity::new(
-      Sprite::new(
-        Rectangle::new(x, y, w, h, COLORS::Red.into()),
-        Texture::none(),
-      ),
-      0.0,
-    ));
-    created_line.load_components(collision_comp.to_owned());
-  }
 
   while !bowtie.should_close() {
     bowtie.tick();
@@ -85,7 +65,6 @@ fn main() {
               ),
               Texture::from(&en_texture),
             ),
-            2.0,
           ));
         }
         glfw::WindowEvent::Key(glfw::Key::O, _, glfw::Action::Press, _) => {
@@ -101,7 +80,6 @@ fn main() {
                 ),
                 Texture::from(&en_texture),
               ),
-              2.0,
             );
             //rand_entity.load_components(rand_move1.component());
             rand_entity.load_components(gravity_comp.to_owned());

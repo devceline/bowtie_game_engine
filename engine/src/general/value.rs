@@ -11,4 +11,5 @@ pub enum Value {
   Array(Vec<Value>),
   Object(HashMap<String, Value>),
   Vec2f32((f32, f32)),
+  Vec3f32((f32, f32, f32)),
 }

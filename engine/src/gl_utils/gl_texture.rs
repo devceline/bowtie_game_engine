@@ -126,9 +126,17 @@ impl LoadableTexture for Texture {
       gl::ActiveTexture(gl::TEXTURE0 + (self.texture_id as u32));
       gl::BindTexture(gl::TEXTURE_2D, self.id as u32);
 
+      let location = Texture::get_image_location(&self.image_name);
+      let file_result = File::open(&location);
+
+      if let Result::Err(_) = file_result {
+        println!("Could not find image at location {}", &location);
+        return
+      }
+
       // Loading file bytes
       let decoder = png::Decoder::new(
-        File::open(Texture::get_image_location(&self.image_name)).unwrap(),
+        file_result.unwrap(),
       );
 
       let (info, mut reader) = decoder.read_info().unwrap();

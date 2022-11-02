@@ -329,6 +329,7 @@ name = "pong_game"
 version = "0.1.0"
 dependencies = [
  "bowtie",
+ "rand",
 ]
 
 [[package]]

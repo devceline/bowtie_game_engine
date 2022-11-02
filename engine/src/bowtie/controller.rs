@@ -104,6 +104,7 @@ impl<'d> BowTie<'d> {
       events: None,
     };
     bowtie.drawer.set_entities_array(&bowtie.entities);
+    bowtie.entities.reserve(5000);
     bowtie
   }
 
@@ -112,7 +113,7 @@ impl<'d> BowTie<'d> {
   pub fn load_entity(
     &mut self,
     entity: StandardEntity<'d>,
-  ) -> &mut StandardEntity<'d> {
+  ) -> *mut StandardEntity<'d> {
     self.entities.push(entity);
     let entity_id = self.entities.len() - 1;
     &mut self.entities[entity_id]
@@ -140,7 +141,6 @@ impl<'d> BowTie<'d> {
           Rectangle::new(0.0, 0.0, 0.0, 0.0, COLORS::White.into()),
           Texture::none(),
         ),
-        0.0,
       ));
     }
     self.drawer.prep_data(&self.shading_program);

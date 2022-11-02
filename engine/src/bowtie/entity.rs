@@ -1,7 +1,7 @@
 use crate::{
   general::direction, gl_utils::gl_texture::LoadableTexture,
   rendering::drawer::DrawableData, sprites::drawable::Drawable, Direction,
-  Rectangle, Sprite,
+  Rectangle, Sprite, Color,
 };
 use std::collections::HashMap;
 
@@ -35,19 +35,15 @@ pub trait Entity<'a> {
 #[derive(Clone)]
 pub struct StandardEntity<'s> {
   sprite: Sprite<'s, Rectangle>,
-  speed: f32,
   components: Vec<StandardComponent<'s>>,
-  direction: Direction,
   collision_direction: Direction,
 }
 
 impl<'s> StandardEntity<'s> {
-  pub fn new(sprite: Sprite<'s, Rectangle>, speed: f32) -> StandardEntity<'s> {
+  pub fn new(sprite: Sprite<'s, Rectangle>) -> StandardEntity<'s> {
     StandardEntity {
       sprite,
-      speed,
       components: vec![],
-      direction: Direction::Stationary,
       collision_direction: Direction::Stationary,
     }
   }
@@ -90,6 +86,10 @@ impl<'s> StandardEntity<'s> {
         comp.act(entity_ref.as_mut().unwrap());
       }
     }
+  }
+
+  pub fn set_color(&mut self, color: Color) {
+    self.sprite.set_color_overlay(color);
   }
 }
 
