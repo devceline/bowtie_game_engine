@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 use crate::{
   general::direction, gl_utils::gl_texture::LoadableTexture,
   rendering::drawer::DrawableData, sprites::drawable::Drawable, Direction,
@@ -13,7 +15,7 @@ use super::component::StandardComponent;
 /// Should have mutable position and should store its own components
 /// Should also have a function that recieves messages so the components
 /// have an effect.
-pub trait Entity<'a> {
+pub trait Entity {
   fn get_drawable(&self) -> DrawableData;
 
   fn get_x(&self) -> f32;
@@ -24,8 +26,8 @@ pub trait Entity<'a> {
   fn get_height(&self) -> f32;
   fn get_width(&self) -> f32;
 
-  fn get_components(&self) -> &Vec<StandardComponent<'a>>;
-  fn load_components(&mut self, component: StandardComponent<'a>);
+  fn get_components(&self) -> &Vec<Rc<StandardComponent>>;
+  fn load_components(&mut self, component: StandardComponent);
 
   /// Implementing this will usually involve pattern matching or if statements
   /// to act depending on the type of message.
@@ -33,16 +35,16 @@ pub trait Entity<'a> {
 }
 
 #[derive(Clone)]
-pub struct StandardEntity<'s> {
-  sprite: Sprite<'s, Rectangle>,
+pub struct StandardEntity {
+  pub sprite: Sprite<Rectangle>,
   speed: f32,
-  components: Vec<StandardComponent<'s>>,
+  components: Vec<Rc<StandardComponent>>,
   direction: Direction,
   collision_direction: Direction,
 }
 
-impl<'s> StandardEntity<'s> {
-  pub fn new(sprite: Sprite<'s, Rectangle>, speed: f32) -> StandardEntity<'s> {
+impl StandardEntity {
+  pub fn new(sprite: Sprite<Rectangle>, speed: f32) -> StandardEntity {
     StandardEntity {
       sprite,
       speed,
@@ -67,21 +69,21 @@ impl<'s> StandardEntity<'s> {
     self.collision_direction = direction;
   }
 
-  pub fn get_component(&self, name: &str) -> Option<&StandardComponent<'s>> {
+  pub fn get_component(&self, name: &str) -> Option<Rc<StandardComponent>> {
     self
       .components
       .iter()
-      .find(|component| component.get_name() == name)
+      .find(|component| component.get_name() == name).cloned()
   }
 
   // TODO: Figure out a way to make this safe
   pub fn act_on_components(&mut self) {
     let mut components: Vec<*const StandardComponent> = vec![];
-    let entity_ref: *mut StandardEntity<'s> = self;
+    let entity_ref: *mut StandardEntity = self;
     unsafe {
       let len = self.components.len();
       for i in 0..len {
-        let comp_ptr: *const StandardComponent = &self.components[i];
+        let comp_ptr: *const StandardComponent = self.components[i].as_ref();
         components.push(comp_ptr);
       }
 
@@ -93,7 +95,7 @@ impl<'s> StandardEntity<'s> {
   }
 }
 
-impl<'a> Entity<'a> for StandardEntity<'a> {
+impl Entity for StandardEntity {
   fn get_x(&self) -> f32 {
     self.sprite.get_x()
   }
@@ -129,12 +131,12 @@ impl<'a> Entity<'a> for StandardEntity<'a> {
     }
   }
 
-  fn get_components(&self) -> &Vec<StandardComponent<'a>> {
+  fn get_components(&self) -> &Vec<Rc<StandardComponent>> {
     &self.components
   }
 
-  fn load_components(&mut self, component: StandardComponent<'a>) {
-    self.components.push(component);
+  fn load_components(&mut self, component: StandardComponent) {
+    self.components.push(Rc::new(component));
   }
 
   fn recieve_message(&mut self, message: Message) {}
@@ -145,7 +147,7 @@ impl<'a> Entity<'a> for StandardEntity<'a> {
 /// the engine
 ///
 /// E.g: A collision component
-pub trait Component<'a> {
+pub trait Component {
   fn get_name(&self) -> &str;
 
   /// Act function recieves information about current entities and returns a
@@ -155,8 +157,8 @@ pub trait Component<'a> {
   /// E.g: An entity may choose to ignore a report of collision.
   unsafe fn act(
     &mut self,
-    entities: &Vec<*mut dyn Entity<'a>>,
-    entity: *mut dyn Entity<'a>,
+    entities: &Vec<*mut dyn Entity>,
+    entity: *mut dyn Entity,
   ) -> Option<Message>;
 }
 

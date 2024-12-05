@@ -1,8 +1,11 @@
+use std::rc::Rc;
+use std::cell::RefCell;
+
 extern crate gl;
 
 use crate::general::color;
 use crate::gl_utils::element_array_buffer::ElementArrayBuffer;
-use crate::gl_utils::gl_texture::{LoadableTexture, Texture};
+use crate::gl_utils::gl_texture::Texture;
 use crate::gl_utils::gl_texture_loader::TextureLoader;
 use crate::gl_utils::gl_translation::{DataType, DrawingMode, ToGl, UsageMode};
 use crate::gl_utils::shader_creator::ShaderProgram;
@@ -10,7 +13,7 @@ use crate::gl_utils::vertex_array_buffer::VertexArrayBuffer;
 use crate::shapes::rectangle::Rectangle;
 use crate::sprites::drawable::Drawable;
 use crate::sprites::sprite::Sprite;
-use crate::{Entity, StandardEntity};
+use crate::{StandardEntity, Entity};
 
 #[derive(Clone)]
 pub struct DrawableData {
@@ -20,7 +23,7 @@ pub struct DrawableData {
   pub texture: Texture,
 }
 
-pub struct Drawer<'a> {
+pub struct Drawer {
   vertex_array_buffer: VertexArrayBuffer<f32>,
   element_array_buffer: ElementArrayBuffer<i32>,
   vertices: Vec<f32>,
@@ -28,11 +31,11 @@ pub struct Drawer<'a> {
   texture_loader: TextureLoader,
   elements_count: i32,
   drawables: Vec<DrawableData>,
-  entities: *const Vec<StandardEntity<'a>>,
+  entities: *const Vec<Rc<RefCell<StandardEntity>>>,
 }
 
-impl<'a> Drawer<'a> {
-  pub fn shell() -> Drawer<'a> {
+impl Drawer {
+  pub fn shell() -> Drawer {
     Drawer {
       vertex_array_buffer: VertexArrayBuffer::shell(),
       element_array_buffer: ElementArrayBuffer::shell(),
@@ -44,7 +47,7 @@ impl<'a> Drawer<'a> {
       entities: std::ptr::null(),
     }
   }
-  pub fn new(usage_mode: UsageMode) -> Drawer<'a> {
+  pub fn new(usage_mode: UsageMode) -> Drawer {
     Drawer {
       vertex_array_buffer: VertexArrayBuffer::<f32>::new(
         DataType::Float32,
@@ -86,7 +89,7 @@ impl<'a> Drawer<'a> {
   pub fn load_drawable_dynamic(
     &mut self,
     drawable: DrawableData,
-    program: &ShaderProgram,
+    _program: &ShaderProgram,
   ) {
     self.drawables.push(drawable.to_owned());
 
@@ -135,7 +138,9 @@ impl<'a> Drawer<'a> {
     let entities = unsafe { self.entities.as_ref().unwrap() };
     let textures = entities
       .iter()
-      .map(|entitiy| entitiy.get_drawable().texture.to_owned())
+      .map(|entitiy| {
+        entitiy.borrow_mut().get_drawable().texture.to_owned()
+      })
       .collect::<Vec<Texture>>();
 
     self.texture_loader.load_textures(textures, program);
@@ -149,7 +154,7 @@ impl<'a> Drawer<'a> {
 
   pub fn set_entities_array(
     &mut self,
-    entities: *const Vec<StandardEntity<'a>>,
+    entities: *const Vec<Rc<RefCell<StandardEntity>>>,
   ) {
     self.entities = entities;
   }
@@ -168,10 +173,11 @@ impl<'a> Drawer<'a> {
     for i in 0..len {
       let entity = &entities[i];
 
-      let drawable = entity.get_drawable();
+      let drawable = entity.borrow_mut().get_drawable();
       self
         .texture_loader
         .load_texture(drawable.to_owned().texture, program);
+
       Drawer::load_drawable(
         &mut self.elements,
         &mut self.vertices,

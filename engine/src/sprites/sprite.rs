@@ -13,22 +13,22 @@ use std::marker::PhantomData;
 
 #[derive(Debug, Clone)]
 /// A sprite manages a texture and a texture to create a drawable.
-pub struct Sprite<'a, TShape>
+pub struct Sprite<TShape>
 where
-  TShape: Shape + 'a,
+  TShape: Shape,
 {
   shape: TShape,
   pub name: String,
   pub texture: Texture,
-  phantom: PhantomData<&'a TShape>,
+  phantom: PhantomData<TShape>,
   transformation: Matrix<f32>,
 }
 
-impl<'a, TShape: 'a> Sprite<'a, TShape>
+impl<TShape> Sprite<TShape>
 where
-  TShape: Shape + 'a,
+  TShape: Shape,
 {
-  pub fn new(shape: TShape, texture: Texture) -> Sprite<'a, TShape> {
+  pub fn new(shape: TShape, texture: Texture) -> Sprite<TShape> {
     Sprite {
       shape,
       name: texture.image_name.to_owned(),
@@ -42,7 +42,7 @@ where
     shape: TShape,
     texture: Texture,
     trans: Matrix<f32>,
-  ) -> Sprite<'a, TShape> {
+  ) -> Sprite<TShape> {
     Sprite {
       shape,
       name: texture.image_name.to_owned(),
@@ -51,6 +51,11 @@ where
       transformation: trans,
     }
   }
+
+  pub fn set_texture(&mut self, texture: Texture) {
+      self.texture = texture;
+  }
+
 
   pub fn move_sprite(&mut self, direction: Direction, amount: f32) {
     match direction {
@@ -180,15 +185,15 @@ where
   }
 }
 
-impl<'a, TShape> Drawable<'a> for Sprite<'a, TShape>
+impl<TShape> Drawable for Sprite<TShape>
 where
-  TShape: Shape + 'a,
+  TShape: Shape,
 {
-  fn set_texture_uniform(&'a self, program: &ShaderProgram) -> () {
+  fn set_texture_uniform(&self, program: &ShaderProgram) -> () {
     self.texture.set_uniform(program);
   }
 
-  fn get_corner_count(&'a self) -> i32 {
+  fn get_corner_count(&self) -> i32 {
     self.shape.get_coordinate_corners().len() as i32
   }
 
@@ -231,11 +236,11 @@ where
   }
 }
 
-impl<'a, TShape> From<&Sprite<'a, TShape>> for Sprite<'a, TShape>
+impl<TShape> From<&Sprite<TShape>> for Sprite<TShape>
 where
   TShape: Shape + Clone,
 {
-  fn from(sprite_ref: &Sprite<'a, TShape>) -> Self {
+  fn from(sprite_ref: &Sprite<TShape>) -> Self {
     Sprite::new(sprite_ref.shape.to_owned(), sprite_ref.texture.to_owned())
   }
 }

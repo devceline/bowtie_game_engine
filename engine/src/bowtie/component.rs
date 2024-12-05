@@ -1,44 +1,46 @@
+use std::rc::Rc;
+use std::cell::RefCell;
+
 use std::{
   collections::HashMap,
-  sync::{Arc, Mutex},
 };
 
 use crate::{general::value::Value, StandardEntity};
 
 pub type ComponentStore = HashMap<String, Value>;
-pub type ComponentFunction<'a> =
-  dyn Fn(&mut StandardEntity<'a>, Arc<Mutex<ComponentStore>>) -> () + 'a;
+pub type ComponentFunction =
+  dyn Fn(Box<&mut StandardEntity>, Rc<RefCell<ComponentStore>>) -> ();
 
 #[derive(Clone)]
-pub struct StandardComponent<'a> {
-  component_function: Arc<ComponentFunction<'a>>,
+pub struct StandardComponent {
+  component_function: Rc<ComponentFunction>,
   name: String,
-  store: Arc<Mutex<ComponentStore>>,
+  store: Rc<RefCell<ComponentStore>>,
 }
 
-impl<'a> StandardComponent<'a> {
+impl StandardComponent {
   pub fn new(
-    f: Arc<ComponentFunction<'a>>,
+    f: Rc<ComponentFunction>,
     name: &str,
     store_seed: ComponentStore,
-  ) -> StandardComponent<'a> {
+  ) -> StandardComponent {
     StandardComponent {
-      component_function: f,
+      component_function: Rc::clone(&f),
       name: String::from(name),
-      store: Arc::new(Mutex::new(store_seed)),
+      store: Rc::new(RefCell::new(store_seed)),
     }
   }
 
-  pub fn get_store(&self) -> &Arc<Mutex<ComponentStore>> {
-    &self.store
+  pub fn get_store(&self) -> Rc<RefCell<ComponentStore>> {
+    Rc::clone(&self.store)
   }
 
   pub fn get_name(&self) -> String {
     self.name.to_owned()
   }
 
-  pub fn act(&self, entity: &mut StandardEntity<'a>) -> () {
+  pub fn act(&self, entity: &mut StandardEntity) -> () {
     let func = &self.component_function;
-    func(entity, self.store.clone());
+    func(Box::new(entity), self.store.clone());
   }
 }

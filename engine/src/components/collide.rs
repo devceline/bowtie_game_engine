@@ -1,8 +1,12 @@
+use std::rc::Rc;
+use std::cell::RefCell;
+
 use std::{
   collections::HashMap,
   marker::PhantomData,
-  sync::{Arc, Mutex},
 };
+
+use crate::bowtie::component::ComponentFunction;
 
 use crate::{
   bowtie::entity::{Component, Entity, Message},
@@ -11,25 +15,25 @@ use crate::{
   StandardComponent, StandardEntity,
 };
 
-pub type CollidingObjects<'d> =
-  HashMap<*mut StandardEntity<'d>, Vec<(*mut StandardEntity<'d>, Direction)>>;
+pub type CollidingObjects =
+  HashMap<*mut StandardEntity, Vec<(*mut StandardEntity, Direction)>>;
 
-pub type CollidingObjectsArc<'d> = Arc<Mutex<CollidingObjects<'d>>>;
+pub type CollidingObjectsRc = Rc<RefCell<CollidingObjects>>;
 
 /// Collision Component
 ///
 /// Sends a message reporting the current direction of collision
 ///
 /// If an entity has not collided, the `Direction` will be `Direction::Stationary`
-pub struct CollisionComponent<'d> {
-  colliding_objects: CollidingObjectsArc<'d>,
-  _marker: PhantomData<&'d i32>,
+pub struct CollisionComponent {
+  colliding_objects: CollidingObjectsRc,
+  _marker: PhantomData<i32>,
 }
 
-impl<'d> CollisionComponent<'d> {
-  pub fn new() -> CollisionComponent<'d> {
+impl CollisionComponent {
+  pub fn new() -> CollisionComponent {
     CollisionComponent {
-      colliding_objects: Arc::new(Mutex::new(HashMap::new())),
+      colliding_objects: Rc::new(RefCell::new(HashMap::new())),
       _marker: PhantomData,
     }
   }
@@ -98,9 +102,9 @@ impl<'d> CollisionComponent<'d> {
     return direction;
   }
 
-  pub fn get_is_collided(&self, entity_ref: *mut StandardEntity<'d>) -> bool {
+  pub fn get_is_collided(&self, entity_ref: *mut StandardEntity) -> bool {
     let is_collided =
-      match self.colliding_objects.lock().unwrap().get(&entity_ref) {
+      match self.colliding_objects.borrow().get(&entity_ref) {
         Some(collision_vec) => collision_vec.len() > 0,
         None => false,
       };
@@ -109,8 +113,8 @@ impl<'d> CollisionComponent<'d> {
   }
 
   pub fn get_entity_collision_direction(
-    colliding_objects: &CollidingObjects<'d>,
-    entity_ref: *mut StandardEntity<'d>,
+    colliding_objects: &CollidingObjects,
+    entity_ref: *mut StandardEntity,
   ) -> Direction {
     let mut collision_direction = Direction::Stationary;
 
@@ -128,8 +132,8 @@ impl<'d> CollisionComponent<'d> {
   }
 
   unsafe fn calculate_collision_direction(
-    entity: *const StandardEntity<'d>,
-    other_entity: *const StandardEntity<'d>,
+    entity: *const StandardEntity,
+    other_entity: *const StandardEntity,
   ) -> Direction {
     let entity_unwrapped = entity.as_ref().unwrap();
     let other_entity_unwrapped = other_entity.as_ref().unwrap();
@@ -159,15 +163,15 @@ impl<'d> CollisionComponent<'d> {
   }
 
   unsafe fn get_final_collission_direction(
-    colliding_objects: &CollidingObjectsArc<'d>,
-    entity: *mut StandardEntity<'d>,
+    colliding_objects: &CollidingObjectsRc,
+    entity: *mut StandardEntity,
   ) -> Direction {
-    let mut objects = colliding_objects.lock().unwrap();
+    let mut objects = colliding_objects.borrow_mut();
 
     let keys = objects
       .keys()
       .map(|k| k.to_owned())
-      .collect::<Vec<*mut StandardEntity<'d>>>();
+      .collect::<Vec<*mut StandardEntity>>();
 
     let current_vec = objects.entry(entity).or_insert(Vec::new());
     for other_entity in keys {
@@ -208,15 +212,16 @@ impl<'d> CollisionComponent<'d> {
     String::from("collision")
   }
 
-  pub fn component(&'d mut self) -> StandardComponent<'d> {
+  pub fn component(&mut self) -> StandardComponent {
+
     StandardComponent::new(
-      Arc::new(|entity, store| unsafe {
+      Rc::new(|entity, store| unsafe {
         let new_collision_direction =
           CollisionComponent::get_final_collission_direction(
             &self.colliding_objects,
             entity,
           );
-        let entity_ptr: *const StandardEntity<'d> = entity;
+        let entity_ptr: *const StandardEntity = entity;
 
         let direction_value = Value::Number(new_collision_direction.into());
 

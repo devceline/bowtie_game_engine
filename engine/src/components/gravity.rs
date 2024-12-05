@@ -1,11 +1,13 @@
+use std::rc::Rc;
+
 use std::{
   collections::HashMap,
   marker::PhantomData,
-  sync::{Arc, Mutex},
 };
 
 use crate::{
-  bowtie::entity::{Component, Entity, Message, StandardEntity},
+  bowtie::entity::{Entity, StandardEntity},
+  bowtie::component::ComponentFunction,
   general::value::Value,
   Direction, StandardComponent,
 };
@@ -14,15 +16,15 @@ use crate::{
 ///
 /// Sends a message about y position updates in `f32`
 #[derive(Clone)]
-pub struct GravityComponent<'s> {
+pub struct GravityComponent {
   speed: f32,
   acceleration: f32,
-  _marker: PhantomData<&'s f32>,
+  _marker: PhantomData<f32>,
   terminal_velocity: f32,
 }
 
-impl<'s> GravityComponent<'s> {
-  pub fn new(speed: f32) -> GravityComponent<'s> {
+impl GravityComponent {
+  pub fn new(speed: f32) -> GravityComponent {
     GravityComponent {
       speed: speed / 100.0,
       acceleration: speed * 0.2,
@@ -35,18 +37,17 @@ impl<'s> GravityComponent<'s> {
     String::from("gravity")
   }
 
-  pub fn component(&'s mut self) -> StandardComponent<'s> {
-    StandardComponent::new(
-      Arc::new(|entity, store| {
-        let mut locked_store = store.lock().unwrap();
-
-        let falling_objects = locked_store
+  pub fn component(&mut self) -> StandardComponent {
+      let function: Rc<ComponentFunction> = Rc::new(|entity, store| {
+        let mut borrowed_store = store.borrow_mut();
+        let falling_objects = borrowed_store
           .entry(String::from("falling_objects"))
           .or_insert(Value::Object(HashMap::new()));
 
         match falling_objects {
           Value::Object(objects) => {
-            let entity_ptr: *mut StandardEntity<'s> = entity;
+            // let entity_ptr: *mut StandardEntity = entity.as_mut();
+            let entity_ptr: *mut StandardEntity = *entity as *mut StandardEntity;
             let entity_ptr_str = format!("{:?}", entity_ptr);
 
             let object_info = objects.entry(entity_ptr_str).or_insert(
@@ -77,7 +78,10 @@ impl<'s> GravityComponent<'s> {
             panic!("Falling objects should be hashmap")
           }
         }
-      }),
+      });
+
+    StandardComponent::new(
+      function,
       GravityComponent::get_name().as_str(),
       HashMap::from([(
         String::from("falling_objects"),

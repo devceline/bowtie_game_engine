@@ -1,6 +1,8 @@
 use std::{
   collections::HashMap,
   marker::PhantomData,
+  rc::Rc,
+  cell::RefCell,
   sync::{Arc, Mutex},
 };
 
@@ -10,20 +12,20 @@ use crate::{
 };
 
 #[derive(Clone)]
-pub struct KeyboardMoveComponent<'s> {
+pub struct KeyboardMoveComponent {
   speed: Arc<Mutex<f32>>,
   acceleration: Arc<f32>,
   next_direction: Arc<Mutex<Direction>>,
   top_speed: Arc<f32>,
-  _marker: PhantomData<&'s f32>,
+  _marker: PhantomData<f32>,
 }
 
-impl<'s> KeyboardMoveComponent<'s> {
+impl KeyboardMoveComponent {
   pub fn new(
     speed: f32,
     acceleration: f32,
     top_speed: f32,
-  ) -> KeyboardMoveComponent<'s> {
+  ) -> KeyboardMoveComponent {
     KeyboardMoveComponent {
       speed: Arc::new(Mutex::new(speed)),
       acceleration: Arc::new(acceleration),
@@ -38,7 +40,7 @@ impl<'s> KeyboardMoveComponent<'s> {
   }
 
   pub fn move_component(
-    entity: &mut StandardEntity<'s>,
+    entity: Rc<RefCell<StandardEntity>>,
     speed_arc: &Arc<Mutex<f32>>,
     acceleration_arc: &Arc<f32>,
     direction_arc: &Arc<Mutex<Direction>>,
@@ -52,10 +54,10 @@ impl<'s> KeyboardMoveComponent<'s> {
       return;
     }
 
-    match entity.get_component(CollisionComponent::get_name().as_str()) {
+    match entity.borrow_mut().get_component(CollisionComponent::get_name().as_str()) {
       Some(comp) => {
-        let collision_store = comp.get_store().lock().unwrap();
-        let entity_ptr: *const StandardEntity<'s> = entity;
+        let collision_store = comp.get_store().borrow_mut();
+        let entity_ptr: *const StandardEntity = entity.as_ptr();
         let entity_id = format!("{:?}", entity_ptr);
         match collision_store.get(&entity_id) {
           None => {}
@@ -73,7 +75,7 @@ impl<'s> KeyboardMoveComponent<'s> {
       None => {}
     }
 
-    entity.move_in_direction(direction, speed_clone);
+    entity.borrow_mut().move_in_direction(direction, speed_clone);
 
     if speed_clone < top_speed_arc.as_ref().clone() {
       let acc = acceleration_arc.as_ref().clone();
@@ -127,11 +129,11 @@ impl<'s> KeyboardMoveComponent<'s> {
     }
   }
 
-  pub fn component(&'s self) -> StandardComponent<'s> {
+  pub fn component(&self) -> StandardComponent {
     StandardComponent::new(
-      Arc::new(|entity, _store| {
+      Rc::new(|entity, _store| {
         KeyboardMoveComponent::move_component(
-          entity,
+          Rc::clone(&entity),
           &self.speed,
           &self.acceleration,
           &self.next_direction,

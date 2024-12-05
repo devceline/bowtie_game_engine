@@ -1,22 +1,22 @@
+use std::rc::Rc;
+use std::cell::RefCell;
+
 extern crate gl;
 extern crate glfw;
 
-use glfw::{Context, FlushedMessages};
+use glfw::Context;
 
 use crate::{
   general::color::COLORS,
   gl_utils::{
-    gl_texture::Texture,
     gl_translation::{DataType, DrawingMode, UsageMode},
     shader_creator::{
       Shader, ShaderProgram, VertexShaderAttribute, VertexShaderAttributeType,
     },
-    vertex_array_object_handler::VertexArrayObject,
   },
   init_debug_callback,
   rendering::drawer::Drawer,
   window::window::WindowConfig,
-  Rectangle, Sprite,
 };
 
 use super::entity::StandardEntity;
@@ -24,9 +24,9 @@ use super::entity::StandardEntity;
 /// Public interface for the game engine's capabilities
 /// Will be responsible for rendering, handling physics systems
 /// And controlling the game's state through entitiy data
-pub struct BowTie<'d> {
-  entities: Vec<StandardEntity<'d>>,
-  drawer: Drawer<'d>,
+pub struct BowTie {
+  entities: Vec<Rc<RefCell<StandardEntity>>>,
+  drawer: Drawer,
   shading_program: ShaderProgram,
   glfw_instance: glfw::Glfw,
   window: Option<glfw::Window>,
@@ -93,8 +93,8 @@ fn get_program() -> ShaderProgram {
   program
 }
 
-impl<'d> BowTie<'d> {
-  pub fn new() -> BowTie<'d> {
+impl BowTie {
+  pub fn new() -> BowTie {
     let mut bowtie = BowTie {
       entities: vec![],
       drawer: Drawer::shell(),
@@ -111,14 +111,12 @@ impl<'d> BowTie<'d> {
   /// To handle rendering and physics
   pub fn load_entity(
     &mut self,
-    entity: StandardEntity<'d>,
-  ) -> &mut StandardEntity<'d> {
+    entity: Rc<RefCell<StandardEntity>>,
+  ) {
     self.entities.push(entity);
-    let entity_id = self.entities.len() - 1;
-    &mut self.entities[entity_id]
   }
 
-  pub fn unload_entity(&mut self, entity: StandardEntity<'d>) {}
+  pub fn unload_entity(&mut self, _entity: StandardEntity) {}
 
   pub fn get_entity_count(&self) -> usize {
     self.entities.len()
@@ -127,7 +125,7 @@ impl<'d> BowTie<'d> {
   /// Updates the entities with the existing systems
   pub fn update_entities(&mut self) {
     for entity in self.entities.iter_mut() {
-      entity.act_on_components();
+      entity.borrow_mut().act_on_components();
     }
   }
 
@@ -135,13 +133,13 @@ impl<'d> BowTie<'d> {
   /// Has to be called before the main draw call
   pub fn prep_for_render(&mut self) {
     if self.entities.len() < 1 {
-      self.load_entity(StandardEntity::new(
-        Sprite::new(
-          Rectangle::new(0.0, 0.0, 0.0, 0.0, COLORS::White.into()),
-          Texture::none(),
-        ),
-        0.0,
-      ));
+      // self.load_entity(StandardEntity::new(
+      //   Sprite::new(
+      //     Rectangle::new(0.0, 0.0, 0.0, 0.0, COLORS::White.into()),
+      //     Texture::none(),
+      //   ),
+      //   0.0,
+      // ));
     }
     self.drawer.prep_data(&self.shading_program);
     self.shading_program.use_program();
