@@ -76,6 +76,22 @@ impl StandardEntity {
       .find(|component| component.get_name() == name).cloned()
   }
 
+  pub fn get_direction(&self) -> Direction {
+      self.direction
+  }
+
+  pub fn set_direction(&mut self, direction: Direction) -> () {
+      self.direction = direction;
+  }
+
+  pub fn get_speed(&self) -> f32 {
+      self.speed
+  }
+
+  pub fn set_speed(&mut self, speed: f32) -> () {
+      self.speed = speed;
+  }
+
   // TODO: Figure out a way to make this safe
   pub fn act_on_components(&mut self) {
     let mut components: Vec<*const StandardComponent> = vec![];

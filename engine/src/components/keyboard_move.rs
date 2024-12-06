@@ -13,24 +13,18 @@ use crate::{
 
 #[derive(Clone)]
 pub struct KeyboardMoveComponent {
-  speed: Arc<Mutex<f32>>,
-  acceleration: Arc<f32>,
-  next_direction: Arc<Mutex<Direction>>,
-  top_speed: Arc<f32>,
+  next_direction: Direction,
+  top_speed: f32,
   _marker: PhantomData<f32>,
 }
 
 impl KeyboardMoveComponent {
   pub fn new(
-    speed: f32,
-    acceleration: f32,
     top_speed: f32,
   ) -> KeyboardMoveComponent {
     KeyboardMoveComponent {
-      speed: Arc::new(Mutex::new(speed)),
-      acceleration: Arc::new(acceleration),
-      next_direction: Arc::new(Mutex::new(Direction::Stationary)),
-      top_speed: Arc::new(top_speed),
+      next_direction: Direction::Stationary,
+      top_speed,
       _marker: PhantomData,
     }
   }
@@ -40,104 +34,97 @@ impl KeyboardMoveComponent {
   }
 
   pub fn move_component(
-    entity: Rc<RefCell<StandardEntity>>,
-    speed_arc: &Arc<Mutex<f32>>,
-    acceleration_arc: &Arc<f32>,
-    direction_arc: &Arc<Mutex<Direction>>,
-    top_speed_arc: &Arc<f32>,
+    entity: &mut StandardEntity,
+    top_speed: f32
   ) {
-    let mut speed = speed_arc.lock().unwrap();
-    let mut direction = direction_arc.lock().unwrap().clone();
-    let speed_clone = speed.clone();
+    let speed_clone = entity.get_speed().clone();
 
-    if direction == Direction::Stationary {
+    if entity.get_direction() == Direction::Stationary {
       return;
     }
 
-    match entity.borrow_mut().get_component(CollisionComponent::get_name().as_str()) {
+    match entity.get_component(CollisionComponent::get_name().as_str()) {
       Some(comp) => {
-        let collision_store = comp.get_store().borrow_mut();
-        let entity_ptr: *const StandardEntity = entity.as_ptr();
+        let collision_store = comp.get_store();
+        let entity_ptr: *const StandardEntity = entity;
         let entity_id = format!("{:?}", entity_ptr);
-        match collision_store.get(&entity_id) {
+        match collision_store.borrow().get(&entity_id) {
           None => {}
           Some(dir_num) => {
             match dir_num {
               Value::Number(num) => {
                 let collision_direction = Direction::from(num.clone());
-                direction = direction.subtract_direction(collision_direction);
+                entity.set_direction(entity.get_direction().subtract_direction(collision_direction))
               }
               _ => {}
             }
           }
-        }
+        };
       }
       None => {}
-    }
+    };
 
-    entity.borrow_mut().move_in_direction(direction, speed_clone);
+    entity.move_in_direction(entity.get_direction(), speed_clone);
 
-    if speed_clone < top_speed_arc.as_ref().clone() {
-      let acc = acceleration_arc.as_ref().clone();
-      *speed = speed_clone + acc;
+
+    if speed_clone < top_speed {
+      let acceleration = 0.2;
+      entity.set_speed(entity.get_speed() + acceleration);
     }
   }
 
-  pub fn listen_for_event(&self, event: &glfw::WindowEvent) {
-    let mut direction = self.next_direction.lock().unwrap();
+  pub fn listen_for_event(&mut self, event: &glfw::WindowEvent) {
     match event {
       glfw::WindowEvent::Key(glfw::Key::Right, _, glfw::Action::Press, _) => {
-        *direction = direction.add_direction(Direction::Right);
+        self.next_direction = self.next_direction.add_direction(Direction::Right);
       }
       glfw::WindowEvent::Key(glfw::Key::Right, _, glfw::Action::Repeat, _) => {
-        *direction = direction.add_direction(Direction::Right);
+        self.next_direction = self.next_direction.add_direction(Direction::Right);
       }
       glfw::WindowEvent::Key(glfw::Key::Right, _, glfw::Action::Release, _) => {
-        *direction = direction.subtract_direction(Direction::Right);
+        self.next_direction = self.next_direction.subtract_direction(Direction::Right);
       }
 
       glfw::WindowEvent::Key(glfw::Key::Left, _, glfw::Action::Press, _) => {
-        *direction = direction.add_direction(Direction::Left);
+        self.next_direction = self.next_direction.add_direction(Direction::Left);
       }
       glfw::WindowEvent::Key(glfw::Key::Left, _, glfw::Action::Repeat, _) => {
-        *direction = direction.add_direction(Direction::Left);
+        self.next_direction = self.next_direction.add_direction(Direction::Left);
       }
       glfw::WindowEvent::Key(glfw::Key::Left, _, glfw::Action::Release, _) => {
-        *direction = direction.subtract_direction(Direction::Left);
+        self.next_direction = self.next_direction.subtract_direction(Direction::Left);
       }
 
       glfw::WindowEvent::Key(glfw::Key::Up, _, glfw::Action::Press, _) => {
-        *direction = direction.add_direction(Direction::Up);
+        self.next_direction = self.next_direction.add_direction(Direction::Up);
       }
       glfw::WindowEvent::Key(glfw::Key::Up, _, glfw::Action::Repeat, _) => {
-        *direction = direction.add_direction(Direction::Up);
+        self.next_direction = self.next_direction.add_direction(Direction::Up);
       }
       glfw::WindowEvent::Key(glfw::Key::Up, _, glfw::Action::Release, _) => {
-        *direction = direction.subtract_direction(Direction::Up);
+        self.next_direction = self.next_direction.subtract_direction(Direction::Up);
       }
 
       glfw::WindowEvent::Key(glfw::Key::Down, _, glfw::Action::Repeat, _) => {
-        *direction = direction.add_direction(Direction::Down);
+        self.next_direction = self.next_direction.add_direction(Direction::Down);
       }
       glfw::WindowEvent::Key(glfw::Key::Down, _, glfw::Action::Press, _) => {
-        *direction = direction.add_direction(Direction::Down);
+        self.next_direction = self.next_direction.add_direction(Direction::Down);
       }
       glfw::WindowEvent::Key(glfw::Key::Down, _, glfw::Action::Release, _) => {
-        *direction = direction.subtract_direction(Direction::Down);
+        self.next_direction = self.next_direction.subtract_direction(Direction::Down);
       }
       _ => {}
     }
   }
 
   pub fn component(&self) -> StandardComponent {
+    let self_top_speed = self.top_speed;
     StandardComponent::new(
-      Rc::new(|entity, _store| {
+      Rc::new(move |entity, _store| {
         KeyboardMoveComponent::move_component(
-          Rc::clone(&entity),
-          &self.speed,
-          &self.acceleration,
-          &self.next_direction,
-          &self.top_speed,
+          entity,
+          self_top_speed,
         );
       }),
       KeyboardMoveComponent::get_name().as_str(),

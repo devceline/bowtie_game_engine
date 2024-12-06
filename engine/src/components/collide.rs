@@ -163,7 +163,7 @@ impl CollisionComponent {
   }
 
   unsafe fn get_final_collission_direction(
-    colliding_objects: &CollidingObjectsRc,
+    colliding_objects: CollidingObjectsRc,
     entity: *mut StandardEntity,
   ) -> Direction {
     let mut objects = colliding_objects.borrow_mut();
@@ -213,19 +213,21 @@ impl CollisionComponent {
   }
 
   pub fn component(&mut self) -> StandardComponent {
+      let self_colliding_objects = self.colliding_objects.clone();
 
     StandardComponent::new(
-      Rc::new(|entity, store| unsafe {
+
+      Rc::new(move |entity, store| unsafe {
         let new_collision_direction =
           CollisionComponent::get_final_collission_direction(
-            &self.colliding_objects,
+            Rc::clone(&self_colliding_objects),
             entity,
           );
-        let entity_ptr: *const StandardEntity = entity;
+        let entity_ptr: *mut StandardEntity = entity;
 
         let direction_value = Value::Number(new_collision_direction.into());
 
-        let mut locked_store = store.lock().unwrap();
+        let mut locked_store = store.borrow_mut();
         let dir = locked_store
           .entry(format!("{:?}", entity_ptr))
           .or_insert(direction_value.to_owned());

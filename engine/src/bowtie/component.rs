@@ -1,15 +1,13 @@
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use std::{
-  collections::HashMap,
-};
+use std::collections::HashMap;
 
 use crate::{general::value::Value, StandardEntity};
 
 pub type ComponentStore = HashMap<String, Value>;
 pub type ComponentFunction =
-  dyn Fn(Box<&mut StandardEntity>, Rc<RefCell<ComponentStore>>) -> ();
+  dyn Fn(&mut StandardEntity, Rc<RefCell<ComponentStore>>) -> ();
 
 #[derive(Clone)]
 pub struct StandardComponent {
@@ -41,6 +39,6 @@ impl StandardComponent {
 
   pub fn act(&self, entity: &mut StandardEntity) -> () {
     let func = &self.component_function;
-    func(Box::new(entity), self.store.clone());
+    func(entity, self.store.clone());
   }
 }
