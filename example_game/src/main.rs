@@ -22,7 +22,7 @@ fn main() {
   let mut collision = CollisionComponent::new();
   let rand_move1 = RandMove::new();
   let mut gravity = GravityComponent::new(0.002);
-  let keyboard_move = KeyboardMoveComponent::new(0.02, 0.0, 0.4);
+  let mut keyboard_move = KeyboardMoveComponent::new(0.05);
 
   let collision_comp = collision.component();
   let rand_comp = rand_move1.component();
@@ -30,20 +30,22 @@ fn main() {
   let keyboard_move_comp = keyboard_move.component();
 
 
+  let mut bowtie = BowTie::new();
+  bowtie.create_window(WindowConfig { width: 1000, height: 800, name: String::from("rust game engine"), mode: WindowMode::Windowed });
+
+
+  bowtie.prep_for_render();
+
   let witch_texture = Texture::new("witch", TextureOptions::default());
   let witch_new_texture = Texture::new("witch_new", TextureOptions::default());
 
   let playable_character = Rc::new(RefCell::new(StandardEntity::new(Sprite::new(Rectangle::new(0.5, 0.0, 0.2, 0.3, COLORS::White.into()), Texture::from(&witch_texture)), 0.0)));
 
-  let mut playable_character_borowed = playable_character.borrow_mut();
-  playable_character_borowed.load_components(collision_comp.to_owned());
 
-  let mut bowtie = BowTie::new();
-  bowtie.create_window(WindowConfig { width: 1000, height: 800, name: String::from("rust game engine"), mode: WindowMode::Windowed });
+  playable_character.borrow_mut().load_components(collision_comp.to_owned());
+  playable_character.borrow_mut().load_components(keyboard_move_comp.to_owned());
 
-  bowtie.load_entity(playable_character_borowed);
-
-  bowtie.prep_for_render();
+  bowtie.load_entity(Rc::clone(&playable_character));
 
   //TODO: Make hollow rectangle
   // let line_thickness = 0.01;
@@ -72,7 +74,7 @@ fn main() {
     let events = bowtie.flush_events();
 
     for event in events {
-      keyboard_move.listen_for_event(&event);
+      keyboard_move.listen_for_event(Rc::clone(&playable_character), &event);
 
       match event {
         glfw::WindowEvent::Key(glfw::Key::Escape, _, _, _) => {

@@ -5,28 +5,18 @@ extern crate rand;
 use rand::Rng;
 
 #[derive(Clone)]
-pub struct RandMove<'a> {
-  direction: Direction,
-  magnitude: f32,
-  _marker: marker::PhantomData<&'a i32>,
+pub struct RandMove {
 }
 
-impl<'a> RandMove<'a> {
-  pub fn new() -> RandMove<'a> {
-    let direction = Direction::from(rand::thread_rng().gen_range(0..8));
-    let magnitude = rand::thread_rng().gen_range(0.0..0.05);
-
-    RandMove {
-      direction,
-      magnitude,
-      _marker: marker::PhantomData,
-    }
+impl RandMove {
+  pub fn new() -> RandMove {
+    RandMove {}
   }
 
-  pub fn component(&'a self) -> StandardComponent<'a> {
+  pub fn component(&self) -> StandardComponent {
     let direction = Direction::from(rand::thread_rng().gen_range(0..8));
     let magnitude = rand::thread_rng().gen_range(0.0..0.03);
-    StandardComponent::new(Arc::new(move |entity, _store| {
+    StandardComponent::new(Rc::new(move |entity, _store| {
       entity.move_in_direction(direction, magnitude);
     }), "rand_move", HashMap::new())
     .to_owned()

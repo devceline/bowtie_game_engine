@@ -68,51 +68,54 @@ impl KeyboardMoveComponent {
 
 
     if speed_clone < top_speed {
-      let acceleration = 0.2;
+      let acceleration = 0.002;
       entity.set_speed(entity.get_speed() + acceleration);
     }
   }
 
-  pub fn listen_for_event(&mut self, event: &glfw::WindowEvent) {
+  pub fn listen_for_event(&mut self, entity: Rc<RefCell<StandardEntity>>, event: &glfw::WindowEvent) {
+    let mut mutable_entity = entity.borrow_mut();
+    let current_direction = mutable_entity.get_direction().clone();
+
     match event {
       glfw::WindowEvent::Key(glfw::Key::Right, _, glfw::Action::Press, _) => {
-        self.next_direction = self.next_direction.add_direction(Direction::Right);
+        mutable_entity.set_direction(current_direction.add_direction(Direction::Right));
       }
       glfw::WindowEvent::Key(glfw::Key::Right, _, glfw::Action::Repeat, _) => {
-        self.next_direction = self.next_direction.add_direction(Direction::Right);
+        mutable_entity.set_direction(current_direction.add_direction(Direction::Right));
       }
       glfw::WindowEvent::Key(glfw::Key::Right, _, glfw::Action::Release, _) => {
-        self.next_direction = self.next_direction.subtract_direction(Direction::Right);
+        mutable_entity.set_direction(current_direction.subtract_direction(Direction::Right));
       }
 
       glfw::WindowEvent::Key(glfw::Key::Left, _, glfw::Action::Press, _) => {
-        self.next_direction = self.next_direction.add_direction(Direction::Left);
+        mutable_entity.set_direction(current_direction.add_direction(Direction::Left));
       }
       glfw::WindowEvent::Key(glfw::Key::Left, _, glfw::Action::Repeat, _) => {
-        self.next_direction = self.next_direction.add_direction(Direction::Left);
+        mutable_entity.set_direction(current_direction.add_direction(Direction::Left));
       }
       glfw::WindowEvent::Key(glfw::Key::Left, _, glfw::Action::Release, _) => {
-        self.next_direction = self.next_direction.subtract_direction(Direction::Left);
+        mutable_entity.set_direction(current_direction.subtract_direction(Direction::Left));
       }
 
       glfw::WindowEvent::Key(glfw::Key::Up, _, glfw::Action::Press, _) => {
-        self.next_direction = self.next_direction.add_direction(Direction::Up);
+        mutable_entity.set_direction(current_direction.add_direction(Direction::Up));
       }
       glfw::WindowEvent::Key(glfw::Key::Up, _, glfw::Action::Repeat, _) => {
-        self.next_direction = self.next_direction.add_direction(Direction::Up);
+        mutable_entity.set_direction(current_direction.add_direction(Direction::Up));
       }
       glfw::WindowEvent::Key(glfw::Key::Up, _, glfw::Action::Release, _) => {
-        self.next_direction = self.next_direction.subtract_direction(Direction::Up);
+        mutable_entity.set_direction(current_direction.subtract_direction(Direction::Up));
       }
 
       glfw::WindowEvent::Key(glfw::Key::Down, _, glfw::Action::Repeat, _) => {
-        self.next_direction = self.next_direction.add_direction(Direction::Down);
+        mutable_entity.set_direction(current_direction.add_direction(Direction::Down));
       }
       glfw::WindowEvent::Key(glfw::Key::Down, _, glfw::Action::Press, _) => {
-        self.next_direction = self.next_direction.add_direction(Direction::Down);
+        mutable_entity.set_direction(current_direction.add_direction(Direction::Down));
       }
       glfw::WindowEvent::Key(glfw::Key::Down, _, glfw::Action::Release, _) => {
-        self.next_direction = self.next_direction.subtract_direction(Direction::Down);
+        mutable_entity.set_direction(current_direction.subtract_direction(Direction::Down));
       }
       _ => {}
     }
