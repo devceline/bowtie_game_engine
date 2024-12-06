@@ -36,15 +36,55 @@ fn main() {
 
   bowtie.prep_for_render();
 
-  let witch_texture = Texture::new("witch", TextureOptions::default());
-  let witch_new_texture = Texture::new("witch_new", TextureOptions::default());
+  let witch_new_texture = Texture::new("witch_walk_1", TextureOptions::default());
+  let backdrop_texture = Texture::new("backdrop", TextureOptions::default());
 
-  let playable_character = Rc::new(RefCell::new(StandardEntity::new(Sprite::new(Rectangle::new(0.5, 0.0, 0.2, 0.3, COLORS::White.into()), Texture::from(&witch_texture)), 0.0)));
+  let running_frames = Box::new(
+      Vec::from_iter(vec![
+          "witch_walk_1",
+          "witch_walk_2",
+          "witch_walk_3",
+          "witch_walk_4",
+          "witch_walk_5",
+          "witch_walk_6",
+          "witch_walk_7",
+          "witch_walk_8",
+      ]
+      .iter()
+      .map(|image_file_name| Texture::new(image_file_name, TextureOptions::default())
+  )));
+
+  let backdrop = Rc::new(
+      RefCell::new(
+          StandardEntity::new(
+              Sprite::new(
+                  Rectangle::new(-1.0, 1.0, 2.0, 2.0,
+                   COLORS::White.into()),
+                   Texture::from(&backdrop_texture)
+              ), 
+              0.0, Box::new(vec![])
+          )
+      )
+  );
+
+  let playable_character = Rc::new(
+      RefCell::new(
+          StandardEntity::new(
+              Sprite::new(
+                  Rectangle::new(0.5, 0.0, 0.116, 0.2, 
+                  COLORS::White.into()), 
+                  Texture::from(&witch_new_texture)
+              ),
+              0.0,
+              running_frames
+          )
+      ));
 
 
   playable_character.borrow_mut().load_components(collision_comp.to_owned());
   playable_character.borrow_mut().load_components(keyboard_move_comp.to_owned());
 
+  bowtie.load_entity(Rc::clone(&backdrop));
   bowtie.load_entity(Rc::clone(&playable_character));
 
   //TODO: Make hollow rectangle
@@ -74,6 +114,7 @@ fn main() {
     let events = bowtie.flush_events();
 
     for event in events {
+      playable_character.borrow_mut().animate();
       keyboard_move.listen_for_event(Rc::clone(&playable_character), &event);
 
       match event {
@@ -106,6 +147,7 @@ fn main() {
         }
         _ => {}
       }
+
     }
   }
 

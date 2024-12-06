@@ -99,6 +99,10 @@ where
     self.shape.flip_texture_corners_x()
   }
 
+  pub fn set_facing_direction(&mut self, direction: Direction) {
+    self.shape.set_facing_direction(direction);
+  }
+
   pub fn transform(&mut self, transformation_matrix: Matrix<f32>) {
     assert!(
       transformation_matrix.get_num_rows() == 4

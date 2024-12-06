@@ -1,4 +1,5 @@
 use crate::general::color::Color;
+use crate::general::direction::Direction;
 
 use super::shape::Shape;
 
@@ -83,8 +84,22 @@ impl Shape for Rectangle {
     for row in 0..4 {
       new_texture_corners[row][0] = 1.0 - self.texture_corners[row][0];
     }
+
+    println!("Flipped to {:?}", new_texture_corners);
+
     self.texture_corners = new_texture_corners;
   }
+
+  fn set_facing_direction(&mut self, direction: Direction) {
+    if direction == Direction::Right {
+      self.texture_corners = [[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0]];
+    }
+
+    if direction == Direction::Left {
+      self.texture_corners = [[1.0, 0.0], [0.0, 0.0], [0.0, 1.0], [1.0, 1.0]];
+    }
+  }
+
 
   fn flip_texture_corners_y(&mut self) {
     let mut new_texture_corners = self.texture_corners.to_owned();
@@ -92,6 +107,7 @@ impl Shape for Rectangle {
     for row in 0..4 {
       new_texture_corners[row][1] = 1.0 - self.texture_corners[row][1];
     }
+
     self.texture_corners = new_texture_corners;
   }
 

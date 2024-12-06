@@ -68,7 +68,7 @@ impl KeyboardMoveComponent {
 
 
     if speed_clone < top_speed {
-      let acceleration = 0.002;
+      let acceleration = 0.0002;
       entity.set_speed(entity.get_speed() + acceleration);
     }
   }
@@ -89,7 +89,7 @@ impl KeyboardMoveComponent {
       }
 
       glfw::WindowEvent::Key(glfw::Key::Left, _, glfw::Action::Press, _) => {
-        mutable_entity.set_direction(current_direction.add_direction(Direction::Left));
+       mutable_entity.set_direction(current_direction.add_direction(Direction::Left));
       }
       glfw::WindowEvent::Key(glfw::Key::Left, _, glfw::Action::Repeat, _) => {
         mutable_entity.set_direction(current_direction.add_direction(Direction::Left));

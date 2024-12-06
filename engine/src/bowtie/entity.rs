@@ -3,6 +3,7 @@ use std::rc::Rc;
 use crate::{
   general::direction, gl_utils::gl_texture::LoadableTexture,
   rendering::drawer::DrawableData, sprites::drawable::Drawable, Direction,
+  Texture,
   Rectangle, Sprite,
 };
 use std::collections::HashMap;
@@ -41,16 +42,20 @@ pub struct StandardEntity {
   components: Vec<Rc<StandardComponent>>,
   direction: Direction,
   collision_direction: Direction,
+  last_running_idx: usize,
+  running_frames: Box<Vec<Texture>>
 }
 
 impl StandardEntity {
-  pub fn new(sprite: Sprite<Rectangle>, speed: f32) -> StandardEntity {
+  pub fn new(sprite: Sprite<Rectangle>, speed: f32, running_frames: Box<Vec<Texture>>) -> StandardEntity {
     StandardEntity {
       sprite,
       speed,
       components: vec![],
       direction: Direction::Stationary,
       collision_direction: Direction::Stationary,
+      last_running_idx: 0,
+      running_frames 
     }
   }
 
@@ -82,6 +87,12 @@ impl StandardEntity {
 
   pub fn set_direction(&mut self, direction: Direction) -> () {
       self.direction = direction;
+
+      self.sprite.set_facing_direction(direction);
+
+      if direction == Direction::Stationary {
+          self.speed = 0.0;
+      }
   }
 
   pub fn get_speed(&self) -> f32 {
@@ -107,6 +118,18 @@ impl StandardEntity {
         let comp = component.as_ref().unwrap();
         comp.act(entity_ref.as_mut().unwrap());
       }
+    }
+  }
+
+  pub fn animate(&mut self) {
+    println!("Animating.. last_running_idx: {}, speed: {}", self.last_running_idx, self.speed);
+    if self.get_speed() > 0.0 {
+      self.last_running_idx = (self.last_running_idx + 1) % self.running_frames.len();
+      self.sprite.set_texture(self.running_frames[self.last_running_idx].clone());
+    }
+    else {
+      self.last_running_idx = 0;
+      self.sprite.set_texture(self.running_frames[0].clone())
     }
   }
 }

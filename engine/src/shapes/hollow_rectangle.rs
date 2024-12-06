@@ -1,4 +1,4 @@
-use crate::{Color, Shape};
+use crate::{Color, Shape, Direction};
 
 #[derive(Debug, Copy, Clone)]
 pub struct HollowRectangle {
@@ -79,6 +79,10 @@ impl Shape for HollowRectangle {
   }
 
   fn flip_texture_corners_y(&mut self) {
+    panic!("HollowRectangle does not support texture_corners")
+  }
+
+  fn set_facing_direction(&mut self, _direction: Direction) {
     panic!("HollowRectangle does not support texture_corners")
   }
 

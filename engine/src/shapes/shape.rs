@@ -1,6 +1,7 @@
 use std::fmt::Debug;
 
 use crate::general::color::Color;
+use crate::general::direction::Direction;
 
 pub trait Shape: Debug {
   fn get_x(&self) -> f32;
@@ -17,4 +18,5 @@ pub trait Shape: Debug {
   fn get_texture_corners(&self) -> [[f32; 2]; 4];
   fn flip_texture_corners_x(&mut self);
   fn flip_texture_corners_y(&mut self);
+  fn set_facing_direction(&mut self, direction: Direction);
 }
