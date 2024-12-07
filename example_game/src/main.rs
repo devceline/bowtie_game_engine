@@ -155,8 +155,10 @@ fn main() {
         current_direction
       };
       entity.set_direction(next_direction);
-      entity.move_in_direction(next_direction, entity.get_speed() * rand::thread_rng().gen_range(0.85..1.8),
-          );
+      entity.move_in_direction(
+        next_direction,
+        entity.get_speed() * rand::thread_rng().gen_range(0.85..1.8),
+      );
 
       if current_direction != next_direction {
         entity.set_speed(0.001)
@@ -182,11 +184,11 @@ fn main() {
           0.07,
           0.11,
           Color::new(
-          rand::thread_rng().gen_range(0.0..1.0),
-          rand::thread_rng().gen_range(0.0..1.0),
-          rand::thread_rng().gen_range(0.0..1.0),
-          rand::thread_rng().gen_range(0.7..0.8),
-          )
+            rand::thread_rng().gen_range(0.0..1.0),
+            rand::thread_rng().gen_range(0.0..1.0),
+            rand::thread_rng().gen_range(0.0..1.0),
+            rand::thread_rng().gen_range(0.7..0.8),
+          ),
         ),
         Texture::from(&bat_texture),
       ),

@@ -106,22 +106,20 @@ fn main() {
 
   let follow_ball_comp = StandardComponent::new(
     Arc::new(|entity, store| {
-
       let key = String::from("direction");
       let mut store_locked = store.lock().unwrap();
       let current_direction_val = store_locked.get_mut(&key).unwrap();
 
       if let Value::Number(direction_num) = current_direction_val {
-        entity.move_in_direction(Direction::from(direction_num.to_owned()), 0.05);
+        entity
+          .move_in_direction(Direction::from(direction_num.to_owned()), 0.05);
 
         if entity.get_y() - entity.get_height() < -0.9 {
           *current_direction_val = Value::Number(Direction::Up.into());
         } else if entity.get_y() > 0.9 {
           *current_direction_val = Value::Number(Direction::Down.into());
-        } 
-
+        }
       }
-
     }),
     "follow_ball",
     HashMap::from([(
