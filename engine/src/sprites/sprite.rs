@@ -53,9 +53,8 @@ where
   }
 
   pub fn set_texture(&mut self, texture: Texture) {
-      self.texture = texture;
+    self.texture = texture;
   }
-
 
   pub fn move_sprite(&mut self, direction: Direction, amount: f32) {
     match direction {

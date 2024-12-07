@@ -1,14 +1,11 @@
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::rc::Rc;
 
-use std::{
-  collections::HashMap,
-  marker::PhantomData,
-};
+use std::{collections::HashMap, marker::PhantomData};
 
 use crate::{
-  bowtie::entity::{Entity, StandardEntity},
   bowtie::component::ComponentStore,
+  bowtie::entity::{Entity, StandardEntity},
   general::value::Value,
   Direction, StandardComponent,
 };
@@ -34,7 +31,11 @@ impl GravityComponent {
     }
   }
 
-  pub fn apply_gravity(&self, entity: Box<&mut StandardEntity>, store: Rc<RefCell<ComponentStore>>) {
+  pub fn apply_gravity(
+    &self,
+    entity: Box<&mut StandardEntity>,
+    store: Rc<RefCell<ComponentStore>>,
+  ) {
     let mut borrowed_store = store.borrow_mut();
     let falling_objects = borrowed_store
       .entry(String::from("falling_objects"))
@@ -83,9 +84,9 @@ impl GravityComponent {
   }
 
   pub fn component(&mut self) -> StandardComponent {
-      let self_terminal_velocity = self.terminal_velocity.to_owned();
-      let self_acceleration = self.acceleration.to_owned();
-      let self_speed = self.speed.to_owned();
+    let self_terminal_velocity = self.terminal_velocity.to_owned();
+    let self_acceleration = self.acceleration.to_owned();
+    let self_speed = self.speed.to_owned();
 
     StandardComponent::new(
       Rc::new(move |entity, store| {

@@ -195,15 +195,13 @@ impl Direction {
 
     if x < 0.0 {
       new_direction = new_direction.add_direction(Direction::Left);
-    }
-    else if x > 0.0 {
+    } else if x > 0.0 {
       new_direction = new_direction.add_direction(Direction::Right);
     }
 
     if y < 0.0 {
       new_direction = new_direction.add_direction(Direction::Down);
-    }
-    else if y > 0.0 {
+    } else if y > 0.0 {
       new_direction = new_direction.add_direction(Direction::Up);
     }
 

@@ -12,6 +12,7 @@ uniform sampler2D tex8_sampler;
 uniform sampler2D tex9_sampler;
 uniform sampler2D tex10_sampler;
 uniform sampler2D tex11_sampler;
+uniform sampler2D tex12_sampler;
 
 in vec4 Color;
 in vec2 tex_cords_out;
@@ -57,6 +58,12 @@ void main()
 			break;
 		case 10: 
 			base_texture = texture(tex10_sampler, tex_cords_out);
+			break;
+		case 11: 
+			base_texture = texture(tex11_sampler, tex_cords_out);
+			break;
+		case 12: 
+			base_texture = texture(tex12_sampler, tex_cords_out);
 			break;
 	}
 

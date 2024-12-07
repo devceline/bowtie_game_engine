@@ -3,8 +3,7 @@ use std::rc::Rc;
 use crate::{
   general::direction, gl_utils::gl_texture::LoadableTexture,
   rendering::drawer::DrawableData, sprites::drawable::Drawable, Direction,
-  Texture,
-  Rectangle, Sprite,
+  Rectangle, Sprite, Texture,
 };
 use std::collections::HashMap;
 
@@ -43,11 +42,15 @@ pub struct StandardEntity {
   direction: Direction,
   collision_direction: Direction,
   last_running_idx: usize,
-  running_frames: Box<Vec<Texture>>
+  running_frames: Rc<Vec<Texture>>,
 }
 
 impl StandardEntity {
-  pub fn new(sprite: Sprite<Rectangle>, speed: f32, running_frames: Box<Vec<Texture>>) -> StandardEntity {
+  pub fn new(
+    sprite: Sprite<Rectangle>,
+    speed: f32,
+    running_frames: Rc<Vec<Texture>>,
+  ) -> StandardEntity {
     StandardEntity {
       sprite,
       speed,
@@ -55,7 +58,7 @@ impl StandardEntity {
       direction: Direction::Stationary,
       collision_direction: Direction::Stationary,
       last_running_idx: 0,
-      running_frames 
+      running_frames,
     }
   }
 
@@ -78,29 +81,30 @@ impl StandardEntity {
     self
       .components
       .iter()
-      .find(|component| component.get_name() == name).cloned()
+      .find(|component| component.get_name() == name)
+      .cloned()
   }
 
   pub fn get_direction(&self) -> Direction {
-      self.direction
+    self.direction
   }
 
   pub fn set_direction(&mut self, direction: Direction) -> () {
-      self.direction = direction;
+    self.direction = direction;
 
-      self.sprite.set_facing_direction(direction);
+    self.sprite.set_facing_direction(direction);
 
-      if direction == Direction::Stationary {
-          self.speed = 0.0;
-      }
+    if direction == Direction::Stationary {
+      self.speed = 0.0;
+    }
   }
 
   pub fn get_speed(&self) -> f32 {
-      self.speed
+    self.speed
   }
 
   pub fn set_speed(&mut self, speed: f32) -> () {
-      self.speed = speed;
+    self.speed = speed;
   }
 
   // TODO: Figure out a way to make this safe
@@ -123,10 +127,12 @@ impl StandardEntity {
 
   pub fn animate(&mut self) {
     if self.get_speed() > 0.0 {
-      self.last_running_idx = (self.last_running_idx + 1) % self.running_frames.len();
-      self.sprite.set_texture(self.running_frames[self.last_running_idx].clone());
-    }
-    else {
+      self.last_running_idx =
+        (self.last_running_idx + 1) % self.running_frames.len();
+      self
+        .sprite
+        .set_texture(self.running_frames[self.last_running_idx].clone());
+    } else {
       self.last_running_idx = 0;
       self.sprite.set_texture(self.running_frames[0].clone())
     }

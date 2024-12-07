@@ -100,7 +100,6 @@ impl Shape for Rectangle {
     }
   }
 
-
   fn flip_texture_corners_y(&mut self) {
     let mut new_texture_corners = self.texture_corners.to_owned();
 

@@ -1,6 +1,6 @@
-use std::rc::Rc;
 use std::cell::RefCell;
 use std::collections::VecDeque;
+use std::rc::Rc;
 
 extern crate gl;
 extern crate glfw;
@@ -112,26 +112,23 @@ impl BowTie {
 
   /// Loads the entity into the drawer and the game's state
   /// To handle rendering and physics
-  pub fn load_entity(
-    &mut self,
-    entity: Rc<RefCell<StandardEntity>>,
-  ) -> usize {
+  pub fn load_entity(&mut self, entity: Rc<RefCell<StandardEntity>>) -> usize {
     let free_idx = self.free_entity_slots.pop_front();
     match free_idx {
       Option::Some(idx) => {
         self.entities[idx] = Option::from(entity);
         return idx;
-      },
+      }
       Option::None => {
         self.entities.push(Option::from(entity));
-        return self.entities.len() - 1
+        return self.entities.len() - 1;
       }
     }
   }
 
   pub fn unload_entity(&mut self, entity_id: usize) {
-      self.entities[entity_id] = Option::None;
-      self.free_entity_slots.push_back(entity_id);
+    self.entities[entity_id] = Option::None;
+    self.free_entity_slots.push_back(entity_id);
   }
 
   pub fn get_entity_count(&self) -> usize {
@@ -182,6 +179,22 @@ impl BowTie {
         window_config.mode.to_glfw(),
       )
       .expect("Failed to create window");
+
+    if window_config.monitor_idx != 0 {
+      self.glfw_instance.with_connected_monitors(|_, monitors| {
+        if window_config.monitor_idx > monitors.len() - 1 {
+          panic!("Supplied monitor not connected.")
+        }
+        let selected_monitor = &monitors[window_config.monitor_idx];
+        let (monitor_x, monitor_y) = selected_monitor.get_pos();
+        println!(
+          "Setting new position to {}, {}\nUsing monitor {}",
+          monitor_x, monitor_y, 0
+        );
+
+        window.set_pos(monitor_x, monitor_y);
+      });
+    }
 
     window.make_current();
 

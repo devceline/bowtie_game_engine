@@ -22,6 +22,7 @@ pub struct WindowConfig {
   pub height: u16,
   pub name: String,
   pub mode: WindowMode,
+  pub monitor_idx: usize,
 }
 
 impl WindowConfig {
@@ -30,12 +31,14 @@ impl WindowConfig {
     height: u16,
     name: &str,
     mode: WindowMode,
+    monitor_idx: usize,
   ) -> WindowConfig {
     WindowConfig {
       width,
       height,
       name: String::from(name),
       mode,
+      monitor_idx,
     }
   }
 

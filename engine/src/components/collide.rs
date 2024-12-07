@@ -1,10 +1,7 @@
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::rc::Rc;
 
-use std::{
-  collections::HashMap,
-  marker::PhantomData,
-};
+use std::{collections::HashMap, marker::PhantomData};
 
 use crate::bowtie::component::ComponentFunction;
 
@@ -87,15 +84,13 @@ impl CollisionComponent {
 
     if right_collision {
       direction = direction.add_direction(Direction::Right);
-    }
-    else if left_collision {
+    } else if left_collision {
       direction = direction.add_direction(Direction::Left);
     }
 
     if down_collision {
       direction = Direction::Down;
-    }
-    else if up_collision {
+    } else if up_collision {
       direction = direction.add_direction(Direction::Up);
     }
 
@@ -103,11 +98,10 @@ impl CollisionComponent {
   }
 
   pub fn get_is_collided(&self, entity_ref: *mut StandardEntity) -> bool {
-    let is_collided =
-      match self.colliding_objects.borrow().get(&entity_ref) {
-        Some(collision_vec) => collision_vec.len() > 0,
-        None => false,
-      };
+    let is_collided = match self.colliding_objects.borrow().get(&entity_ref) {
+      Some(collision_vec) => collision_vec.len() > 0,
+      None => false,
+    };
 
     return is_collided;
   }
@@ -213,7 +207,7 @@ impl CollisionComponent {
   }
 
   pub fn component(&mut self) -> StandardComponent {
-      let self_colliding_objects = self.colliding_objects.clone();
+    let self_colliding_objects = self.colliding_objects.clone();
 
     StandardComponent::new(
       Rc::new(move |entity, store| unsafe {

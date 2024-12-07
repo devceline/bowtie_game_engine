@@ -1,5 +1,5 @@
-use std::rc::Rc;
 use std::cell::RefCell;
+use std::rc::Rc;
 
 extern crate gl;
 
@@ -13,7 +13,7 @@ use crate::gl_utils::vertex_array_buffer::VertexArrayBuffer;
 use crate::shapes::rectangle::Rectangle;
 use crate::sprites::drawable::Drawable;
 use crate::sprites::sprite::Sprite;
-use crate::{StandardEntity, Entity};
+use crate::{Entity, StandardEntity};
 
 #[derive(Clone)]
 pub struct DrawableData {
@@ -139,11 +139,11 @@ impl Drawer {
     let textures = entities
       .iter()
       .filter_map(|entitiy_option| {
-          if let Some(entity) = entitiy_option {
-            return Some(entity.borrow().get_drawable().texture.to_owned())
-          }
+        if let Some(entity) = entitiy_option {
+          return Some(entity.borrow().get_drawable().texture.to_owned());
+        }
 
-          None
+        None
       })
       .collect::<Vec<Texture>>();
 
@@ -178,7 +178,7 @@ impl Drawer {
       let entity_option = &entities[i];
 
       if entity_option.is_none() {
-          continue;
+        continue;
       }
 
       let entity = entity_option.as_ref().unwrap();

@@ -1,4 +1,4 @@
-use crate::{Color, Shape, Direction};
+use crate::{Color, Direction, Shape};
 
 #[derive(Debug, Copy, Clone)]
 pub struct HollowRectangle {
