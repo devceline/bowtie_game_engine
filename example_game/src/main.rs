@@ -1,6 +1,8 @@
 use std::rc::Rc;
 use std::cell::RefCell;
 
+use tokio::time::{sleep, Duration};
+
 extern crate bowtie;
 extern crate futures;
 extern crate rand;
@@ -12,7 +14,7 @@ use rand::Rng;
 
 use bowtie::{
   premade_components::{CollisionComponent, GravityComponent, KeyboardMoveComponent},
-  BowTie, Direction, Entity, Message, Rectangle, Sprite, StandardComponent,
+  BowTie, Direction, Entity, Message, Rectangle, Sprite, StandardComponent, Color,
   StandardEntity, Texture, TextureOptions, COLORS, WindowMode, WindowConfig, glfw
 };
 
@@ -22,7 +24,7 @@ fn main() {
   let mut collision = CollisionComponent::new();
   let rand_move1 = RandMove::new();
   let mut gravity = GravityComponent::new(0.002);
-  let mut keyboard_move = KeyboardMoveComponent::new(0.05);
+  let mut keyboard_move = KeyboardMoveComponent::new(0.02);
 
   let collision_comp = collision.component();
   let rand_comp = rand_move1.component();
@@ -67,6 +69,24 @@ fn main() {
       )
   );
 
+  let floor = Rc::new(
+      RefCell::new(
+          StandardEntity::new(
+              Sprite::new(
+                  Rectangle::new(
+                      -1.0, -0.5, 2.0, 0.02, 
+                      Color::new(1.0, 1.0, 1.0, 0.1)
+                  ),
+                  Texture::none()
+              ),
+              0.0,
+              Box::new(vec![])
+          )
+      )
+  );
+
+  floor.borrow_mut().load_component(collision_comp.to_owned());
+
   let playable_character = Rc::new(
       RefCell::new(
           StandardEntity::new(
@@ -80,12 +100,14 @@ fn main() {
           )
       ));
 
+  playable_character.borrow_mut().load_component(collision_comp.to_owned());
+  playable_character.borrow_mut().load_component(keyboard_move_comp.to_owned());
+  playable_character.borrow_mut().load_component(gravity_comp.to_owned());
 
-  playable_character.borrow_mut().load_components(collision_comp.to_owned());
-  playable_character.borrow_mut().load_components(keyboard_move_comp.to_owned());
 
   bowtie.load_entity(Rc::clone(&backdrop));
   bowtie.load_entity(Rc::clone(&playable_character));
+  bowtie.load_entity(Rc::clone(&floor));
 
   //TODO: Make hollow rectangle
   // let line_thickness = 0.01;
@@ -124,26 +146,34 @@ fn main() {
         glfw::WindowEvent::Key(glfw::Key::E, _, glfw::Action::Press, _) => {
             playable_character.borrow_mut().sprite.set_texture(witch_new_texture.clone())
         }
+
+        glfw::WindowEvent::Key(glfw::Key::R, _, glfw::Action::Press, _) => {
+            playable_character.borrow_mut().set_x(0.0);
+            playable_character.borrow_mut().set_y(0.0);
+        }
         glfw::WindowEvent::Key(glfw::Key::O, _, glfw::Action::Press, _) => {
-          //for _ in 0..100 {
-          //  let mut rand_entity = StandardEntity::new(
-          //    Sprite::new(
-          //      Rectangle::new(
-          //        rand::thread_rng().gen_range(-1.0..1.0) - 0.1,
-          //        rand::thread_rng().gen_range(-1.0..1.0) + 0.3,
-          //        0.2,
-          //        0.3,
-          //        COLORS::Red.into(),
-          //      ),
-          //      Texture::from(&witch_texture),
-          //    ),
-          //    2.0,
-          //  );
-          //  //rand_entity.load_components(rand_move1.component());
-          //  rand_entity.load_components(gravity_comp.to_owned());
-          //  bowtie.load_entity(rand_entity);
-          //}
-          //println!("Handling {} entities", bowtie.get_entity_count());
+          for _ in 0..100 {
+            let rand_entity = Rc::new(RefCell::new(
+StandardEntity::new(
+              Sprite::new(
+                Rectangle::new(
+                  rand::thread_rng().gen_range(-1.0..1.0) - 0.1,
+                  rand::thread_rng().gen_range(-1.0..1.0) + 0.3,
+                  0.06,
+                  0.08,
+                  Color::new(1.0, 0.0, 0.0, 0.3),
+                ),
+                Texture::from(&witch_new_texture),
+              ),
+              2.0,
+              Box::new(vec![])
+            )
+            ));
+            //rand_entity.load_components(rand_move1.component());
+            rand_entity.borrow_mut().load_component(gravity_comp.to_owned());
+            bowtie.load_entity(rand_entity);
+          }
+          println!("Handling {} entities", bowtie.get_entity_count());
         }
         _ => {}
       }

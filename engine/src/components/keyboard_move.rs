@@ -88,6 +88,16 @@ impl KeyboardMoveComponent {
         mutable_entity.set_direction(current_direction.subtract_direction(Direction::Right));
       }
 
+      glfw::WindowEvent::Key(glfw::Key::D, _, glfw::Action::Press, _) => {
+        mutable_entity.set_direction(current_direction.add_direction(Direction::Right));
+      }
+      glfw::WindowEvent::Key(glfw::Key::D, _, glfw::Action::Repeat, _) => {
+        mutable_entity.set_direction(current_direction.add_direction(Direction::Right));
+      }
+      glfw::WindowEvent::Key(glfw::Key::D, _, glfw::Action::Release, _) => {
+        mutable_entity.set_direction(current_direction.subtract_direction(Direction::Right));
+      }
+
       glfw::WindowEvent::Key(glfw::Key::Left, _, glfw::Action::Press, _) => {
        mutable_entity.set_direction(current_direction.add_direction(Direction::Left));
       }
@@ -95,6 +105,17 @@ impl KeyboardMoveComponent {
         mutable_entity.set_direction(current_direction.add_direction(Direction::Left));
       }
       glfw::WindowEvent::Key(glfw::Key::Left, _, glfw::Action::Release, _) => {
+        mutable_entity.set_direction(current_direction.subtract_direction(Direction::Left));
+      }
+
+
+      glfw::WindowEvent::Key(glfw::Key::A, _, glfw::Action::Press, _) => {
+       mutable_entity.set_direction(current_direction.add_direction(Direction::Left));
+      }
+      glfw::WindowEvent::Key(glfw::Key::A, _, glfw::Action::Repeat, _) => {
+        mutable_entity.set_direction(current_direction.add_direction(Direction::Left));
+      }
+      glfw::WindowEvent::Key(glfw::Key::A, _, glfw::Action::Release, _) => {
         mutable_entity.set_direction(current_direction.subtract_direction(Direction::Left));
       }
 
@@ -116,6 +137,10 @@ impl KeyboardMoveComponent {
       }
       glfw::WindowEvent::Key(glfw::Key::Down, _, glfw::Action::Release, _) => {
         mutable_entity.set_direction(current_direction.subtract_direction(Direction::Down));
+      }
+
+      glfw::WindowEvent::Key(glfw::Key::Space, _, glfw::Action::Press, _) => {
+        mutable_entity.move_in_direction(Direction::Up, 0.3);
       }
       _ => {}
     }

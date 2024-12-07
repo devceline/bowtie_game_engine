@@ -93,7 +93,7 @@ impl CollisionComponent {
     }
 
     if down_collision {
-      direction = direction.add_direction(Direction::Down);
+      direction = Direction::Down;
     }
     else if up_collision {
       direction = direction.add_direction(Direction::Up);
@@ -216,7 +216,6 @@ impl CollisionComponent {
       let self_colliding_objects = self.colliding_objects.clone();
 
     StandardComponent::new(
-
       Rc::new(move |entity, store| unsafe {
         let new_collision_direction =
           CollisionComponent::get_final_collission_direction(

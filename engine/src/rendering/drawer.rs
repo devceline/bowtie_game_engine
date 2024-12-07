@@ -31,7 +31,7 @@ pub struct Drawer {
   texture_loader: TextureLoader,
   elements_count: i32,
   drawables: Vec<DrawableData>,
-  entities: *const Vec<Rc<RefCell<StandardEntity>>>,
+  entities: *const Vec<Option<Rc<RefCell<StandardEntity>>>>,
 }
 
 impl Drawer {
@@ -138,8 +138,12 @@ impl Drawer {
     let entities = unsafe { self.entities.as_ref().unwrap() };
     let textures = entities
       .iter()
-      .map(|entitiy| {
-        entitiy.borrow_mut().get_drawable().texture.to_owned()
+      .filter_map(|entitiy_option| {
+          if let Some(entity) = entitiy_option {
+            return Some(entity.borrow().get_drawable().texture.to_owned())
+          }
+
+          None
       })
       .collect::<Vec<Texture>>();
 
@@ -154,7 +158,7 @@ impl Drawer {
 
   pub fn set_entities_array(
     &mut self,
-    entities: *const Vec<Rc<RefCell<StandardEntity>>>,
+    entities: *const Vec<Option<Rc<RefCell<StandardEntity>>>>,
   ) {
     self.entities = entities;
   }
@@ -171,7 +175,13 @@ impl Drawer {
     let len = entities.len();
 
     for i in 0..len {
-      let entity = &entities[i];
+      let entity_option = &entities[i];
+
+      if entity_option.is_none() {
+          continue;
+      }
+
+      let entity = entity_option.as_ref().unwrap();
 
       let drawable = entity.borrow_mut().get_drawable();
       self

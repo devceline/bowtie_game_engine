@@ -28,7 +28,7 @@ pub trait Entity {
   fn get_width(&self) -> f32;
 
   fn get_components(&self) -> &Vec<Rc<StandardComponent>>;
-  fn load_components(&mut self, component: StandardComponent);
+  fn load_component(&mut self, component: StandardComponent);
 
   /// Implementing this will usually involve pattern matching or if statements
   /// to act depending on the type of message.
@@ -122,7 +122,6 @@ impl StandardEntity {
   }
 
   pub fn animate(&mut self) {
-    println!("Animating.. last_running_idx: {}, speed: {}", self.last_running_idx, self.speed);
     if self.get_speed() > 0.0 {
       self.last_running_idx = (self.last_running_idx + 1) % self.running_frames.len();
       self.sprite.set_texture(self.running_frames[self.last_running_idx].clone());
@@ -174,7 +173,7 @@ impl Entity for StandardEntity {
     &self.components
   }
 
-  fn load_components(&mut self, component: StandardComponent) {
+  fn load_component(&mut self, component: StandardComponent) {
     self.components.push(Rc::new(component));
   }
 

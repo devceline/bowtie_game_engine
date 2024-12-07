@@ -1,5 +1,6 @@
 use std::rc::Rc;
 use std::cell::RefCell;
+use std::collections::VecDeque;
 
 extern crate gl;
 extern crate glfw;
@@ -25,7 +26,8 @@ use super::entity::StandardEntity;
 /// Will be responsible for rendering, handling physics systems
 /// And controlling the game's state through entitiy data
 pub struct BowTie {
-  entities: Vec<Rc<RefCell<StandardEntity>>>,
+  entities: Vec<Option<Rc<RefCell<StandardEntity>>>>,
+  free_entity_slots: VecDeque<usize>,
   drawer: Drawer,
   shading_program: ShaderProgram,
   glfw_instance: glfw::Glfw,
@@ -97,6 +99,7 @@ impl BowTie {
   pub fn new() -> BowTie {
     let mut bowtie = BowTie {
       entities: vec![],
+      free_entity_slots: VecDeque::from([]),
       drawer: Drawer::shell(),
       shading_program: ShaderProgram::shell(),
       glfw_instance: glfw::init(glfw::FAIL_ON_ERRORS).unwrap(),
@@ -112,11 +115,24 @@ impl BowTie {
   pub fn load_entity(
     &mut self,
     entity: Rc<RefCell<StandardEntity>>,
-  ) {
-    self.entities.push(entity);
+  ) -> usize {
+    let free_idx = self.free_entity_slots.pop_front();
+    match free_idx {
+      Option::Some(idx) => {
+        self.entities[idx] = Option::from(entity);
+        return idx;
+      },
+      Option::None => {
+        self.entities.push(Option::from(entity));
+        return self.entities.len() - 1
+      }
+    }
   }
 
-  pub fn unload_entity(&mut self, _entity: StandardEntity) {}
+  pub fn unload_entity(&mut self, entity_id: usize) {
+      self.entities[entity_id] = Option::None;
+      self.free_entity_slots.push_back(entity_id);
+  }
 
   pub fn get_entity_count(&self) -> usize {
     self.entities.len()
@@ -124,8 +140,10 @@ impl BowTie {
 
   /// Updates the entities with the existing systems
   pub fn update_entities(&mut self) {
-    for entity in self.entities.iter_mut() {
-      entity.borrow_mut().act_on_components();
+    for entity_option in self.entities.iter_mut() {
+      if let Some(entity) = entity_option {
+        entity.borrow_mut().act_on_components();
+      }
     }
   }
 
