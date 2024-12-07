@@ -2,15 +2,10 @@ use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
 
-use tokio::time::{sleep, Duration};
-
 extern crate bowtie;
 extern crate futures;
 extern crate rand;
 
-mod components;
-
-use components::rand_move::RandMove;
 use rand::Rng;
 
 use bowtie::{
@@ -46,8 +41,7 @@ fn main() {
   let witch_new_texture =
     Texture::new("witch_walk_1", TextureOptions::default());
 
-  let bat_texture =
-      Texture::new("bat_fly_1", TextureOptions::default());
+  let bat_texture = Texture::new("bat_fly_1", TextureOptions::default());
 
   let backdrop_texture = Texture::new("backdrop", TextureOptions::default());
 
@@ -64,36 +58,40 @@ fn main() {
     ]
     .iter()
     .map(|image_file_name| {
-      Texture::new(image_file_name, TextureOptions::default())
-    }),
+      let original_texture =
+        Texture::new(image_file_name, TextureOptions::default());
+      let ref_copy = Texture::from(&original_texture);
+      return [original_texture, ref_copy];
+    })
+    .flatten(),
   ));
 
-      let bat_fly_1 = Texture::new("bat_fly_1", TextureOptions::default());
-      let bat_fly_2 = Texture::new("bat_fly_2", TextureOptions::default());
+  let bat_fly_1 = Texture::new("bat_fly_1", TextureOptions::default());
+  let bat_fly_2 = Texture::new("bat_fly_2", TextureOptions::default());
 
   let flying_frames = Rc::new(vec![
-      Texture::from(&bat_fly_1),
-      Texture::from(&bat_fly_1),
-      Texture::from(&bat_fly_1),
-      Texture::from(&bat_fly_1),
-      Texture::from(&bat_fly_1),
-      Texture::from(&bat_fly_1),
-      Texture::from(&bat_fly_1),
-      Texture::from(&bat_fly_1),
-      Texture::from(&bat_fly_2),
-      Texture::from(&bat_fly_2),
-      Texture::from(&bat_fly_2),
-      Texture::from(&bat_fly_2),
-      Texture::from(&bat_fly_2),
-      Texture::from(&bat_fly_2),
-      Texture::from(&bat_fly_2),
-      Texture::from(&bat_fly_2),
-      Texture::from(&bat_fly_2),
-      Texture::from(&bat_fly_2),
-      Texture::from(&bat_fly_2),
-      Texture::from(&bat_fly_2),
-      Texture::from(&bat_fly_2),
-      Texture::from(&bat_fly_2),
+    Texture::from(&bat_fly_1),
+    Texture::from(&bat_fly_1),
+    Texture::from(&bat_fly_1),
+    Texture::from(&bat_fly_1),
+    Texture::from(&bat_fly_1),
+    Texture::from(&bat_fly_1),
+    Texture::from(&bat_fly_1),
+    Texture::from(&bat_fly_1),
+    Texture::from(&bat_fly_2),
+    Texture::from(&bat_fly_2),
+    Texture::from(&bat_fly_2),
+    Texture::from(&bat_fly_2),
+    Texture::from(&bat_fly_2),
+    Texture::from(&bat_fly_2),
+    Texture::from(&bat_fly_2),
+    Texture::from(&bat_fly_2),
+    Texture::from(&bat_fly_2),
+    Texture::from(&bat_fly_2),
+    Texture::from(&bat_fly_2),
+    Texture::from(&bat_fly_2),
+    Texture::from(&bat_fly_2),
+    Texture::from(&bat_fly_2),
   ]);
 
   let backdrop = Rc::new(RefCell::new(StandardEntity::new(
@@ -118,7 +116,7 @@ fn main() {
 
   let playable_character = Rc::new(RefCell::new(StandardEntity::new(
     Sprite::new(
-      Rectangle::new(0.5, 0.0, 0.07, 0.15, COLORS::White.into()),
+      Rectangle::new(0.5, 0.0, 0.06, 0.15, COLORS::White.into()),
       Texture::from(&witch_new_texture),
     ),
     0.0,
@@ -134,45 +132,37 @@ fn main() {
 
   let circle_move = StandardComponent::new(
     Rc::new(|entity, _| {
-        let current_direction = entity.get_direction();
-        let current_speed = entity.get_speed();
-        let next_direction = if current_speed >= 0.008 {
-match current_direction {
-            Direction::UpLeft => {
-                Direction::UpRight
-            },
-            Direction::UpRight => {
-                Direction::DownRight
-            },
-            Direction::DownRight => {
-                Direction::DownLeft
-            },
-            Direction::DownLeft => {
-                Direction::UpLeft
-            },
-            Direction::Stationary => {
-                match rand::thread_rng().gen_range(1..4) {
-                    1 => Direction::UpLeft,
-                    2 => Direction::UpRight,
-                    3 => Direction::DownLeft,
-                    4 => Direction::DownRight,
-                    _ => Direction::DownRight
-                }
-            }
-            _ => {
-                panic!("CIrcle Move does not support external movement.")
-            }
+      let current_direction = entity.get_direction();
+      let current_speed = entity.get_speed();
+      let next_direction = if current_speed >= 0.008 {
+        match current_direction {
+          Direction::UpLeft => Direction::UpRight,
+          Direction::UpRight => Direction::DownRight,
+          Direction::DownRight => Direction::DownLeft,
+          Direction::DownLeft => Direction::UpLeft,
+          Direction::Stationary => match rand::thread_rng().gen_range(1..4) {
+            1 => Direction::UpLeft,
+            2 => Direction::UpRight,
+            3 => Direction::DownLeft,
+            4 => Direction::DownRight,
+            _ => Direction::DownRight,
+          },
+          _ => {
+            panic!("CIrcle Move does not support external movement.")
+          }
         }
-        } else { current_direction };
-        entity.set_direction(next_direction);
-        entity.move_in_direction(next_direction, entity.get_speed());
+      } else {
+        current_direction
+      };
+      entity.set_direction(next_direction);
+      entity.move_in_direction(next_direction, entity.get_speed() * rand::thread_rng().gen_range(0.85..1.8),
+          );
 
-        if current_direction != next_direction {
-            entity.set_speed(0.0)
-        }
-        else {
-            entity.set_speed(current_speed + 0.0005);
-        }
+      if current_direction != next_direction {
+        entity.set_speed(0.001)
+      } else {
+        entity.set_speed(current_speed + 0.0005);
+      }
     }),
     "circle_move",
     HashMap::new(),
@@ -182,13 +172,22 @@ match current_direction {
 
   let mut bats: Vec<Rc<RefCell<StandardEntity>>> = vec![];
 
-  for i in 0..100 {
+  for _ in 0..600 {
     let bat = Rc::new(RefCell::new(StandardEntity::new(
       Sprite::new(
-        Rectangle::new((
-        ((i % 20) as f32) - 9.8)/10.0,
-        rand::thread_rng().gen_range(-0.4..0.9),
-        0.07, 0.11, COLORS::White.into()),
+        Rectangle::new(
+          // (((i % 20) as f32) - 9.8) / 10.0,
+          rand::thread_rng().gen_range(-0.94..0.95),
+          rand::thread_rng().gen_range(-0.4..0.95),
+          0.07,
+          0.11,
+          Color::new(
+          rand::thread_rng().gen_range(0.0..1.0),
+          rand::thread_rng().gen_range(0.0..1.0),
+          rand::thread_rng().gen_range(0.0..1.0),
+          rand::thread_rng().gen_range(0.7..0.8),
+          )
+        ),
         Texture::from(&bat_texture),
       ),
       0.0,
@@ -209,10 +208,10 @@ match current_direction {
     bowtie.tick();
     let events = bowtie.flush_events();
 
-      playable_character.borrow_mut().animate();
-      for bat in &bats {
-          bat.borrow_mut().animate();
-      } 
+    playable_character.borrow_mut().animate();
+    for bat in &bats {
+      bat.borrow_mut().animate();
+    }
 
     for event in events {
       keyboard_move.listen_for_event(Rc::clone(&playable_character), &event);

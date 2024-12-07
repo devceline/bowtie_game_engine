@@ -131,8 +131,21 @@ impl BowTie {
     self.free_entity_slots.push_back(entity_id);
   }
 
+  pub fn unload_entities_out_of_view(&mut self) {
+      let entities_count = self.entities.len();
+      for entity_idx in  0..entities_count {
+          if let Some(entity) = &self.entities[entity_idx] {
+              let entity_is_out_of_horizontal_view = entity.borrow().sprite.get_x() > 1.0 || entity.borrow().sprite.get_x() < -1.0;
+              let entity_is_out_of_vertical_view = entity.borrow().sprite.get_y() > 1.0 || entity.borrow().sprite.get_y() < -1.0;
+              if  entity_is_out_of_vertical_view || entity_is_out_of_horizontal_view {
+                self.unload_entity(entity_idx);
+              }
+          }
+      }
+  }
+
   pub fn get_entity_count(&self) -> usize {
-    self.entities.len()
+    self.entities.len() - self.free_entity_slots.len()
   }
 
   /// Updates the entities with the existing systems
@@ -244,6 +257,7 @@ impl BowTie {
   }
 
   pub fn tick(&mut self) {
+    self.unload_entities_out_of_view();
     self.window.as_mut().unwrap().swap_buffers();
     self.glfw_instance.poll_events();
     self.update_entities();
@@ -257,4 +271,5 @@ impl BowTie {
   pub fn set_should_close(&mut self, should: bool) {
     self.window.as_mut().unwrap().set_should_close(should)
   }
+
 }

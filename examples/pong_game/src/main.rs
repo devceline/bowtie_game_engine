@@ -131,10 +131,11 @@ fn main() {
   );
 
   player_rect.load_components(keyboard_move_comp);
-
   player_rect.load_components(collision_comp.to_owned());
+
   enemy_rect.load_components(collision_comp.to_owned());
   enemy_rect.load_components(follow_ball_comp.to_owned());
+
   ball.load_components(collision_comp.to_owned());
   ball.load_components(move_till_collide);
 
