@@ -11,23 +11,25 @@ use rand::Rng;
 use bowtie::{
   glfw,
   premade_components::{
-    CollisionComponent, GravityComponent, KeyboardMoveComponent,
+    CollisionComponent, 
+    GravityComponent, 
+    KeyboardMoveComponent,
   },
-  BowTie, Color, Direction, Entity, Message, Rectangle, Sprite,
-  StandardComponent, StandardEntity, Texture, TextureOptions, WindowConfig,
-  WindowMode, COLORS,
+  BowTie, Color, Direction, Entity, 
+  Rectangle, Sprite, StandardComponent, 
+  StandardEntity, Texture, TextureOptions, 
+  WindowConfig, WindowMode, COLORS,
 };
 
 fn main() {
-  let mut collision = CollisionComponent::new();
-  let mut gravity = GravityComponent::new(0.002);
-  let mut keyboard_move = KeyboardMoveComponent::new(0.01);
+  let collision_comp = CollisionComponent::new().component();
+  let gravity_comp = GravityComponent::new(0.002).component();
 
-  let collision_comp = collision.component();
-  let gravity_comp = gravity.component();
+  let mut keyboard_move = KeyboardMoveComponent::new(0.01);
   let keyboard_move_comp = keyboard_move.component();
 
   let mut bowtie = BowTie::new();
+
   bowtie.create_window(WindowConfig {
     width: 1400,
     height: 900,
@@ -41,9 +43,11 @@ fn main() {
   let witch_new_texture =
     Texture::new("witch_walk_1", TextureOptions::default());
 
-  let bat_texture = Texture::new("bat_fly_1", TextureOptions::default());
+  let bat_texture = 
+      Texture::new("bat_fly_1", TextureOptions::default());
 
-  let backdrop_texture = Texture::new("backdrop", TextureOptions::default());
+  let backdrop_texture = 
+      Texture::new("backdrop", TextureOptions::default());
 
   let running_frames = Rc::new(Vec::from_iter(
     vec![
@@ -58,6 +62,7 @@ fn main() {
     ]
     .iter()
     .map(|image_file_name| {
+      // Duplicate sprite frames to artificially elongate animation
       let original_texture =
         Texture::new(image_file_name, TextureOptions::default());
       let ref_copy = Texture::from(&original_texture);
@@ -69,6 +74,8 @@ fn main() {
   let bat_fly_1 = Texture::new("bat_fly_1", TextureOptions::default());
   let bat_fly_2 = Texture::new("bat_fly_2", TextureOptions::default());
 
+  // Custom timing
+  // TODO: Figure out a cleaner solution for timing.
   let flying_frames = Rc::new(vec![
     Texture::from(&bat_fly_1),
     Texture::from(&bat_fly_1),
@@ -116,7 +123,7 @@ fn main() {
 
   let playable_character = Rc::new(RefCell::new(StandardEntity::new(
     Sprite::new(
-      Rectangle::new(0.5, 0.0, 0.06, 0.15, COLORS::White.into()),
+      Rectangle::new(0.5, 0.0, 0.06, 0.15, Color::new(0.8, 0.8, 1.0, 0.95)),
       Texture::from(&witch_new_texture),
     ),
     0.0,
@@ -134,7 +141,11 @@ fn main() {
     Rc::new(|entity, _| {
       let current_direction = entity.get_direction();
       let current_speed = entity.get_speed();
-      let next_direction = if current_speed >= 0.008 {
+
+      let min_speed = 0.001;
+      let max_speed = 0.005;
+
+      let next_direction = if current_speed >= max_speed {
         match current_direction {
           Direction::UpLeft => Direction::UpRight,
           Direction::UpRight => Direction::DownRight,
@@ -160,21 +171,28 @@ fn main() {
         entity.get_speed() * rand::thread_rng().gen_range(0.85..1.8),
       );
 
-      if current_direction != next_direction {
-        entity.set_speed(0.001)
-      } else {
-        entity.set_speed(current_speed + 0.0005);
+
+      let entity_acceleration = entity.get_acceleration();
+
+      if current_speed >= max_speed {
+          entity.set_acceleration(entity_acceleration * -1.0)
       }
+
+      if (current_speed + entity_acceleration <= min_speed) && (entity_acceleration < 0.0) {
+          entity.set_acceleration(entity_acceleration * -1.0)
+      }
+
+      let next_speed = current_speed + entity.get_acceleration();
+
+      entity.set_speed(next_speed);
     }),
     "circle_move",
     HashMap::new(),
   );
 
-  bowtie.load_entity(Rc::clone(&backdrop));
-
   let mut bats: Vec<Rc<RefCell<StandardEntity>>> = vec![];
 
-  for _ in 0..600 {
+  for _ in 0..200 {
     let bat = Rc::new(RefCell::new(StandardEntity::new(
       Sprite::new(
         Rectangle::new(
@@ -199,6 +217,8 @@ fn main() {
     bats.push(bat);
   }
 
+  bowtie.load_entity(Rc::clone(&backdrop));
+
   for bat in &bats {
     bowtie.load_entity(Rc::clone(&bat));
   }
@@ -208,12 +228,15 @@ fn main() {
 
   while !bowtie.should_close() {
     bowtie.tick();
-    let events = bowtie.flush_events();
 
     playable_character.borrow_mut().animate();
+
     for bat in &bats {
       bat.borrow_mut().animate();
     }
+
+    let events = bowtie.flush_events();
+
 
     for event in events {
       keyboard_move.listen_for_event(Rc::clone(&playable_character), &event);
@@ -222,9 +245,11 @@ fn main() {
         glfw::WindowEvent::Key(glfw::Key::Escape, _, _, _) => {
           bowtie.set_should_close(true);
         }
+        glfw::WindowEvent::Key(glfw::Key::Q, _, _, _) => {
+          bowtie.set_should_close(true);
+        }
         glfw::WindowEvent::Key(glfw::Key::E, _, glfw::Action::Press, _) => {
-          playable_character
-            .borrow_mut()
+          playable_character.borrow_mut()
             .sprite
             .set_texture(witch_new_texture.clone())
         }
@@ -233,6 +258,7 @@ fn main() {
           playable_character.borrow_mut().set_x(0.0);
           playable_character.borrow_mut().set_y(0.0);
         }
+
         glfw::WindowEvent::Key(glfw::Key::O, _, glfw::Action::Press, _) => {
           for _ in 0..100 {
             let rand_entity = Rc::new(RefCell::new(StandardEntity::new(
@@ -249,11 +275,11 @@ fn main() {
               2.0,
               Rc::new(vec![]),
             )));
-            //rand_entity.load_components(rand_move1.component());
             rand_entity
               .borrow_mut()
               .load_component(gravity_comp.to_owned());
-            let rand_entity_id = bowtie.load_entity(rand_entity);
+
+            bowtie.load_entity(Rc::clone(&rand_entity));
           }
           println!("Handling {} entities", bowtie.get_entity_count());
         }

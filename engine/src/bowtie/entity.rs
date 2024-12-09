@@ -38,6 +38,7 @@ pub trait Entity {
 pub struct StandardEntity {
   pub sprite: Sprite<Rectangle>,
   speed: f32,
+  acceleration: f32,
   components: Vec<Rc<StandardComponent>>,
   direction: Direction,
   collision_direction: Direction,
@@ -54,6 +55,7 @@ impl StandardEntity {
     StandardEntity {
       sprite,
       speed,
+      acceleration: 0.0005,
       components: vec![],
       direction: Direction::Stationary,
       collision_direction: Direction::Stationary,
@@ -105,6 +107,14 @@ impl StandardEntity {
 
   pub fn set_speed(&mut self, speed: f32) -> () {
     self.speed = speed;
+  }
+
+  pub fn get_acceleration(&self) -> f32 {
+    self.acceleration
+  }
+
+  pub fn set_acceleration(&mut self, acceleration: f32) -> () {
+    self.acceleration = acceleration;
   }
 
   // TODO: Figure out a way to make this safe

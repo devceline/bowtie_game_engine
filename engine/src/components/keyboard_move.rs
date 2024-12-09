@@ -13,17 +13,13 @@ use crate::{
 
 #[derive(Clone)]
 pub struct KeyboardMoveComponent {
-  next_direction: Direction,
   top_speed: f32,
-  _marker: PhantomData<f32>,
 }
 
 impl KeyboardMoveComponent {
   pub fn new(top_speed: f32) -> KeyboardMoveComponent {
     KeyboardMoveComponent {
-      next_direction: Direction::Stationary,
       top_speed,
-      _marker: PhantomData,
     }
   }
 
@@ -157,7 +153,7 @@ impl KeyboardMoveComponent {
       }
 
       glfw::WindowEvent::Key(glfw::Key::Space, _, glfw::Action::Press, _) => {
-        mutable_entity.move_in_direction(Direction::Up, 0.3);
+        mutable_entity.move_in_direction(current_direction.add_direction(Direction::Up), 0.05);
       }
       _ => {}
     }
